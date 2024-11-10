@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("api/users")
 public class UserProfileController {
-    @PutMapping(value="update", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value="", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> updateProfile(@RequestBody RegisterDTO registerDTO) {
         if(registerDTO.getEmail().equals("good@gmail.com")) {
             return new ResponseEntity<String>(HttpStatus.OK);
