@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("api/auth")
+@RequestMapping("/api/auth")
 public class AuthenticationController {
-    @PostMapping(value = "login", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> login(@RequestBody LoginDTO loginDTO) {
         if(Objects.equals(loginDTO.getEmail(), "good@email.com")) {
             return new ResponseEntity<String>("JWT Token", HttpStatus.OK);
@@ -21,16 +21,16 @@ public class AuthenticationController {
         return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
     }
 
-    @PostMapping(value = "register", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> login(@RequestBody RegisterDTO registerDTO) {
         if(Objects.equals(registerDTO.getEmail(), "good@email.com")) {
-            return new ResponseEntity<String>(HttpStatus.OK);
+            return new ResponseEntity<String>(HttpStatus.CREATED);
         }
 
         return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
     }
 
-    @PutMapping(value="register/{id}")
+    @PutMapping(value="/register/{id}")
     public ResponseEntity<String> confirmRegistration(@PathVariable Long id) {
         if(id == 5) {
             return new ResponseEntity<String>("JWT Token", HttpStatus.OK);
