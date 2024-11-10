@@ -1,6 +1,6 @@
 package org.example.eventy.users.dtos;
 
-public class RegisterDTO {
+public class UserDTO {
     private byte[][] profilePictures;
     private String email;
     private String password;
@@ -12,11 +12,11 @@ public class RegisterDTO {
     private String address;
     private String phoneNumber;
 
-    public RegisterDTO() {
+    public UserDTO() {
 
     }
 
-    public RegisterDTO(byte[][] profilePictures, String email, String password, String confirmedPassword, String firstName, String lastName, String name, String description, String address, String phoneNumber) {
+    public UserDTO(byte[][] profilePictures, String email, String password, String confirmedPassword, String firstName, String lastName, String name, String description, String address, String phoneNumber) {
         this.profilePictures = profilePictures;
         this.email = email;
         this.password = password;

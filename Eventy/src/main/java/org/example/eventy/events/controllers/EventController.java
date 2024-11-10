@@ -23,9 +23,9 @@ public class EventController {
         return new ResponseEntity<EventDTO>(HttpStatus.BAD_REQUEST);
     }
 
-    @GetMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EventDTO> getEvent(@PathVariable Long id) {
-        if(id == 5) {
+    @GetMapping(value = "/{eventId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EventDTO> getEvent(@PathVariable Long eventId) {
+        if(eventId == 5) {
             return new ResponseEntity<EventDTO>(new EventDTO(), HttpStatus.OK);
         }
 
@@ -46,5 +46,36 @@ public class EventController {
         }
 
         return new ResponseEntity<EventDTO>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping(value = "/favorite/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<EventDTO>> getFavoriteEvents(@PathVariable Long userId) {
+        if(userId == 5) {
+            List<EventDTO> events = new ArrayList<EventDTO>();
+            return new ResponseEntity<Collection<EventDTO>>(events, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<Collection<EventDTO>>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping(value = "/organized/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<EventDTO>> getEventsOrganizedByUser(@PathVariable Long userId) {
+        if(userId == 5) {
+            // check if this is a valid id of a organizer first
+            List<EventDTO> events = new ArrayList<EventDTO>();
+            return new ResponseEntity<Collection<EventDTO>>(events, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<Collection<EventDTO>>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping(value = "/accepted/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<EventDTO>> getAcceptedEventsByUser(@PathVariable Long userId) {
+        if(userId == 5) {
+            List<EventDTO> events = new ArrayList<EventDTO>();
+            return new ResponseEntity<Collection<EventDTO>>(events, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<Collection<EventDTO>>(HttpStatus.NOT_FOUND);
     }
 }

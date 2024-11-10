@@ -11,27 +11,27 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/events/pdfs")
 public class EventDownloadPDFController {
-    @GetMapping(value = "/details/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> downloadEventDetailsPDF(@PathVariable("id") Long id) {
-        if(id == 5) {
+    @GetMapping(value = "/details/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> downloadEventDetailsPDF(@PathVariable Long eventId) {
+        if(eventId == 5) {
             return new ResponseEntity<String>("Downloaded", HttpStatus.OK);
         }
 
         return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping(value = "/guest-list/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> downloadGuestListPDF(@PathVariable("id") Long id) {
-        if(id == 5) {
+    @GetMapping(value = "/guest-list/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> downloadGuestListPDF(@PathVariable Long eventId) {
+        if(eventId == 5) {
             return new ResponseEntity<String>("Downloaded", HttpStatus.OK);
         }
 
         return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping(value = "/stats/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> downloadEventStatsPDF(@PathVariable("id") Long id) {
-        if(id == 5) {
+    @GetMapping(value = "/stats/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> downloadEventStatsPDF(@PathVariable Long eventId) {
+        if(eventId == 5) {
             return new ResponseEntity<String>("Downloaded", HttpStatus.OK);
         }
 

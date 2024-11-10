@@ -28,9 +28,9 @@ public class ProductController {
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/provider/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<ProductDTO>> getProductsProvider(@PathVariable("id") Long id) {
-        if(id == 5) {
+    @GetMapping(value = "/provider/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<ProductDTO>> getProductsProvider(@PathVariable Long userId) {
+        if(userId == 5) {
             List<ProductDTO> products = new ArrayList<>();
             return new ResponseEntity<>(products, HttpStatus.OK);
         }

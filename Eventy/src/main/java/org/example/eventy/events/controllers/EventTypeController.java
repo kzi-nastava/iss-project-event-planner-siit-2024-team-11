@@ -26,9 +26,9 @@ public class EventTypeController {
         return new ResponseEntity<Collection<EventTypeDTO>>(eventTypes, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EventTypeDTO> getTypeById(@PathVariable Long id) {
-        if(id == 5) {
+    @GetMapping(value = "/{eventTypeId}",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EventTypeDTO> getTypeById(@PathVariable Long eventTypeId) {
+        if(eventTypeId == 5) {
             EventTypeDTO eventType = new EventTypeDTO();
             return new ResponseEntity<EventTypeDTO>(eventType, HttpStatus.OK);
         }
@@ -54,9 +54,9 @@ public class EventTypeController {
         return new ResponseEntity<EventTypeDTO>(HttpStatus.NOT_FOUND);
     }
 
-    @PutMapping(value = "/{id}")
-    public ResponseEntity<EventTypeDTO> deactivateType(@PathVariable Long id) {
-        if(id == 5) {
+    @PutMapping(value = "/{eventTypeId}")
+    public ResponseEntity<EventTypeDTO> deactivateType(@PathVariable Long eventTypeId) {
+        if(eventTypeId == 5) {
             return new ResponseEntity<EventTypeDTO>(HttpStatus.OK);
         }
 
