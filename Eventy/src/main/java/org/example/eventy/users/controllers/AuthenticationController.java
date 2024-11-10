@@ -30,7 +30,7 @@ public class AuthenticationController {
         return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping(value="register/{id}")
+    @PutMapping(value="register/{id}")
     public ResponseEntity<String> confirmRegistration(@PathVariable Long id) {
         if(id == 5) {
             return new ResponseEntity<String>("JWT Token", HttpStatus.OK);
