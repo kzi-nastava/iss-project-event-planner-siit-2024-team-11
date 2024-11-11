@@ -47,10 +47,10 @@ public class ProductController {
         return new ResponseEntity<ProductDTO>(HttpStatus.NOT_FOUND);
     }
 
-    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ProductDTO> deleteProduct(@RequestBody ProductDTO productDTO) {
-        if(productDTO.getName().equals("product")) {
-            return new ResponseEntity<ProductDTO>(productDTO, HttpStatus.OK);
+    @PutMapping(value = "{productId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ProductDTO> deleteProduct(@PathVariable Long productId) {
+        if(productId == 5) {
+            return new ResponseEntity<ProductDTO>(HttpStatus.OK);
         }
 
         return new ResponseEntity<ProductDTO>(HttpStatus.NOT_FOUND);

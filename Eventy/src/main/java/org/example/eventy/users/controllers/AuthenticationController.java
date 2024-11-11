@@ -22,7 +22,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> login(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<String> register(@RequestBody UserDTO userDTO) {
         if(Objects.equals(userDTO.getEmail(), "good@email.com")) {
             return new ResponseEntity<String>(HttpStatus.CREATED);
         }
