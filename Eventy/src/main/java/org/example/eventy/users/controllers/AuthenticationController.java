@@ -1,6 +1,7 @@
 package org.example.eventy.users.controllers;
 
 import org.example.eventy.users.dtos.LoginDTO;
+import org.example.eventy.users.dtos.RegistrationDTO;
 import org.example.eventy.users.dtos.UserDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,32 +13,36 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthenticationController {
-    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> login(@RequestBody LoginDTO loginDTO) {
-        if(Objects.equals(loginDTO.getEmail(), "good@email.com")) {
-            return new ResponseEntity<String>("JWT Token", HttpStatus.OK);
+        if(loginDTO.getEmail().equals("good@gmail.com")) {
+            return new ResponseEntity<>("JWT Token", HttpStatus.OK);
         }
 
-        return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
-    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> register(@RequestBody UserDTO userDTO) {
-        if(Objects.equals(userDTO.getEmail(), "good@email.com")) {
-            return new ResponseEntity<String>(HttpStatus.CREATED);
+    @PostMapping(value = "/registration", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<String> register(@RequestBody RegistrationDTO registrationDTO) {
+        if(registrationDTO.getEmail().equals("good@gmail.com")) {
+            return new ResponseEntity<String>("Confirmation email sent to the email address!", HttpStatus.CREATED);
         }
 
-        return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<String>("Validation failed!", HttpStatus.BAD_REQUEST);
     }
 
-    @PutMapping(value="/register/{userId}")
-    public ResponseEntity<String> confirmRegistration(@PathVariable Long userId) {
-        if(userId == 5) {
+    @PutMapping(value="/registration-confirmation/{requestId}", produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<String> confirmRegistration(@PathVariable Long requestId) {
+        if(requestId == 5) {
             return new ResponseEntity<String>("JWT Token", HttpStatus.OK);
             // redirect to the home page?
         }
 
-        return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+        if(requestId == 100) {
+            return new ResponseEntity<String>("24 hours have passed!", HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>("Registration request not found!", HttpStatus.NOT_FOUND);
         // redirect to some kind of error page?
     }
 }

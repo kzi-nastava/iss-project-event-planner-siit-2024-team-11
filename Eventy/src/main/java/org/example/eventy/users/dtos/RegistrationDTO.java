@@ -2,8 +2,7 @@ package org.example.eventy.users.dtos;
 
 import java.util.List;
 
-public class UserDTO {
-    private Long id;
+public class RegistrationDTO {
     private List<String> profilePictures;
     private String email;
     private String password;
@@ -15,12 +14,11 @@ public class UserDTO {
     private String address;
     private String phoneNumber;
 
-    public UserDTO() {
+    public RegistrationDTO() {
 
     }
 
-    public UserDTO(Long id, List<String> profilePictures, String email, String password, String confirmedPassword, String firstName, String lastName, String name, String description, String address, String phoneNumber) {
-        this.id = id;
+    public RegistrationDTO(List<String> profilePictures, String email, String password, String confirmedPassword, String firstName, String lastName, String name, String description, String address, String phoneNumber) {
         this.profilePictures = profilePictures;
         this.email = email;
         this.password = password;
@@ -31,14 +29,6 @@ public class UserDTO {
         this.description = description;
         this.address = address;
         this.phoneNumber = phoneNumber;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public List<String> getProfilePictures() {
