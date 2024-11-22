@@ -4,13 +4,15 @@ import java.util.ArrayList;
 
 public class Budget {
     private ArrayList<BudgetItem> budgetedItems;
+    private Event event;
 
     public Budget() {
         this.budgetedItems = new ArrayList<>();
     }
 
-    public Budget(ArrayList<BudgetItem> budgetedItems) {
+    public Budget(ArrayList<BudgetItem> budgetedItems, Event event) {
         this.budgetedItems = budgetedItems;
+        this.event = event;
     }
 
     public boolean isOverbudget() {
