@@ -3,7 +3,7 @@ package org.example.eventy.solutions.models;
 import org.example.eventy.common.models.ReservationConfirmationType;
 
 public class Service extends Solution {
-    private ServiceHistory previousService;
+    private ServiceHistory currentService;
 
     private String specifics;
     private int minReservationTime;
@@ -25,16 +25,16 @@ public class Service extends Solution {
         this.reservationType = reservationType;
     }
 
-    public Service(ServiceHistory previousService) {
-        this.previousService = previousService;
+    public Service(ServiceHistory currentService) {
+        this.currentService = currentService;
     }
 
-    public ServiceHistory getPreviousService() {
-        return previousService;
+    public ServiceHistory getCurrentService() {
+        return currentService;
     }
 
-    public void setPreviousService(ServiceHistory currentService) {
-        this.previousService = currentService;
+    public void setCurrentService(ServiceHistory currentService) {
+        this.currentService = currentService;
     }
 
     public String getSpecifics() {
