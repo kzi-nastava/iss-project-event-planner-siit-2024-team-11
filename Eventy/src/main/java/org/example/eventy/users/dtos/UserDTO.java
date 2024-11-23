@@ -5,6 +5,7 @@ import java.util.List;
 public class UserDTO {
     private Long id;
     private List<String> profilePictures;
+    private UserType userType;
     private String email;
     private String firstName;
     private String lastName;
@@ -17,9 +18,10 @@ public class UserDTO {
 
     }
 
-    public UserDTO(Long id, List<String> profilePictures, String email, String firstName, String lastName, String name, String description, String address, String phoneNumber) {
+    public UserDTO(Long id, List<String> profilePictures, UserType userType, String email, String firstName, String lastName, String name, String description, String address, String phoneNumber) {
         this.id = id;
         this.profilePictures = profilePictures;
+        this.userType = userType;
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -43,6 +45,14 @@ public class UserDTO {
 
     public void setProfilePictures(List<String> profilePictures) {
         this.profilePictures = profilePictures;
+    }
+
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
     }
 
     public String getEmail() {

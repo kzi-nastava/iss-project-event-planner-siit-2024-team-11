@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/users")
 public class UserProfileController {
-    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     // type ResponseEntity<UserDTO> ??? here and in Auth??? UserDTO shouldnt have pass and confPass???
     public ResponseEntity<String> updateProfile(@RequestBody UpdateUserProfileDTO updateUserProfileDTO) {
         if(updateUserProfileDTO.getEmail().equals("good@gmail.com")) {

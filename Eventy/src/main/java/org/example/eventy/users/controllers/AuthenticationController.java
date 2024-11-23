@@ -3,6 +3,7 @@ package org.example.eventy.users.controllers;
 import org.example.eventy.users.dtos.LoginDTO;
 import org.example.eventy.users.dtos.RegistrationDTO;
 import org.example.eventy.users.dtos.UserDTO;
+import org.example.eventy.users.dtos.UserType;
 import org.example.eventy.users.models.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,6 +24,7 @@ public class AuthenticationController {
             userDTO.setEmail("good@gmail.com");
             userDTO.setId(5L);
             userDTO.setProfilePictures(new ArrayList<>());
+            userDTO.setUserType(UserType.ORGANIZER);
             userDTO.setFirstName("Ime");
             userDTO.setLastName("Prezime");
             userDTO.setAddress("Neka Adresa");
@@ -49,6 +51,7 @@ public class AuthenticationController {
             userDTO.setEmail("good@gmail.com");
             userDTO.setId(5L);
             userDTO.setProfilePictures(new ArrayList<>());
+            userDTO.setUserType(UserType.ORGANIZER);
             userDTO.setFirstName("Ime");
             userDTO.setLastName("Prezime");
             userDTO.setAddress("Neka Adresa");
