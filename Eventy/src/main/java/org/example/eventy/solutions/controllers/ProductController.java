@@ -83,15 +83,15 @@ public class ProductController {
     public ResponseEntity<ProductDTO> updateProduct(@RequestBody ProductDTO productDTO, @PathVariable Long productId) {
         ProductDTO updatedProductDTO = new ProductDTO();
         if(productDTO.getId() == 5L && productId == 5L) {
-            productDTO.setId(productDTO.getId());
-            productDTO.setName(productDTO.getName());
-            productDTO.setPrice(productDTO.getPrice());
-            productDTO.setDiscount(productDTO.getDiscount());
-            productDTO.setDescription(productDTO.getDescription());
-            productDTO.setAvailability(productDTO.isAvailable());
-            productDTO.setVisibility(productDTO.isVisible());
-            productDTO.setImages(productDTO.getImages());
-            productDTO.setRelatedEventTypes(productDTO.getRelatedEventTypes());
+            updatedProductDTO.setId(productDTO.getId());
+            updatedProductDTO.setName(productDTO.getName());
+            updatedProductDTO.setPrice(productDTO.getPrice());
+            updatedProductDTO.setDiscount(productDTO.getDiscount());
+            updatedProductDTO.setDescription(productDTO.getDescription());
+            updatedProductDTO.setAvailability(productDTO.isAvailable());
+            updatedProductDTO.setVisibility(productDTO.isVisible());
+            updatedProductDTO.setImages(productDTO.getImages());
+            updatedProductDTO.setRelatedEventTypes(productDTO.getRelatedEventTypes());
             return new ResponseEntity<ProductDTO>(updatedProductDTO, HttpStatus.OK);
         }
 
