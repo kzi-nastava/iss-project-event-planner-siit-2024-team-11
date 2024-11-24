@@ -78,10 +78,4 @@ public class EventController {
 
         return new ResponseEntity<Collection<EventDTO>>(HttpStatus.NOT_FOUND);
     }
-
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<EventDTO>> getAll() {
-        List<EventDTO> events = new ArrayList<EventDTO>();
-        return new ResponseEntity<Collection<EventDTO>>(events, HttpStatus.OK);
-    }
 }
