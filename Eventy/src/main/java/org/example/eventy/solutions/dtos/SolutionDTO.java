@@ -2,6 +2,7 @@ package org.example.eventy.solutions.dtos;
 
 import org.example.eventy.events.dtos.EventTypeDTO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SolutionDTO {
@@ -11,7 +12,7 @@ public class SolutionDTO {
     private double price;
     private double discount;
     private List<EventTypeDTO> relatedEventTypes;
-    private byte[][] images;
+    private ArrayList<String> imageUrls;
     private boolean visibility;
     private boolean availability;
 
@@ -19,13 +20,13 @@ public class SolutionDTO {
 
     }
 
-    public SolutionDTO(String name, String description, double price, double discount, List<EventTypeDTO> relatedEventTypes, byte[][] images, boolean visibility, boolean availability) {
+    public SolutionDTO(String name, String description, double price, double discount, List<EventTypeDTO> relatedEventTypes, ArrayList<String> imageUrls, boolean visibility, boolean availability) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.discount = discount;
         this.relatedEventTypes = relatedEventTypes;
-        this.images = images;
+        this.imageUrls = imageUrls;
         this.visibility = visibility;
         this.availability = availability;
     }
@@ -70,12 +71,12 @@ public class SolutionDTO {
         this.relatedEventTypes = relatedEventTypes;
     }
 
-    public byte[][] getImages() {
-        return images;
+    public ArrayList<String> getImages() {
+        return imageUrls;
     }
 
-    public void setImages(byte[][] images) {
-        this.images = images;
+    public void setImages(ArrayList<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 
     public boolean isVisibility() {
