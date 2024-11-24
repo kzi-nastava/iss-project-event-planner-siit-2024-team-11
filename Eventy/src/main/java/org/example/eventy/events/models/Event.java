@@ -1,5 +1,7 @@
 package org.example.eventy.events.models;
 
+import org.example.eventy.users.models.EventOrganizer;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,12 +16,13 @@ public class Event {
     private EventType type;
     private Location location;
     private List<Activity> agenda;
+    private EventOrganizer organiser;
 
     public Event() {
 
     }
 
-    public Event(Long id, String name, String description, int maxNumberParticipants, PrivacyType privacy, LocalDateTime startDate, LocalDateTime endDate, EventType type, Location location, List<Activity> agenda) {
+    public Event(Long id, String name, String description, int maxNumberParticipants, PrivacyType privacy, LocalDateTime startDate, LocalDateTime endDate, EventType type, Location location, List<Activity> agenda, EventOrganizer organiser) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -30,6 +33,7 @@ public class Event {
         this.type = type;
         this.location = location;
         this.agenda = agenda;
+        this.organiser = organiser;
     }
 
     public Long getId() {
@@ -110,5 +114,13 @@ public class Event {
 
     public void setAgenda(List<Activity> agenda) {
         this.agenda = agenda;
+    }
+
+    public EventOrganizer getOrganiser() {
+        return organiser;
+    }
+
+    public void setOrganiser(EventOrganizer organiser) {
+        this.organiser = organiser;
     }
 }
