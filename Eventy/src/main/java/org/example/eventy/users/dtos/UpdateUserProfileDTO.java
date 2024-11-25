@@ -2,11 +2,13 @@ package org.example.eventy.users.dtos;
 
 import java.util.List;
 
-public class UserDTO {
+public class UpdateUserProfileDTO {
     private Long id;
     private List<String> profilePictures;
-    private UserType userType;
     private String email;
+    private String oldPassword;
+    private String password;
+    private String confirmedPassword;
     private String firstName;
     private String lastName;
     private String name;
@@ -14,15 +16,17 @@ public class UserDTO {
     private String address;
     private String phoneNumber;
 
-    public UserDTO() {
+    public UpdateUserProfileDTO() {
 
     }
 
-    public UserDTO(Long id, List<String> profilePictures, UserType userType, String email, String firstName, String lastName, String name, String description, String address, String phoneNumber) {
+    public UpdateUserProfileDTO(Long id, List<String> profilePictures, String email, String oldPassword, String password, String confirmedPassword, String firstName, String lastName, String name, String description, String address, String phoneNumber) {
         this.id = id;
         this.profilePictures = profilePictures;
-        this.userType = userType;
         this.email = email;
+        this.oldPassword = oldPassword;
+        this.password = password;
+        this.confirmedPassword = confirmedPassword;
         this.firstName = firstName;
         this.lastName = lastName;
         this.name = name;
@@ -47,20 +51,36 @@ public class UserDTO {
         this.profilePictures = profilePictures;
     }
 
-    public UserType getUserType() {
-        return userType;
-    }
-
-    public void setUserType(UserType userType) {
-        this.userType = userType;
-    }
-
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getOldPassword() {
+        return oldPassword;
+    }
+
+    public void setOldPassword(String oldPassword) {
+        this.oldPassword = oldPassword;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getConfirmedPassword() {
+        return confirmedPassword;
+    }
+
+    public void setConfirmedPassword(String confirmedPassword) {
+        this.confirmedPassword = confirmedPassword;
     }
 
     public String getFirstName() {

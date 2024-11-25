@@ -12,7 +12,7 @@ public class SolutionDTO {
     private double price;
     private double discount;
     private List<EventTypeDTO> relatedEventTypes;
-    private ArrayList<String> imageUrls;
+    private List<String> images;
     private boolean visibility;
     private boolean availability;
 
@@ -20,7 +20,7 @@ public class SolutionDTO {
 
     }
 
-    public SolutionDTO(String name, String description, double price, double discount, List<EventTypeDTO> relatedEventTypes, ArrayList<String> imageUrls, boolean visibility, boolean availability) {
+    public SolutionDTO(String name, String description, double price, double discount, List<EventTypeDTO> relatedEventTypes, List<String> images, boolean visibility, boolean availability) {
         this.name = name;
         this.description = description;
         this.price = price;
@@ -71,15 +71,15 @@ public class SolutionDTO {
         this.relatedEventTypes = relatedEventTypes;
     }
 
-    public ArrayList<String> getImages() {
-        return imageUrls;
+    public List<String> getImages() {
+        return images;
     }
 
-    public void setImages(ArrayList<String> imageUrls) {
-        this.imageUrls = imageUrls;
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 
-    public boolean isVisibility() {
+    public boolean isVisible() {
         return visibility;
     }
 
@@ -87,7 +87,7 @@ public class SolutionDTO {
         this.visibility = visibility;
     }
 
-    public boolean isAvailability() {
+    public boolean isAvailable() {
         return availability;
     }
 
