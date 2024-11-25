@@ -3,19 +3,30 @@ package org.example.eventy.solutions.dtos;
 import java.util.Calendar;
 
 public class ServiceReservationDTO {
+    private Long id;
     private Long selectedEventId;
-    private Long selectedSolutionId;
+    private Long selectedServiceId;
     private Calendar reservationStartDateTime;
     private Calendar reservationEndDateTime;
 
     public ServiceReservationDTO() {
+
     }
 
-    public ServiceReservationDTO(Long selectedEventId, Long selectedSolutionId, Calendar reservationStartDateTime, Calendar reservationEndDateTime) {
+    public ServiceReservationDTO(Long id, Long selectedEventId, Long selectedServiceId, Calendar reservationStartDateTime, Calendar reservationEndDateTime) {
+        this.id = id;
         this.selectedEventId = selectedEventId;
-        this.selectedSolutionId = selectedSolutionId;
+        this.selectedServiceId = selectedServiceId;
         this.reservationStartDateTime = reservationStartDateTime;
         this.reservationEndDateTime = reservationEndDateTime;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getSelectedEventId() {
@@ -26,12 +37,12 @@ public class ServiceReservationDTO {
         this.selectedEventId = selectedEventId;
     }
 
-    public Long getSelectedSolutionId() {
-        return selectedSolutionId;
+    public Long getSelectedServiceId() {
+        return selectedServiceId;
     }
 
-    public void setSelectedSolutionId(Long selectedSolutionId) {
-        this.selectedSolutionId = selectedSolutionId;
+    public void setSelectedServiceId(Long selectedServiceId) {
+        this.selectedServiceId = selectedServiceId;
     }
 
     public Calendar getReservationStartDateTime() {

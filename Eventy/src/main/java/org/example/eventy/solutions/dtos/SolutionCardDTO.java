@@ -26,7 +26,7 @@ public class SolutionCardDTO {
 
     }
 
-    public SolutionCardDTO(Long solutionId, SolutionType type, String name, String categoryName, String description, Integer minReservationTime, Integer maxReservationTime, ArrayList<String> eventTypeNames, double price, int discount, String firstImageUrl, boolean isAvailable, Long organiserId, String organiserName, String providerImageUrl) {
+    public SolutionCardDTO(Long solutionId, SolutionType type, String name, String categoryName, String description, Integer minReservationTime, Integer maxReservationTime, ArrayList<String> eventTypeNames, double price, int discount, String firstImageUrl, boolean isAvailable, Long providerId, String providerName, String providerImageUrl) {
         this.solutionId = solutionId;
         this.type = type;
         this.name = name;
@@ -39,8 +39,8 @@ public class SolutionCardDTO {
         this.discount = discount;
         this.firstImageUrl = firstImageUrl;
         this.isAvailable = isAvailable;
-        this.providerId = organiserId;
-        this.providerName = organiserName;
+        this.providerId = providerId;
+        this.providerName = providerName;
         this.providerImageUrl = providerImageUrl;
     }
 
