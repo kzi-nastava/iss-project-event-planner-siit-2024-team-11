@@ -79,15 +79,4 @@ public class ServiceService {
 
         return serviceCard;
     }
-
-    public ServiceReservationDTO createServiceReservation(ServiceReservationDTO serviceReservation) {
-        ServiceReservationDTO newServiceReservation = new ServiceReservationDTO();
-
-        newServiceReservation.setSelectedEventId(serviceReservation.getSelectedEventId());
-        newServiceReservation.setSelectedSolutionId(serviceReservation.getSelectedSolutionId());
-        newServiceReservation.setReservationStartDateTime(serviceReservation.getReservationStartDateTime());
-        newServiceReservation.setReservationEndDateTime(serviceReservation.getReservationEndDateTime());
-
-        return newServiceReservation;
-    }
 }

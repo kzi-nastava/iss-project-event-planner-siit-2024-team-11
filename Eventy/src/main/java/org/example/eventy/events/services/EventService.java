@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 @Service
 public class EventService {
+
     /*@Autowired
     private EventRepository eventRepository;*/
 
