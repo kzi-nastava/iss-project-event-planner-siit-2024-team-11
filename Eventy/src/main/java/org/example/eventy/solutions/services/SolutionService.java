@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -27,7 +28,7 @@ public class SolutionService {
             "A handcrafted 3-tier wedding cake with customizable flavors.",
             null, // minReservationTime - only for Service
             null, // maxReservationTime - only for Service
-            new ArrayList<>(List.of("Wedding", "Birthday")),
+            new ArrayList<>(Arrays.asList("Wedding", "Birthday")),
             150.00,
             10,
             "https://example.com/images/wedding-cake.png",
@@ -45,7 +46,7 @@ public class SolutionService {
             null, // descripiton - only for Product
             2,
             6,
-            new ArrayList<>(List.of("Wedding", "Corporate")),
+            new ArrayList<>(Arrays.asList("Wedding", "Corporate")),
             500.00,
             15,
             "https://example.com/images/dj-service.png",
@@ -71,7 +72,7 @@ public class SolutionService {
             "A handcrafted 3-tier wedding cake with customizable flavors.",
             null, // minReservationTime - only for Service
             null, // maxReservationTime - only for Service
-            new ArrayList<>(List.of("Wedding", "Birthday")),
+            new ArrayList<>(Arrays.asList("Wedding", "Birthday")),
             150.00,
             10,
             "https://example.com/images/wedding-cake.png",
@@ -93,7 +94,7 @@ public class SolutionService {
             "A handcrafted 3-tier wedding cake with customizable flavors.",
             null, // minReservationTime - only for Service
             null, // maxReservationTime - only for Service
-            new ArrayList<>(List.of("Wedding", "Birthday")),
+            new ArrayList<>(Arrays.asList("Wedding", "Birthday")),
             150.00,
             10,
             "https://example.com/images/wedding-cake.png",
@@ -111,7 +112,7 @@ public class SolutionService {
             null, // descripiton - only for Product
             2,
             6,
-            new ArrayList<>(List.of("Wedding", "Corporate")),
+            new ArrayList<>(Arrays.asList("Wedding", "Corporate")),
             500.00,
             15,
             "https://example.com/images/dj-service.png",
@@ -137,7 +138,7 @@ public class SolutionService {
             "A handcrafted 3-tier wedding cake with customizable flavors.",
             null, // minReservationTime - only for Service
             null, // maxReservationTime - only for Service
-            new ArrayList<>(List.of("Wedding", "Birthday")),
+            new ArrayList<>(Arrays.asList("Wedding", "Birthday")),
             150.00,
             10,
             "https://example.com/images/wedding-cake.png",
@@ -155,7 +156,7 @@ public class SolutionService {
             null, // descripiton - only for Product
             2,
             6,
-            new ArrayList<>(List.of("Wedding", "Corporate")),
+            new ArrayList<>(Arrays.asList("Wedding", "Corporate")),
             500.00,
             15,
             "https://example.com/images/dj-service.png",
