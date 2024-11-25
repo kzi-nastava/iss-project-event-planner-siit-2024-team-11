@@ -1,5 +1,7 @@
 package org.example.eventy.reviews.controllers;
 
+import org.example.eventy.reviews.dtos.CreateReviewDTO;
+import org.example.eventy.reviews.dtos.CreatedReviewDTO;
 import org.example.eventy.reviews.dtos.ReviewDTO;
 import org.example.eventy.reviews.dtos.UpdateReviewDTO;
 import org.example.eventy.reviews.services.ReviewService;
@@ -89,5 +91,13 @@ public class ReviewController {
         }
 
         return new ResponseEntity<ReviewDTO>(HttpStatus.NO_CONTENT);
+    }
+
+    // POST "/api/reviews"
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CreatedReviewDTO> createReview(@RequestBody CreateReviewDTO reviewDTO) {
+        // create Review in service
+        CreatedReviewDTO responseDTO = new CreatedReviewDTO();
+        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 }
