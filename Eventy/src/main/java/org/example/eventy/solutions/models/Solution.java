@@ -1,38 +1,42 @@
 package org.example.eventy.solutions.models;
 
 import org.example.eventy.events.models.EventType;
+import org.example.eventy.users.models.SolutionProvider;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Solution {
     private Long id;
     private String name;
+    private Category category;
     private String description;
     private double price;
     private int discount;
-    private byte[][] images;
+    private ArrayList<String> imageUrls;
     private boolean isVisible;
     private boolean isAvailable;
     private boolean isDeleted;
-    private Category category;
     private List<EventType> relatedEventTypes;
+    private SolutionProvider provider;
 
     public Solution() {
 
     }
 
-    public Solution(Long id, String name, String description, double price, int discount, byte[][] images, boolean isVisible, boolean isAvailable, boolean isDeleted, Category category, List<EventType> relatedEventTypes) {
+    public Solution(Long id, String name, String description, double price, int discount, ArrayList<String> imageUrls, boolean isVisible, boolean isAvailable, boolean isDeleted, Category category, List<EventType> relatedEventTypes, SolutionProvider provider) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.discount = discount;
-        this.images = images;
+        this.imageUrls = imageUrls;
         this.isVisible = isVisible;
         this.isAvailable = isAvailable;
         this.isDeleted = isDeleted;
         this.category = category;
         this.relatedEventTypes = relatedEventTypes;
+        this.provider = provider;
     }
 
     public Long getId() {
@@ -75,12 +79,12 @@ public abstract class Solution {
         this.discount = discount;
     }
 
-    public byte[][] getImages() {
-        return images;
+    public ArrayList<String> getImageUrls() {
+        return imageUrls;
     }
 
-    public void setImages(byte[][] images) {
-        this.images = images;
+    public void setImageUrls(ArrayList<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 
     public boolean isVisible() {
@@ -121,5 +125,13 @@ public abstract class Solution {
 
     public void setRelatedEventTypes(List<EventType> relatedEventTypes) {
         this.relatedEventTypes = relatedEventTypes;
+    }
+
+    public SolutionProvider getProvider() {
+        return provider;
+    }
+
+    public void setProvider(SolutionProvider provider) {
+        this.provider = provider;
     }
 }
