@@ -14,8 +14,8 @@ public class ReviewService {
     /*@Autowired
     private ReviewRepository reviewRepository;*/
 
-    public ReviewDTO getPendingReview(Long reviewId) {
-        ReviewDTO pendingReview = new ReviewDTO(
+    public ReviewDTO getReview(Long reviewId) {
+        ReviewDTO review = new ReviewDTO(
             reviewId,
             "Great event, well-organized and fun!",
             5,
@@ -26,7 +26,7 @@ public class ReviewService {
             false
         );
 
-        return pendingReview;
+        return review;
     }
 
     public ArrayList<ReviewDTO> getPendingReviews(Pageable pageable) {
@@ -59,21 +59,6 @@ public class ReviewService {
         return pendingReviews;
     }
 
-    public ReviewDTO getAcceptedReview(Long reviewId) {
-        ReviewDTO acceptedReview = new ReviewDTO(
-            reviewId,
-            "Great event, well-organized and fun!",
-            5,
-            "johndoe123@gmail.com",
-            "exit.festival@gmail.com",
-            "EXIT 2024",
-            Status.ACCEPTED,
-            false
-        );
-
-        return acceptedReview;
-    }
-
     public ArrayList<ReviewDTO> getAcceptedReviews(Pageable pageable) {
         ReviewDTO acceptedReview1 = new ReviewDTO(
             1L,
@@ -104,18 +89,19 @@ public class ReviewService {
         return acceptedReviews;
     }
 
-    public ReviewDTO updateReview(ReviewDTO pendingReview, UpdateReviewDTO updatedReview) {
-        pendingReview.setComment(updatedReview.getComment());
-        pendingReview.setGrade(updatedReview.getGrade());
+    public ReviewDTO updateReview(ReviewDTO review, UpdateReviewDTO updatedReview) {
+        review.setComment(updatedReview.getComment());
+        review.setGrade(updatedReview.getGrade());
+        review.setStatus(updatedReview.getStatus());
 
-        return saveReview(pendingReview);
+        return saveReview(review);
     }
 
-    public ReviewDTO deleteReview(ReviewDTO pendingReview) {
-        pendingReview.setStatus(Status.DENIED);
-        pendingReview.setDeleted(true);
+    public ReviewDTO deleteReview(ReviewDTO review) {
+        review.setStatus(Status.DENIED);
+        review.setDeleted(true);
 
-        return saveReview(pendingReview);
+        return saveReview(review);
     }
 
     public ReviewDTO saveReview(ReviewDTO pendingReview) {

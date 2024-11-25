@@ -57,12 +57,12 @@ public class ReportService {
         return saveReport(newReport);
     }
 
-    private ReportDTO saveReport(ReportDTO report) {
-        return report;
-    }
-
     public Boolean deleteReport(Long reviewId) {
         //reportRepository.deleteById(reviewId);
         return true;
+    }
+
+    private ReportDTO saveReport(ReportDTO report) {
+        return report;
     }
 }
