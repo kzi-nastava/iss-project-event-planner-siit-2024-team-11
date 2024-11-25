@@ -31,7 +31,7 @@ public class ProductController {
        also SolutionCardDTO == ProductCardDTO == ServiceCardDTO (only a few of fields will be null) */
     // GET "/api/products"
     // ***NOTE: this should be named getProducts PROBABLY, but we already have one method below named like that
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/cards", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<SolutionCardDTO>> getProductCards(Pageable pageable) {
         ArrayList<SolutionCardDTO> products = productService.getProducts(pageable);
         return new ResponseEntity<>(products, HttpStatus.OK);

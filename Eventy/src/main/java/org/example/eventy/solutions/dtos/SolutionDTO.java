@@ -26,7 +26,7 @@ public class SolutionDTO {
         this.price = price;
         this.discount = discount;
         this.relatedEventTypes = relatedEventTypes;
-        this.imageUrls = imageUrls;
+        this.images = images;
         this.visibility = visibility;
         this.availability = availability;
     }
