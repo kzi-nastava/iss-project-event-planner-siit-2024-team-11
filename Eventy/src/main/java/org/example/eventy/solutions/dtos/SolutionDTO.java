@@ -2,6 +2,7 @@ package org.example.eventy.solutions.dtos;
 
 import org.example.eventy.events.dtos.EventTypeDTO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SolutionDTO {
@@ -25,7 +26,7 @@ public class SolutionDTO {
         this.price = price;
         this.discount = discount;
         this.relatedEventTypes = relatedEventTypes;
-        this.images = images;
+        this.imageUrls = imageUrls;
         this.visibility = visibility;
         this.availability = availability;
     }
