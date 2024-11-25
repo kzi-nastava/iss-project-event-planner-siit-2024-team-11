@@ -1,7 +1,6 @@
 package org.example.eventy.solutions.services;
 
 import org.example.eventy.common.models.SolutionType;
-import org.example.eventy.solutions.dtos.ServiceReservationDTO;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

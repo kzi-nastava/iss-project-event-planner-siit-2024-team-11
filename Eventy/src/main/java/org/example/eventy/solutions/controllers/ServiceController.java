@@ -1,6 +1,5 @@
 package org.example.eventy.solutions.controllers;
 
-import org.example.eventy.solutions.dtos.ServiceReservationDTO;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
 import org.example.eventy.solutions.services.ServiceService;
 import org.springframework.beans.factory.annotation.Autowired;

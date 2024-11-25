@@ -1,22 +1,23 @@
-package org.example.eventy.solutions.dtos;
+package org.example.eventy.solutions.models;
+
+import org.example.eventy.events.models.Event;
 
 import java.util.Calendar;
 
-public class ServiceReservationDTO {
+public class Reservation {
     private Long id;
-    private Long selectedEventId;
-    private Long selectedServiceId;
+    private Event selectedEvent;
+    private Service selectedService;
     private Calendar reservationStartDateTime;
     private Calendar reservationEndDateTime;
 
-    public ServiceReservationDTO() {
-
+    public Reservation() {
     }
 
-    public ServiceReservationDTO(Long id, Long selectedEventId, Long selectedServiceId, Calendar reservationStartDateTime, Calendar reservationEndDateTime) {
+    public Reservation(Long id, Event selectedEvent, Service selectedService, Calendar reservationStartDateTime, Calendar reservationEndDateTime) {
         this.id = id;
-        this.selectedEventId = selectedEventId;
-        this.selectedServiceId = selectedServiceId;
+        this.selectedEvent = selectedEvent;
+        this.selectedService = selectedService;
         this.reservationStartDateTime = reservationStartDateTime;
         this.reservationEndDateTime = reservationEndDateTime;
     }
@@ -29,20 +30,20 @@ public class ServiceReservationDTO {
         this.id = id;
     }
 
-    public Long getSelectedEventId() {
-        return selectedEventId;
+    public Event getSelectedEvent() {
+        return selectedEvent;
     }
 
-    public void setSelectedEventId(Long selectedEventId) {
-        this.selectedEventId = selectedEventId;
+    public void setSelectedEvent(Event selectedEvent) {
+        this.selectedEvent = selectedEvent;
     }
 
-    public Long getSelectedServiceId() {
-        return selectedServiceId;
+    public Service getSelectedService() {
+        return selectedService;
     }
 
-    public void setSelectedServiceId(Long selectedServiceId) {
-        this.selectedServiceId = selectedServiceId;
+    public void setSelectedService(Service selectedService) {
+        this.selectedService = selectedService;
     }
 
     public Calendar getReservationStartDateTime() {
