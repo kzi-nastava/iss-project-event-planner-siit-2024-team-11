@@ -1,0 +1,138 @@
+package org.example.eventy.solutions.services;
+
+import org.example.eventy.common.models.ReservationConfirmationType;
+import org.example.eventy.common.models.Status;
+import org.example.eventy.events.dtos.EventTypeDTO;
+import org.example.eventy.events.models.EventType;
+import org.example.eventy.solutions.dtos.CategoryDTO;
+import org.example.eventy.solutions.dtos.services.*;
+import org.example.eventy.solutions.models.Category;
+import org.example.eventy.solutions.models.Service;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
+public class ServicesService {
+
+    private Collection<Service> allServices = new ArrayList<>();
+
+    private void setTestData() {
+        Category category1 = new Category(1L, "Category 1", "Description for Category 1", Status.ACCEPTED);
+        Category category2 = new Category(2L, "Category 2", "Description for Category 2", Status.ACCEPTED);
+
+        List<Category> recommendedCategoriesForEventType1 = new ArrayList<>();
+        recommendedCategoriesForEventType1.add(category1);
+
+        List<Category> recommendedCategoriesForEventType2 = new ArrayList<>();
+        recommendedCategoriesForEventType2.add(category2);
+
+        EventType eventType1 = new EventType(1L, "Event Type 1", "Description for Event Type 1", true, recommendedCategoriesForEventType1);
+        EventType eventType2 = new EventType(2L, "Event Type 2", "Description for Event Type 2", true, recommendedCategoriesForEventType2);
+
+        List<EventType> eventTypeList1 = new ArrayList<>();
+        eventTypeList1.add(eventType1);  // List with first EventType
+
+        List<EventType> eventTypeList2 = new ArrayList<>();
+        eventTypeList2.add(eventType2);
+
+        Service service1 = new Service(
+                1L, "Service 1", "Description for Service 1", 100.0, 10, new byte[0][0],
+                true, true, false, category1, eventTypeList1,
+                null, "Specifics for Service 1", 10, 120, 30, 15, ReservationConfirmationType.AUTOMATIC
+        );
+
+        Service service2 = new Service(
+                2L, "Service 2", "Description for Service 2", 200.0, 20, new byte[0][0],
+                true, true, false, category2, eventTypeList2,
+                null, "Specifics for Service 2", 15, 90, 45, 20, ReservationConfirmationType.MANUAL
+        );
+
+        Service service3 = new Service(
+                3L, "Service 3", "Description for Service 3", 150.0, 15, new byte[0][0],
+                true, true, false, category1, eventTypeList2,
+                null, "Specifics for Service 3", 20, 100, 60, 30, ReservationConfirmationType.AUTOMATIC
+        );
+
+        Service service4 = new Service(
+                4L, "Service 4", "Description for Service 4", 250.0, 25, new byte[0][0],
+                true, true, false, category2, eventTypeList1,
+                null, "Specifics for Service 4", 30, 150, 90, 45, ReservationConfirmationType.MANUAL
+        );
+
+        Service service5 = new Service(
+                5L, "Service 5", "Description for Service 5", 180.0, 18, new byte[0][0],
+                true, true, false, category1, eventTypeList2,
+                null, "Specifics for Service 5", 25, 110, 75, 35, ReservationConfirmationType.AUTOMATIC
+        );
+
+        allServices.add(service1);
+        allServices.add(service2);
+        allServices.add(service3);
+        allServices.add(service4);
+        allServices.add(service5);
+    }
+
+    public ServicesService() {
+        setTestData();
+    }
+
+    public CreatedServiceDTO createService(CreateServiceDTO createServiceDTO) {
+        CreatedServiceDTO createdServiceDTO = new CreatedServiceDTO();
+        createdServiceDTO.setId(1337L);
+        createdServiceDTO.setName(createServiceDTO.getName());
+        createdServiceDTO.setDescription(createServiceDTO.getDescription());
+        createdServiceDTO.setPrice(createServiceDTO.getPrice());
+        createdServiceDTO.setDiscount(createServiceDTO.getDiscount());
+        createdServiceDTO.setImages(createServiceDTO.getImages());
+        createdServiceDTO.setCategory(createServiceDTO.getCategory());
+        createdServiceDTO.setRelatedEventTypes(createServiceDTO.getRelatedEventTypes());
+        createdServiceDTO.setSpecifics(createServiceDTO.getSpecifics());
+        createdServiceDTO.setMinReservationTime(createServiceDTO.getMinReservationTime());
+        createdServiceDTO.setMaxReservationTime(createServiceDTO.getMaxReservationTime());
+        createdServiceDTO.setReservationDeadline(createServiceDTO.getReservationDeadline());
+        createdServiceDTO.setCancellationDeadline(createServiceDTO.getCancellationDeadline());
+        createdServiceDTO.setAutomaticReservationAcceptance(createServiceDTO.getAutomaticReservationAcceptance());
+        return createdServiceDTO;
+    }
+
+    public Collection<GetServiceDTO> getServices(String name, CategoryDTO category, EventTypeDTO eventType, double minPrice, double maxPrice, boolean available) {
+        Collection<GetServiceDTO> getServiceDTOs = new ArrayList<>();
+        allServices.forEach(s -> getServiceDTOs.add(new GetServiceDTO(s)));
+        return getServiceDTOs;
+    }
+
+    public Optional<GetServiceDTO> getService(long id) {
+        return Optional.of(new GetServiceDTO(allServices.stream().filter(s -> s.getId() == id).findFirst().get()));
+    }
+
+    public Optional<UpdatedServiceDTO> updateService(UpdateServiceDTO updateServiceDTO) {
+        Optional<Service> oldService = allServices.stream().filter(s -> s.getId() == updateServiceDTO.getId()).findFirst();
+        if (!oldService.isPresent()) {
+            return Optional.empty();
+        }
+        UpdatedServiceDTO updatedServiceDTO = new UpdatedServiceDTO();
+        updatedServiceDTO.setId(updateServiceDTO.getId());
+        updatedServiceDTO.setName(updateServiceDTO.getName());
+        updatedServiceDTO.setDescription(updateServiceDTO.getDescription());
+        updatedServiceDTO.setPrice(updateServiceDTO.getPrice());
+        updatedServiceDTO.setDiscount(updateServiceDTO.getDiscount());
+        updatedServiceDTO.setImages(updateServiceDTO.getImages());
+        updatedServiceDTO.setVisible(updateServiceDTO.isVisible());
+        updatedServiceDTO.setAvailable(updateServiceDTO.isAvailable());
+        updatedServiceDTO.setCategory(updateServiceDTO.getCategory());
+        updatedServiceDTO.setRelatedEventTypes(updateServiceDTO.getRelatedEventTypes());
+        updatedServiceDTO.setSpecifics(updateServiceDTO.getSpecifics());
+        updatedServiceDTO.setMinReservationTime(updateServiceDTO.getMinReservationTime());
+        updatedServiceDTO.setMaxReservationTime(updateServiceDTO.getMaxReservationTime());
+        updatedServiceDTO.setReservationDeadline(updateServiceDTO.getReservationDeadline());
+        updatedServiceDTO.setCancellationDeadline(updateServiceDTO.getCancellationDeadline());
+        updatedServiceDTO.setAutomaticReservationAcceptance(updateServiceDTO.getAutomaticReservationAcceptance());
+        return Optional.of(updatedServiceDTO);
+    }
+
+    public void deleteService(long id) {
+        allServices.removeIf(s -> s.getId() == id);
+    }
+}
