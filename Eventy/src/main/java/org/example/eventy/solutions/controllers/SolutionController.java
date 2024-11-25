@@ -80,8 +80,8 @@ public class SolutionController {
     // GET http://localhost:8080/api/solutions/filter?search=cake&type=SERVICE&category=Wedding&eventTypes=Ceremony,Reception&company=ElegantEvents&minPrice=100&maxPrice=1000&startDate=2024-12-01&endDate=2024-12-31&isAvailable=true&page=0&size=10&sort=name,asc
     @GetMapping(value = "/filter", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<SolutionCardDTO>> filterSolutions(
-        @RequestParam(required = false, defaultValue = "Any") String search,
-        @RequestParam(required = false) String type,
+        @RequestParam(required = false) String search,
+        @RequestParam(required = false, defaultValue = "Any") String type,
         @RequestParam(required = false) String category,
         @RequestParam(required = false) ArrayList<String> eventTypes,
         @RequestParam(required = false) String company,

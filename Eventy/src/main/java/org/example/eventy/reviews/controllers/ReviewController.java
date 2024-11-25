@@ -20,13 +20,13 @@ public class ReviewController {
     @Autowired
     private ReviewService reviewService;
 
-    // GET "/api/reviews/pending/5"
-    @GetMapping(value = "/pending/{reviewId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ReviewDTO> getPendingReview(@PathVariable Long reviewId) {
-        ReviewDTO pendingReview = reviewService.getPendingReview(reviewId);
+    // GET "/api/reviews/5"
+    @GetMapping(value = "/{reviewId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ReviewDTO> getReview(@PathVariable Long reviewId) {
+        ReviewDTO review = reviewService.getReview(reviewId);
 
         if (reviewId == 5) {
-            return new ResponseEntity<ReviewDTO>(pendingReview, HttpStatus.OK);
+            return new ResponseEntity<ReviewDTO>(review, HttpStatus.OK);
         }
 
         return new ResponseEntity<ReviewDTO>(HttpStatus.NOT_FOUND);
@@ -37,18 +37,6 @@ public class ReviewController {
     public ResponseEntity<Collection<ReviewDTO>> getPendingReviews(Pageable pageable) {
         ArrayList<ReviewDTO> pendingReviews = reviewService.getPendingReviews(pageable);
         return new ResponseEntity<Collection<ReviewDTO>>(pendingReviews, HttpStatus.OK);
-    }
-
-    // GET "/api/reviews/accepted/5"
-    @GetMapping(value = "/accepted/{reviewId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ReviewDTO> getAcceptedReview(@PathVariable Long reviewId) {
-        ReviewDTO acceptedReview = reviewService.getAcceptedReview(reviewId);
-
-        if (reviewId == 5) {
-            return new ResponseEntity<ReviewDTO>(acceptedReview, HttpStatus.OK);
-        }
-
-        return new ResponseEntity<ReviewDTO>(HttpStatus.NOT_FOUND);
     }
 
     // GET "/api/reviews/accepted"
@@ -62,17 +50,17 @@ public class ReviewController {
     {
         "comment": "Updated review comment",
         "grade": 4,
-        "status": PENDING
+        "status": "PENDING"
     }
     */
     // PUT "/api/reviews/5"
     @PutMapping(value = "/{reviewId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ReviewDTO> updateReview(@RequestBody UpdateReviewDTO updatedReview, @PathVariable Long reviewId) {
         if(reviewId == 5) {
-            ReviewDTO pendingReview = reviewService.getPendingReview(reviewId);
-            pendingReview = reviewService.updateReview(pendingReview, updatedReview);
+            ReviewDTO review = reviewService.getReview(reviewId);
+            review = reviewService.updateReview(review, updatedReview);
 
-            return new ResponseEntity<ReviewDTO>(pendingReview, HttpStatus.OK);
+            return new ResponseEntity<ReviewDTO>(review, HttpStatus.OK);
         }
 
         return new ResponseEntity<ReviewDTO>(HttpStatus.NOT_FOUND);
@@ -82,10 +70,10 @@ public class ReviewController {
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<ReviewDTO> deleteReview(@PathVariable Long reviewId) {
         if(reviewId == 5) {
-            ReviewDTO pendingReview = reviewService.getPendingReview(reviewId);
-            pendingReview = reviewService.deleteReview(pendingReview);
+            ReviewDTO review = reviewService.getReview(reviewId);
+            review = reviewService.deleteReview(review);
 
-            return new ResponseEntity<ReviewDTO>(pendingReview, HttpStatus.OK);
+            return new ResponseEntity<ReviewDTO>(review, HttpStatus.OK);
         }
 
         return new ResponseEntity<ReviewDTO>(HttpStatus.NO_CONTENT);
