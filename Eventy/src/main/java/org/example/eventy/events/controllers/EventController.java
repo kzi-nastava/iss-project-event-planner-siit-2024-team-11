@@ -140,3 +140,4 @@ public class EventController {
         return new ResponseEntity<Collection<EventCardDTO>>(filteredEvents, HttpStatus.OK);
     }
 }
+
