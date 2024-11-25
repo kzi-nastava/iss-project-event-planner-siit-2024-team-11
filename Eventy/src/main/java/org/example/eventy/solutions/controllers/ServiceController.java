@@ -42,14 +42,4 @@ public class ServiceController {
 
         return new ResponseEntity<SolutionCardDTO>(HttpStatus.NOT_FOUND);
     }
-
-    @PostMapping(value = "/reservations", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ServiceReservationDTO> createServiceReservation(@RequestBody ServiceReservationDTO serviceReservation) {
-        if (serviceReservation.getSelectedEventId() == 5) {
-            ServiceReservationDTO newServiceReservation = serviceService.createServiceReservation(serviceReservation);
-            return new ResponseEntity<>(newServiceReservation, HttpStatus.CREATED);
-        }
-
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
 }
