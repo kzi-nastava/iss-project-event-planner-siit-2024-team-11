@@ -1,6 +1,7 @@
 package org.example.eventy.solutions.models;
 
 import org.example.eventy.events.models.EventType;
+import org.example.eventy.users.models.SolutionProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +19,8 @@ public class Service extends Solution {
 
     }
 
-    public Service(Long id, String name, String description, double price, int discount, ArrayList<String> imageUrls, boolean isVisible, boolean isAvailable, boolean isDeleted, Category category, List<EventType> relatedEventTypes, String specifics, Integer minReservationTime, Integer maxReservationTime, Integer reservationDeadline, Integer cancellationDeadline, ReservationConfirmationType reservationType, ServiceHistory currentService) {
-        super(id, name, description, price, discount, imageUrls, isVisible, isAvailable, isDeleted, category, relatedEventTypes);
+    public Service(Long id, String name, String description, double price, int discount, ArrayList<String> imageUrls, boolean isVisible, boolean isAvailable, boolean isDeleted, Category category, List<EventType> relatedEventTypes, SolutionProvider provider, String specifics, Integer minReservationTime, Integer maxReservationTime, Integer reservationDeadline, Integer cancellationDeadline, ReservationConfirmationType reservationType, ServiceHistory currentService) {
+        super(id, name, description, price, discount, imageUrls, isVisible, isAvailable, isDeleted, category, relatedEventTypes, provider);
         this.specifics = specifics;
         this.minReservationTime = minReservationTime;
         this.maxReservationTime = maxReservationTime;
