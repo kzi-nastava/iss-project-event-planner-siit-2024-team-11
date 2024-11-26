@@ -4,6 +4,7 @@ import org.example.eventy.events.dtos.EventDTO;
 import org.example.eventy.events.dtos.EventTypeDTO;
 import org.example.eventy.solutions.dtos.CreateProductDTO;
 import org.example.eventy.solutions.dtos.ProductDTO;
+import org.example.eventy.solutions.dtos.ProductPurchaseDTO;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
 import org.example.eventy.solutions.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,5 +139,10 @@ public class ProductController {
         }
 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @PostMapping(value = "/purchase", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> purchaseProduct(@RequestBody ProductPurchaseDTO productPurchaseDTO) {
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }
