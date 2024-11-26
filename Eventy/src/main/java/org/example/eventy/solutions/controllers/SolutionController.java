@@ -113,7 +113,7 @@ public class SolutionController {
     }
 
     @PutMapping(value = "/pricelist/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getProviderPrices(@PathVariable Long userId, @RequestBody PriceListDTO newPricelist) {
+    public ResponseEntity<?> updateProviderPrices(@PathVariable Long userId, @RequestBody PriceListDTO newPricelist) {
         if(userId == 5) {
             // handle new price list in service
             return new ResponseEntity<>(HttpStatus.OK);
