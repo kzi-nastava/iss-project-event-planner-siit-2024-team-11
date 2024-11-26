@@ -1,5 +1,6 @@
 package org.example.eventy.solutions.models;
 
+import org.example.eventy.common.models.ReservationConfirmationType;
 import org.example.eventy.events.models.EventType;
 import org.example.eventy.users.models.SolutionProvider;
 

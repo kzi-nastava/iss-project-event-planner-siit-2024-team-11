@@ -1,6 +1,8 @@
 package org.example.eventy.solutions.controllers;
 
 import org.example.eventy.events.dtos.EventCardDTO;
+import org.example.eventy.solutions.dtos.PriceListDTO;
+import org.example.eventy.solutions.dtos.ProductDTO;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
 import org.example.eventy.solutions.dtos.SolutionDTO;
 import org.example.eventy.solutions.services.ProductService;
@@ -97,5 +99,25 @@ public class SolutionController {
                 search, type, category, eventTypes, company, minPrice, maxPrice, startDate, endDate, isAvailable, pageable);
 
         return new ResponseEntity<Collection<SolutionCardDTO>>(filteredSolutions, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/pricelist/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<SolutionCardDTO>> getProviderPrices(@PathVariable Long userId) {
+        if(userId == 5) {
+            // prices are shown in cards like the cards on the homepage
+            List<SolutionCardDTO> solutions = solutionService.getSolutions(Pageable.unpaged());
+            return new ResponseEntity<Collection<SolutionCardDTO>>(solutions, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<Collection<SolutionCardDTO>>(HttpStatus.NOT_FOUND);
+    }
+
+    @PutMapping(value = "/pricelist/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateProviderPrices(@PathVariable Long userId, @RequestBody PriceListDTO newPricelist) {
+        if(userId == 5) {
+            // handle new price list in service
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 }

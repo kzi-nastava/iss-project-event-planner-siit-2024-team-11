@@ -3,10 +3,12 @@ package org.example.eventy.reviews.models;
 import org.example.eventy.common.models.Status;
 import org.example.eventy.events.models.Event;
 import org.example.eventy.solutions.models.Service;
+import org.example.eventy.solutions.models.Solution;
 
 public class Review {
+    private Long id;
     private Event event;
-    private Service service;
+    private Solution solution;
     private String comment;
     private Integer grade;
     private Status status;
@@ -17,12 +19,16 @@ public class Review {
 
     public Review(Event event, Service service, String comment, Integer grade, Status status, Boolean isDeleted) {
         this.event = event;
-        this.service = service;
+        this.solution = service;
         this.comment = comment;
         this.grade = grade;
         this.status = status;
         this.isDeleted = isDeleted;
     }
+
+    public Long getId() { return id; }
+
+    public void setId(Long id) { this.id = id; }
 
     public Event getEvent() {
         return event;
@@ -32,12 +38,12 @@ public class Review {
         this.event = event;
     }
 
-    public Service getService() {
-        return service;
+    public Solution getSolution() {
+        return solution;
     }
 
-    public void setService(Service service) {
-        this.service = service;
+    public void setSolution(Solution solution) {
+        this.solution = solution;
     }
 
     public String getComment() {

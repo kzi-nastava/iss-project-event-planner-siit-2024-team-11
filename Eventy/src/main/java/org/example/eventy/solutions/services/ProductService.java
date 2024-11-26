@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -22,7 +23,7 @@ public class ProductService {
             "Elegant floral centerpiece for wedding tables.",
             null, // minReservationTime - only for Service
             null, // maxReservationTime - only for Service
-            new ArrayList<>(List.of("Wedding", "Reception")),
+            new ArrayList<>(Arrays.asList("Wedding", "Reception")),
             75.00,
             10,
             "https://example.com/images/centerpiece.jpg",
@@ -40,7 +41,7 @@ public class ProductService {
             "Complete photo booth setup with unlimited prints.",
             null, // minReservationTime - only for Service
             null, // maxReservationTime - only for Service
-            new ArrayList<>(List.of("Corporate", "Wedding")),
+            new ArrayList<>(Arrays.asList("Corporate", "Wedding")),
             400.00,
             15,
             "https://example.com/images/photo_booth.jpg",
@@ -66,7 +67,7 @@ public class ProductService {
             "Elegant floral centerpiece for wedding tables.",
             null, // minReservationTime - only for Service
             null, // maxReservationTime - only for Service
-            new ArrayList<>(List.of("Wedding", "Reception")),
+            new ArrayList<>(Arrays.asList("Wedding", "Reception")),
             75.00,
             10,
             "https://example.com/images/centerpiece.jpg",
