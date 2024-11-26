@@ -1,5 +1,6 @@
 package org.example.eventy.reviews.controllers;
 
+import org.example.eventy.common.models.Status;
 import org.example.eventy.reviews.dtos.CreateReviewDTO;
 import org.example.eventy.reviews.dtos.CreatedReviewDTO;
 import org.example.eventy.reviews.dtos.ReviewDTO;
@@ -86,6 +87,14 @@ public class ReviewController {
     public ResponseEntity<CreatedReviewDTO> createReview(@RequestBody CreateReviewDTO reviewDTO) {
         // create Review in service
         CreatedReviewDTO responseDTO = new CreatedReviewDTO();
+        responseDTO.setId(1337L);
+        responseDTO.setReviewerId(42L);
+        responseDTO.setComment("Literally me");
+        responseDTO.setGrade(5);
+        responseDTO.setStatus(Status.PENDING);
+        responseDTO.setEventName("Ryan Reynolds theme party");
+        responseDTO.setSolutionName(null);
+        // SolutionName == null -> it's an Event review; else, it's a Solution review
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 }
