@@ -44,11 +44,12 @@ public class ServiceController {
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GetServiceDTO> getService(@PathVariable("id") long id) {
-        Optional<GetServiceDTO> service = serviceService.getService(id);
+        /*Optional<GetServiceDTO> service = serviceService.getService(id);
         if (!service.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(service.get(), HttpStatus.OK);
+        }*/
+        GetServiceDTO service = new GetServiceDTO();
+        return new ResponseEntity<>(service, HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

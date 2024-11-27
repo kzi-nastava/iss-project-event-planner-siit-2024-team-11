@@ -83,7 +83,7 @@ public class ReviewController {
     }
 
     // DELETE "/api/reviews/5"
-    @DeleteMapping("/{reviewId}")
+    @DeleteMapping(value ="/{reviewId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ReviewDTO> deleteReview(@PathVariable Long reviewId) {
         if(reviewId == 5) {
             Review reviewModel = reviewService.deleteReview(reviewId);

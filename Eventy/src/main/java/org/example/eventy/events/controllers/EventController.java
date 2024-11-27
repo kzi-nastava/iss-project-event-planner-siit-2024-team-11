@@ -26,7 +26,7 @@ public class EventController {
     @Autowired
     private EventService eventService;
 
-    @GetMapping(value = "/{eventId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EventDTO> getEvent(@PathVariable Long eventId) {
         if(eventId == 5) {
             return new ResponseEntity<EventDTO>(new EventDTO(), HttpStatus.OK);
