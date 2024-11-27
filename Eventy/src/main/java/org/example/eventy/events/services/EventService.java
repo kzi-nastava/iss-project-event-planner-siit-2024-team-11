@@ -1,6 +1,7 @@
 package org.example.eventy.events.services;
 
-import org.example.eventy.events.dtos.EventCardDTO;
+import org.example.eventy.events.models.*;
+import org.example.eventy.users.models.EventOrganizer;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -14,137 +15,67 @@ public class EventService {
     /*@Autowired
     private EventRepository eventRepository;*/
 
-    public ArrayList<EventCardDTO> getEvents(Pageable pageable) {
-        EventCardDTO eventCard1 = new EventCardDTO(
-            1L,
-            "Spring Tech Summit 2024",
-            "A gathering of tech enthusiasts and professionals to explore the latest trends.",
-            1000,
-            true,
-            "Technology",
-            "TechHub Conference Center",
-            LocalDateTime.of(2024, 5, 10, 9, 0),
-            LocalDateTime.of(2024, 5, 10, 18, 0),
-            51L,
-            "TechWorld Organizers",
-            "https://example.com/images/techworld.png"
-        );
-
-        EventCardDTO eventCard2 = new EventCardDTO(
-            2L,
-            "Morning Yoga Retreat",
-            "A serene yoga session for relaxation and mindfulness.",
-            50,
-            true,
-            "Wellness",
-            "Sunrise Yoga Studio",
-            LocalDateTime.of(2024, 6, 15, 7, 30),
-            LocalDateTime.of(2024, 6, 15, 9, 0),
-            72L,
-            "HealthFirst",
-            "https://example.com/images/healthfirst.png"
-        );
-
-        ArrayList<EventCardDTO> events = new ArrayList<>();
-        events.add(eventCard1);
-        events.add(eventCard2);
-
+    public ArrayList<Event> getEvents(String search, ArrayList<String> eventTypes, String location, LocalDate startDate, LocalDate endDate, Pageable pageable) {
+        ArrayList<Event> events = generateEventExamples(1);
         return events;
+        //return eventRepository.findAll(search, eventTypes, location, startDate, endDate, pageable);
     }
 
-    public EventCardDTO getEventCard(Long eventId) {
-        EventCardDTO eventCard = new EventCardDTO(
-            eventId,
-            "Spring Tech Summit 2024",
-            "A gathering of tech enthusiasts and professionals to explore the latest trends.",
-            1000,
-            true,
-            "Technology",
-            "TechHub Conference Center",
-            LocalDateTime.of(2024, 5, 10, 9, 0),
-            LocalDateTime.of(2024, 5, 10, 18, 0),
-            51L,
-            "TechWorld Organizers",
-            "https://example.com/images/techworld.png"
-        );
+    public Event getEvent(Long eventId) {
+        ArrayList<Event> featuredEvents = generateEventExamples(1);
+        Event event = featuredEvents.get(0);
+        event.setId(eventId);
 
-        return eventCard;
+        return event;
     }
 
-    public ArrayList<EventCardDTO> getFeaturedEvents() {
-        EventCardDTO featuredEventCard1 = new EventCardDTO(
-            1L,
-            "FEATURED - Spring Tech Summit 2024",
-            "A gathering of tech enthusiasts and professionals to explore the latest trends.",
-            1000,
-            true,
-            "Technology",
-            "TechHub Conference Center",
-            LocalDateTime.of(2024, 5, 10, 9, 0),
-            LocalDateTime.of(2024, 5, 10, 18, 0),
-            51L,
-            "TechWorld Organizers",
-            "https://example.com/images/techworld.png"
-        );
-
-        EventCardDTO featuredEventCard2 = new EventCardDTO(
-            2L,
-            "FEATURED - Morning Yoga Retreat",
-            "A serene yoga session for relaxation and mindfulness.",
-            50,
-            true,
-            "Wellness",
-            "Sunrise Yoga Studio",
-            LocalDateTime.of(2024, 6, 15, 7, 30),
-            LocalDateTime.of(2024, 6, 15, 9, 0),
-            72L,
-            "HealthFirst",
-            "https://example.com/images/healthfirst.png"
-        );
-
-        ArrayList<EventCardDTO> featuredEvents = new ArrayList<>();
-        featuredEvents.add(featuredEventCard1);
-        featuredEvents.add(featuredEventCard2);
-
+    public ArrayList<Event> getFeaturedEvents() {
+        ArrayList<Event> featuredEvents = generateEventExamples(2);
         return featuredEvents;
     }
 
-    public ArrayList<EventCardDTO> filterEvents(String search, ArrayList<String> eventTypes, String location, LocalDate startDate, LocalDate endDate, Pageable pageable) {
-        EventCardDTO filteredEventCard1 = new EventCardDTO(
-            1L,
-            "FILTERED - Spring Tech Summit 2024",
-            "A gathering of tech enthusiasts and professionals to explore the latest trends.",
-            1000,
-            true,
-            "Technology",
-            "TechHub Conference Center",
-            LocalDateTime.of(2024, 5, 10, 9, 0),
-            LocalDateTime.of(2024, 5, 10, 18, 0),
-            51L,
-            "TechWorld Organizers",
-            "https://example.com/images/techworld.png"
-        );
+    public ArrayList<Event> generateEventExamples(int type) {
+        EventType eventType = new EventType();
+        eventType.setName("Event type name");
+        Location loc = new Location();
+        loc.setName("Location name");
+        ArrayList<String> images = new ArrayList<String>();
+        images.add("Image 1"); images.add("Image 2");
 
-        EventCardDTO filteredEventCard2 = new EventCardDTO(
-            2L,
-            "FILTERED - Morning Yoga Retreat",
-            "A serene yoga session for relaxation and mindfulness.",
-            50,
-            true,
-            "Wellness",
-            "Sunrise Yoga Studio",
-            LocalDateTime.of(2024, 6, 15, 7, 30),
-            LocalDateTime.of(2024, 6, 15, 9, 0),
-            72L,
-            "HealthFirst",
-            "https://example.com/images/healthfirst.png"
-        );
+        Event event1 = new Event();
+        event1.setId(1L);
+        event1.setName(type == 1 ? "Sophia's 25th Birthday Party" : "FEATURED - Sophia's 25th Birthday Party");
+        event1.setDescription("A fun-filled evening to celebrate Sophia's birthday with friends and family.");
+        event1.setMaxNumberParticipants(50);
+        event1.setPrivacy(PrivacyType.PRIVATE);
+        event1.setType(eventType);
+        event1.setLocation(loc);
+        event1.setStartDate(LocalDateTime.of(2024, 12, 15, 18, 0));
+        event1.setEndDate(LocalDateTime.of(2024, 12, 15, 23, 0));
+        event1.setOrganiser(new EventOrganizer());
+        event1.getOrganiser().setFirstName("Tac Tac");
+        event1.getOrganiser().setLastName("Jezickovic");
+        event1.getOrganiser().setImageUrls(images);
 
-        ArrayList<EventCardDTO> filteredEvents = new ArrayList<>();
-        filteredEvents.add(filteredEventCard1);
-        filteredEvents.add(filteredEventCard2);
+        Event event2 = new Event();
+        event2.setId(2L);
+        event2.setName(type == 1 ? "2025 Annual Tech Conference" : "FEATURED - 2025 Annual Tech Conference");
+        event2.setDescription("An annual conference to discuss the latest trends in technology and innovation.");
+        event2.setMaxNumberParticipants(500);
+        event2.setPrivacy(PrivacyType.PUBLIC);
+        event2.setType(eventType);
+        event2.setLocation(loc);
+        event2.setStartDate(LocalDateTime.of(2025, 5, 20, 9, 0));
+        event2.setEndDate(LocalDateTime.of(2025, 5, 20, 17, 0));
+        event2.setOrganiser(new EventOrganizer());
+        event2.getOrganiser().setFirstName("Tac Tac");
+        event2.getOrganiser().setLastName("Jezickovic");
+        event2.getOrganiser().setImageUrls(images);
 
-        return filteredEvents;
-        //return eventRepository.findFilteredEvents(search, eventTypes, location, startDate, endDate, pageable);
+        ArrayList<Event> events = new ArrayList<>();
+        events.add(event1);
+        events.add(event2);
+
+        return events;
     }
 }
