@@ -9,7 +9,7 @@ import java.util.List;
 
 public class User {
     private Long id;
-    private byte[][] profilePictures;
+    private ArrayList<String> imageUrls;
     private String email;
     private String password;
     private String address;
@@ -28,9 +28,9 @@ public class User {
 
     }
 
-    public User(Long id, byte[][] profilePictures, String email, String password, String address, String phoneNumber, boolean isActive, boolean isDeactivated, boolean hasSilencedNotifications, LocalDateTime suspensionDeadline) {
+    public User(Long id, ArrayList<String> imageUrls, String email, String password, String address, String phoneNumber, boolean isActive, boolean isDeactivated, boolean hasSilencedNotifications, LocalDateTime suspensionDeadline) {
         this.id = id;
-        this.profilePictures = profilePictures;
+        this.imageUrls = imageUrls;
         this.email = email;
         this.password = password;
         this.address = address;
@@ -45,9 +45,9 @@ public class User {
         this.favoriteSolutions = new ArrayList<>();
     }
 
-    public User(Long id, byte[][] profilePictures, String email, String password, String address, String phoneNumber, boolean isActive, boolean isDeactivated, boolean hasSilencedNotifications, LocalDateTime suspensionDeadline, List<User> blocked, RegistrationRequest registrationRequest, List<Event> acceptedEvents, List<Event> favoriteEvents, List<Solution> favoriteSolutions) {
+    public User(Long id, ArrayList<String> imageUrls, String email, String password, String address, String phoneNumber, boolean isActive, boolean isDeactivated, boolean hasSilencedNotifications, LocalDateTime suspensionDeadline, List<User> blocked, RegistrationRequest registrationRequest, List<Event> acceptedEvents, List<Event> favoriteEvents, List<Solution> favoriteSolutions) {
         this.id = id;
-        this.profilePictures = profilePictures;
+        this.imageUrls = imageUrls;
         this.email = email;
         this.password = password;
         this.address = address;
@@ -71,12 +71,12 @@ public class User {
         this.id = id;
     }
 
-    public byte[][] getProfilePictures() {
-        return profilePictures;
+    public ArrayList<String> getImageUrls() {
+        return imageUrls;
     }
 
-    public void setProfilePictures(byte[][] profilePictures) {
-        this.profilePictures = profilePictures;
+    public void setImageUrls(ArrayList<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 
     public String getEmail() {

@@ -7,14 +7,14 @@ import java.util.Calendar;
 public class Reservation {
     private Long id;
     private Event selectedEvent;
-    private Service selectedService;
+    private Solution selectedService;
     private Calendar reservationStartDateTime;
     private Calendar reservationEndDateTime;
 
     public Reservation() {
     }
 
-    public Reservation(Long id, Event selectedEvent, Service selectedService, Calendar reservationStartDateTime, Calendar reservationEndDateTime) {
+    public Reservation(Long id, Event selectedEvent, Solution selectedService, Calendar reservationStartDateTime, Calendar reservationEndDateTime) {
         this.id = id;
         this.selectedEvent = selectedEvent;
         this.selectedService = selectedService;
@@ -38,11 +38,11 @@ public class Reservation {
         this.selectedEvent = selectedEvent;
     }
 
-    public Service getSelectedService() {
+    public Solution getSelectedService() {
         return selectedService;
     }
 
-    public void setSelectedService(Service selectedService) {
+    public void setSelectedService(Solution selectedService) {
         this.selectedService = selectedService;
     }
 

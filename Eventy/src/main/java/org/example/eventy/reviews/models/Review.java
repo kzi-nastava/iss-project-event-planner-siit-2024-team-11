@@ -4,9 +4,11 @@ import org.example.eventy.common.models.Status;
 import org.example.eventy.events.models.Event;
 import org.example.eventy.solutions.models.Service;
 import org.example.eventy.solutions.models.Solution;
+import org.example.eventy.users.models.User;
 
 public class Review {
     private Long id;
+    private User sender;
     private Event event;
     private Solution solution;
     private String comment;
@@ -17,9 +19,11 @@ public class Review {
     public Review() {
     }
 
-    public Review(Event event, Service service, String comment, Integer grade, Status status, Boolean isDeleted) {
+    public Review(Long id, User sender, Event event, Solution solution, String comment, Integer grade, Status status, Boolean isDeleted) {
+        this.id = id;
+        this.sender = sender;
         this.event = event;
-        this.solution = service;
+        this.solution = solution;
         this.comment = comment;
         this.grade = grade;
         this.status = status;
@@ -29,6 +33,14 @@ public class Review {
     public Long getId() { return id; }
 
     public void setId(Long id) { this.id = id; }
+
+    public User getSender() {
+        return sender;
+    }
+
+    public void setSender(User sender) {
+        this.sender = sender;
+    }
 
     public Event getEvent() {
         return event;
