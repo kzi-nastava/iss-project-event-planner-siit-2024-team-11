@@ -6,7 +6,7 @@ import org.example.eventy.users.models.SolutionProvider;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Solution {
+public class Solution {
     private Long id;
     private String name;
     private Category category;
@@ -17,14 +17,14 @@ public abstract class Solution {
     private boolean isVisible;
     private boolean isAvailable;
     private boolean isDeleted;
-    private List<EventType> relatedEventTypes;
+    private List<EventType> eventTypes;
     private SolutionProvider provider;
 
     public Solution() {
 
     }
 
-    public Solution(Long id, String name, String description, double price, int discount, ArrayList<String> imageUrls, boolean isVisible, boolean isAvailable, boolean isDeleted, Category category, List<EventType> relatedEventTypes, SolutionProvider provider) {
+    public Solution(Long id, String name, String description, double price, int discount, ArrayList<String> imageUrls, boolean isVisible, boolean isAvailable, boolean isDeleted, Category category, List<EventType> eventTypes, SolutionProvider provider) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -35,7 +35,7 @@ public abstract class Solution {
         this.isAvailable = isAvailable;
         this.isDeleted = isDeleted;
         this.category = category;
-        this.relatedEventTypes = relatedEventTypes;
+        this.eventTypes = eventTypes;
         this.provider = provider;
     }
 
@@ -119,12 +119,12 @@ public abstract class Solution {
         this.category = category;
     }
 
-    public List<EventType> getRelatedEventTypes() {
-        return relatedEventTypes;
+    public List<EventType> getEventTypes() {
+        return eventTypes;
     }
 
-    public void setRelatedEventTypes(List<EventType> relatedEventTypes) {
-        this.relatedEventTypes = relatedEventTypes;
+    public void setEventTypes(List<EventType> eventTypes) {
+        this.eventTypes = eventTypes;
     }
 
     public SolutionProvider getProvider() {

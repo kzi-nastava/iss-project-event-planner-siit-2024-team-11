@@ -1,20 +1,18 @@
 package org.example.eventy.solutions.services;
 
 import org.example.eventy.common.models.ReservationConfirmationType;
-import org.example.eventy.common.models.SolutionType;
 import org.example.eventy.common.models.Status;
-import org.example.eventy.events.dtos.EventTypeDTO;
 import org.example.eventy.events.models.EventType;
-import org.example.eventy.solutions.dtos.CategoryDTO;
-import org.example.eventy.solutions.dtos.SolutionCardDTO;
 import org.example.eventy.solutions.dtos.services.*;
 import org.example.eventy.solutions.models.Category;
+import org.example.eventy.solutions.models.Service;
+import org.example.eventy.solutions.models.Solution;
+import org.example.eventy.users.models.SolutionProvider;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-@Service
+@org.springframework.stereotype.Service
 public class ServiceService {
     // @Autowired
     // private ServiceRepository serviceRepository;
@@ -88,7 +86,7 @@ public class ServiceService {
         createdServiceDTO.setDescription(createServiceDTO.getDescription());
         createdServiceDTO.setPrice(createServiceDTO.getPrice());
         createdServiceDTO.setDiscount(createServiceDTO.getDiscount());
-        createdServiceDTO.setImages(createServiceDTO.getImages());
+        createdServiceDTO.setImageUrls(createServiceDTO.getImageUrls());
         createdServiceDTO.setCategory(createServiceDTO.getCategory());
         createdServiceDTO.setRelatedEventTypes(createServiceDTO.getRelatedEventTypes());
         createdServiceDTO.setSpecifics(createServiceDTO.getSpecifics());
@@ -121,7 +119,7 @@ public class ServiceService {
         updatedServiceDTO.setDescription(updateServiceDTO.getDescription());
         updatedServiceDTO.setPrice(updateServiceDTO.getPrice());
         updatedServiceDTO.setDiscount(updateServiceDTO.getDiscount());
-        updatedServiceDTO.setImages(updateServiceDTO.getImages());
+        updatedServiceDTO.setImageUrls(updateServiceDTO.getImageUrls());
         updatedServiceDTO.setVisible(updateServiceDTO.isVisible());
         updatedServiceDTO.setAvailable(updateServiceDTO.isAvailable());
         updatedServiceDTO.setCategory(updateServiceDTO.getCategory());
@@ -139,69 +137,72 @@ public class ServiceService {
         allServices.removeIf(s -> s.getId() == id);
     }
 
-    public ArrayList<SolutionCardDTO> getServices(Pageable pageable) {
-        SolutionCardDTO serviceCard1 = new SolutionCardDTO(
-            1L,
-            SolutionType.SERVICE,
-            "Wedding Catering",
-            "Catering",
-            null, // description - only for Product
-            3,
-            8,
-            new ArrayList<>(Arrays.asList("Wedding", "Reception")),
-            50.00,
-            5,
-            "https://example.com/images/wedding_catering.jpg",
-            true,
-            601L,
-            "Gourmet Delights",
-            "https://example.com/images/gourmet_delights.jpg"
-        );
-
-        SolutionCardDTO serviceCard2 = new SolutionCardDTO(
-            2L,
-            SolutionType.SERVICE,
-            "Live Music Band",
-            "Entertainment",
-            null, // description - only for Product
-            2,
-            5,
-            new ArrayList<>(Arrays.asList("Wedding", "Party")),
-            1200.00,
-            0,
-            "https://example.com/images/music_band.jpg",
-            false,
-            602L,
-            "Melody Makers",
-            "https://example.com/images/melody_makers.jpg"
-        );
-
-        ArrayList<SolutionCardDTO> services = new ArrayList<>();
-        services.add(serviceCard1);
-        services.add(serviceCard2);
-
+    public ArrayList<Solution> getServices(Pageable pageable) {
+        ArrayList<Solution> services = generateServiceExamples();
         return services;
     }
 
-    public SolutionCardDTO getServiceCard(Long serviceId) {
-        SolutionCardDTO serviceCard = new SolutionCardDTO(
-            serviceId,
-            SolutionType.SERVICE,
-            "Wedding Catering",
-            "Catering",
-            null, // description - only for Product
-            3,
-            8,
-            new ArrayList<>(Arrays.asList("Wedding", "Reception")),
-            50.00,
-            5,
-            "https://example.com/images/wedding_catering.jpg",
-            true,
-            601L,
-            "Gourmet Delights",
-            "https://example.com/images/gourmet_delights.jpg"
-        );
+    public Solution getService(Long serviceId) {
+        ArrayList<Solution> services = generateServiceExamples();
+        Solution service = services.get(0);
+        service.setId(serviceId);
 
-        return serviceCard;
+        return service;
+    }
+
+    public ArrayList<Solution> generateServiceExamples() {
+        Category category1 = new Category();
+        category1.setName("Catering");
+        ArrayList<EventType> eventTypes = new ArrayList<EventType>();
+        EventType eventType1 = new EventType();
+        eventType1.setName("Wedding");
+        EventType eventType2 = new EventType();
+        eventType2.setName("Birthday");
+        eventTypes.add(eventType1);
+        eventTypes.add(eventType2);
+        ArrayList<String> imageUrls = new ArrayList<String>();
+        imageUrls.add("https://example.com/solution.png");
+        SolutionProvider provider = new SolutionProvider();
+        provider.setName("TacTac");
+        provider.setEmail("cakes.luxury@gmail.com");
+        provider.setImageUrls(imageUrls);
+
+        Service service1 = new Service();
+        service1.setId(1L);
+        service1.setName("Catering Food");
+        service1.setCategory(category1);
+        service1.setMinReservationTime(1);
+        service1.setMaxReservationTime(3);
+        service1.setDescription(null);
+        service1.setEventTypes(eventTypes);
+        service1.setPrice(2220.00);
+        service1.setDiscount(15);
+        service1.setImageUrls(imageUrls);
+        service1.setAvailable(true);
+        service1.setProvider(provider);
+
+        Category category2 = new Category();
+        category2.setName("Entertainment");
+        provider.setEmail("exit.festival@gmail.com");
+
+        Service service2 = new org.example.eventy.solutions.models.Service();
+        service2.setId(2L);
+        service2.setName("DJ Services");
+        service2.setCategory(category2);
+        service2.setMinReservationTime(2);
+        service2.setMaxReservationTime(6);
+        service2.setDescription(null);
+        service2.setEventTypes(eventTypes);
+        service2.setPrice(150.00);
+        service2.setDiscount(10);
+        service2.setImageUrls(imageUrls);
+        service2.setAvailable(true);
+        service2.setProvider(provider);
+
+        ArrayList<Solution> services = new ArrayList<Solution>();
+        services.add(service1);
+        services.add(service2);
+
+        return services;
     }
 }

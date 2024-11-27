@@ -1,5 +1,7 @@
 package org.example.eventy.solutions.dtos;
 
+import org.example.eventy.solutions.models.Reservation;
+
 import java.util.Calendar;
 
 public class ReservationDTO {
@@ -11,6 +13,14 @@ public class ReservationDTO {
 
     public ReservationDTO() {
 
+    }
+
+    public ReservationDTO(Reservation reservation) {
+        this.id = reservation.getId();
+        this.selectedEventId = reservation.getSelectedEvent().getId();
+        this.selectedServiceId = reservation.getSelectedService().getId();
+        this.reservationStartDateTime = reservation.getReservationStartDateTime();
+        this.reservationEndDateTime = reservation.getReservationEndDateTime();
     }
 
     public ReservationDTO(Long id, Long selectedEventId, Long selectedServiceId, Calendar reservationStartDateTime, Calendar reservationEndDateTime) {
