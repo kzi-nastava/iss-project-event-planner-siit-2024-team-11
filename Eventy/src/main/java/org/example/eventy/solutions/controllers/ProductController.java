@@ -135,6 +135,10 @@ public class ProductController {
             return new ResponseEntity<ProductDTO>(updatedProductDTO, HttpStatus.OK);
         }
 
+        if(productId == 100L) {
+            return new ResponseEntity<ProductDTO>(updatedProductDTO, HttpStatus.BAD_REQUEST);
+        }
+
         return new ResponseEntity<ProductDTO>(updatedProductDTO, HttpStatus.NOT_FOUND);
     }
 
