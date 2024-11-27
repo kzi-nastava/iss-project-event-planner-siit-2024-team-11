@@ -38,10 +38,10 @@ public class UserProfileController {
         return new ResponseEntity<UserDTO>(userDTO, HttpStatus.NOT_FOUND);
     }
 
-    @PutMapping(value="/{userId}/deactivation")
+    @DeleteMapping(value="/{userId}")
     public ResponseEntity<?> deactivateProfile(@PathVariable Long userId) {
         if(userId == 5) {
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/authentication")
 public class AuthenticationController {
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> login(@RequestBody LoginDTO loginDTO) {
@@ -29,7 +29,7 @@ public class AuthenticationController {
             userDTO.setLastName("Prezime");
             userDTO.setAddress("Neka Adresa");
             userDTO.setPhoneNumber("+13482192329");
-            return new ResponseEntity<>(userDTO, HttpStatus.OK);
+            return new ResponseEntity<UserDTO>(userDTO, HttpStatus.OK);
         }
 
         return new ResponseEntity<UserDTO>(userDTO, HttpStatus.UNAUTHORIZED);
