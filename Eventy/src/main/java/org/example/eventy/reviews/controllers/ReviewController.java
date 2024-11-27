@@ -63,11 +63,11 @@ public class ReviewController {
     }
 
     /*
-//    {
-//        "comment": "Updated review comment",
-//        "grade": 4,
-//        "status": "PENDING"
-//    }
+    {
+        "comment": "Updated review comment",
+        "grade": 4,
+        "status": "PENDING"
+    }
     */
     // PUT "/api/reviews/5"
     @PutMapping(value = "/{reviewId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -89,10 +89,10 @@ public class ReviewController {
             Review reviewModel = reviewService.deleteReview(reviewId);
             ReviewDTO review = new ReviewDTO(reviewModel);
 
-            return new ResponseEntity<ReviewDTO>(review, HttpStatus.OK);
+            return new ResponseEntity<ReviewDTO>(review, HttpStatus.NO_CONTENT);
         }
 
-        return new ResponseEntity<ReviewDTO>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<ReviewDTO>(HttpStatus.NOT_FOUND);
     }
 
     // POST "/api/reviews"

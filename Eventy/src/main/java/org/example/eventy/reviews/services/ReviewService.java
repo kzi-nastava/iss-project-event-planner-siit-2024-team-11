@@ -78,7 +78,7 @@ public class ReviewService {
             solution,
             type == 1? "PENDING - Great event, well-organized and fun!" : type == 2 ? "ACCEPTED - Great event, well-organized and fun!" : "Great event, well-organized and fun!",
             5,
-            Status.PENDING,
+            type == 1 ? Status.PENDING : Status.ACCEPTED,
             false
         );
 
@@ -89,7 +89,7 @@ public class ReviewService {
             null,
             type == 1? "PENDING - The cake was decent, but there is room for improvement." : type == 2 ? "ACCEPTED - The cake was decent, but there is room for improvement." : "The cake was decent, but there is room for improvement.",
             3,
-            Status.PENDING,
+            type == 1 ? Status.PENDING : Status.ACCEPTED,
             false
         );
 
