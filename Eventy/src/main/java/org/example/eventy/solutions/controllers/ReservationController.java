@@ -1,6 +1,7 @@
 package org.example.eventy.solutions.controllers;
 
 import org.example.eventy.solutions.dtos.ReservationDTO;
+import org.example.eventy.solutions.models.Reservation;
 import org.example.eventy.solutions.services.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,9 @@ public class ReservationController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ReservationDTO> createReservation(@RequestBody ReservationDTO reservation) {
         if (reservation.getId() == 5) {
-            ReservationDTO newReservation = reservationService.createReservation(reservation);
+            Reservation newReservationModel = reservationService.createReservation(reservation);
+            ReservationDTO newReservation = new ReservationDTO(newReservationModel);
+
             return new ResponseEntity<>(newReservation, HttpStatus.CREATED);
         }
 
@@ -42,7 +45,9 @@ public class ReservationController {
     @GetMapping(value = "/{reservationId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ReservationDTO> getReservation(@PathVariable Long reservationId) {
         if (reservationId == 5) {
-            ReservationDTO reservation = reservationService.getReservation(reservationId);
+            Reservation reservationModel = reservationService.getReservation(reservationId);
+            ReservationDTO reservation = new ReservationDTO(reservationModel);
+
             return new ResponseEntity<ReservationDTO>(reservation, HttpStatus.OK);
         }
 
@@ -52,9 +57,14 @@ public class ReservationController {
     // GET "/api/reservations/service/5"
     @GetMapping(value = "/service/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<ReservationDTO>> getReservationsByServiceId(@PathVariable Long serviceId) {
-        ArrayList<ReservationDTO> reservations = reservationService.getReservationsByServiceId(serviceId);
-
         if (serviceId == 5) {
+            ArrayList<Reservation> reservationModels = reservationService.getReservationsByServiceId(serviceId);
+
+            ArrayList<ReservationDTO> reservations = new ArrayList<>();
+            for (Reservation reservation : reservationModels) {
+                reservations.add(new ReservationDTO(reservation));
+            }
+
             return new ResponseEntity<Collection<ReservationDTO>>(reservations, HttpStatus.OK);
         }
 
@@ -64,9 +74,14 @@ public class ReservationController {
     // GET "/api/reservations/event/5"
     @GetMapping(value = "/event/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<ReservationDTO>> getReservationsByEventId(@PathVariable Long eventId) {
-        ArrayList<ReservationDTO> reservations = reservationService.getReservationsByEventId(eventId);
-
         if (eventId == 5) {
+            ArrayList<Reservation> reservationModels = reservationService.getReservationsByEventId(eventId);
+
+            ArrayList<ReservationDTO> reservations = new ArrayList<>();
+            for (Reservation reservation : reservationModels) {
+                reservations.add(new ReservationDTO(reservation));
+            }
+
             return new ResponseEntity<Collection<ReservationDTO>>(reservations, HttpStatus.OK);
         }
 

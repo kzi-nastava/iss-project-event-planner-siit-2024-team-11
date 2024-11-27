@@ -1,11 +1,11 @@
 package org.example.eventy.solutions.controllers;
 
-import org.example.eventy.events.dtos.EventDTO;
 import org.example.eventy.events.dtos.EventTypeDTO;
 import org.example.eventy.solutions.dtos.CreateProductDTO;
 import org.example.eventy.solutions.dtos.ProductDTO;
 import org.example.eventy.solutions.dtos.ProductPurchaseDTO;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
+import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -34,16 +33,23 @@ public class ProductController {
     // ***NOTE: this should be named getProducts PROBABLY, but we already have one method below named like that
     @GetMapping(value = "/cards", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<SolutionCardDTO>> getProductCards(Pageable pageable) {
-        ArrayList<SolutionCardDTO> products = productService.getProducts(pageable);
+        ArrayList<Solution> productModels = productService.getProducts(pageable);
+
+        ArrayList<SolutionCardDTO> products = new ArrayList<>();
+        for (Solution solution : productModels) {
+            products.add(new SolutionCardDTO(solution));
+        }
+
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
-    // GET "/api/products/5/card"
-    @GetMapping(value = "/{productId}/card", produces = MediaType.APPLICATION_JSON_VALUE)
+    // GET "/api/products/cards/5"
+    @GetMapping(value = "/cards/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SolutionCardDTO> getProductCard(@PathVariable Long productId) {
-        SolutionCardDTO productCard = productService.getProductCard(productId);
-
         if (productId == 5) {
+            Solution productCardModel = productService.getProduct(productId);
+            SolutionCardDTO productCard = new SolutionCardDTO(productCardModel);
+
             return new ResponseEntity<SolutionCardDTO>(productCard, HttpStatus.OK);
         }
 

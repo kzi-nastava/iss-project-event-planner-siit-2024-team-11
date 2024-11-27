@@ -1,9 +1,8 @@
 package org.example.eventy.solutions.controllers;
 
-import org.example.eventy.events.dtos.EventTypeDTO;
-import org.example.eventy.solutions.dtos.CategoryDTO;
 import org.example.eventy.solutions.dtos.services.*;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
+import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.services.ServiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -73,18 +72,25 @@ public class ServiceController {
        2) they are NOT in card shapes (they always will be if we are getting all services)
        also SolutionCardDTO == ProductCardDTO == ServiceCardDTO (only a few of fields will be null) */
     // GET "/api/services"
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<SolutionCardDTO>> getServices(Pageable pageable) {
-        ArrayList<SolutionCardDTO> services = serviceService.getServices(pageable);
+    @GetMapping(value = "/cards", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<SolutionCardDTO>> getServiceCards(Pageable pageable) {
+        ArrayList<Solution> serviceModels = serviceService.getServices(pageable);
+
+        ArrayList<SolutionCardDTO> services = new ArrayList<>();
+        for (Solution solution : serviceModels) {
+            services.add(new SolutionCardDTO(solution));
+        }
+
         return new ResponseEntity<>(services, HttpStatus.OK);
     }
 
-    // GET "/api/services/5/card"
-    @GetMapping(value = "/{serviceId}/card", produces = MediaType.APPLICATION_JSON_VALUE)
+    // GET "/api/services/cards/5"
+    @GetMapping(value = "/cards/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SolutionCardDTO> getServiceCard(@PathVariable Long serviceId) {
-        SolutionCardDTO serviceCard = serviceService.getServiceCard(serviceId);
-
         if (serviceId == 5) {
+            Solution serviceCardModel = serviceService.getService(serviceId);
+            SolutionCardDTO serviceCard = new SolutionCardDTO(serviceCardModel);
+
             return new ResponseEntity<SolutionCardDTO>(serviceCard, HttpStatus.OK);
         }
 
