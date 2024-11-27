@@ -15,7 +15,7 @@ public class UpdatedServiceDTO {
     private String description;
     private double price;
     private int discount;
-    private byte[][] images;
+    private ArrayList<String> imageUrls;
     private boolean isVisible;
     private boolean isAvailable;
     private CategoryDTO category;
@@ -35,12 +35,12 @@ public class UpdatedServiceDTO {
         this.description = service.getDescription();
         this.price = service.getPrice();
         this.discount = service.getDiscount();
-        this.images = service.getImages();
+        this.imageUrls = service.getImageUrls();
         this.isVisible = service.isVisible();
         this.isAvailable = service.isAvailable();
         this.category = new CategoryDTO(service.getCategory());
         this.relatedEventTypes = new ArrayList<>();
-        service.getRelatedEventTypes().forEach(et -> this.relatedEventTypes.add(new EventTypeDTO(et.getName(), et.getDescription())));
+        service.getEventTypes().forEach(et -> this.relatedEventTypes.add(new EventTypeDTO(et.getName(), et.getDescription())));
         this.specifics = service.getSpecifics();
         this.minReservationTime = service.getMinReservationTime();
         this.maxReservationTime = service.getMaxReservationTime();
@@ -81,12 +81,12 @@ public class UpdatedServiceDTO {
         this.discount = discount;
     }
 
-    public byte[][] getImages() {
-        return images;
+    public ArrayList<String> getImageUrls() {
+        return imageUrls;
     }
 
-    public void setImages(byte[][] images) {
-        this.images = images;
+    public void setImageUrls(ArrayList<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 
     public boolean isVisible() {

@@ -2,6 +2,8 @@ package org.example.eventy.solutions.dtos.services;
 
 import org.example.eventy.events.dtos.EventTypeDTO;
 import org.example.eventy.solutions.dtos.CategoryDTO;
+
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class UpdateServiceDTO {
@@ -11,7 +13,7 @@ public class UpdateServiceDTO {
     private String description;
     private double price;
     private int discount;
-    private byte[][] images;
+    private ArrayList<String> imageUrls;
     private boolean isVisible;
     private boolean isAvailable;
     private CategoryDTO category;
@@ -57,12 +59,12 @@ public class UpdateServiceDTO {
         this.discount = discount;
     }
 
-    public byte[][] getImages() {
-        return images;
+    public ArrayList<String> getImageUrls() {
+        return imageUrls;
     }
 
-    public void setImages(byte[][] images) {
-        this.images = images;
+    public void setImageUrls(ArrayList<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 
     public boolean isVisible() {

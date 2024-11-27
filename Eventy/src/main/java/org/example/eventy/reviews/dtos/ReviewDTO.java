@@ -1,6 +1,7 @@
 package org.example.eventy.reviews.dtos;
 
 import org.example.eventy.common.models.Status;
+import org.example.eventy.reviews.models.Review;
 
 public class ReviewDTO {
     private Long id;
@@ -8,7 +9,7 @@ public class ReviewDTO {
     private Integer grade;
     private String senderEmail;
     private String recipientEmail;
-    private String description; // event/product/service name
+    private String title; // event/product/service name
     private Status status;
     private Boolean isDeleted;
 
@@ -16,15 +17,26 @@ public class ReviewDTO {
 
     }
 
-    public ReviewDTO(Long id, String comment, Integer grade, String senderEmail, String recipientEmail, String description, Status status, Boolean isDeleted) {
+    public ReviewDTO(Long id, String comment, Integer grade, String senderEmail, String recipientEmail, String title, Status status, Boolean isDeleted) {
         this.id = id;
         this.comment = comment;
         this.grade = grade;
         this.senderEmail = senderEmail;
         this.recipientEmail = recipientEmail;
-        this.description = description;
+        this.title = title;
         this.status = status;
         this.isDeleted = isDeleted;
+    }
+
+    public ReviewDTO(Review review) {
+        this.id = review.getId();
+        this.comment = review.getComment();
+        this.grade = review.getGrade();
+        this.senderEmail = review.getSender().getEmail();
+        this.recipientEmail = review.getSolution() == null ? review.getEvent().getOrganiser().getEmail() : review.getSolution().getProvider().getEmail();
+        this.title = review.getSolution() == null ? review.getEvent().getName() : review.getSolution().getName();
+        this.status = review.getStatus();
+        this.isDeleted = review.getDeleted();
     }
 
     public Long getId() {
@@ -67,13 +79,13 @@ public class ReviewDTO {
         this.recipientEmail = recipientEmail;
     }
 
-    public String getDescription() {
+    public String getTitle() {
 
-        return description;
+        return title;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public Status getStatus() {

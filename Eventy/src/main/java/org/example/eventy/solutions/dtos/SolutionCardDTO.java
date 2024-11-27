@@ -2,6 +2,8 @@ package org.example.eventy.solutions.dtos;
 
 import org.example.eventy.common.models.SolutionType;
 import org.example.eventy.events.models.EventType;
+import org.example.eventy.solutions.models.Service;
+import org.example.eventy.solutions.models.Solution;
 
 import java.util.ArrayList;
 
@@ -42,6 +44,32 @@ public class SolutionCardDTO {
         this.providerId = providerId;
         this.providerName = providerName;
         this.providerImageUrl = providerImageUrl;
+    }
+
+    public SolutionCardDTO(Solution solution) {
+        this.solutionId = solution.getId();
+        this.type = solution.getDescription() != null ? SolutionType.PRODUCT : SolutionType.SERVICE;
+        this.name = solution.getName();
+        this.categoryName = solution.getCategory().getName();
+        this.description = solution.getDescription();
+        if (solution instanceof Service) {
+            this.minReservationTime = ((Service) solution).getMinReservationTime();
+            this.maxReservationTime = ((Service) solution).getMaxReservationTime();
+        } else {
+            this.minReservationTime = null;
+            this.maxReservationTime = null;
+        }
+        this.eventTypeNames = new ArrayList<String>();
+        for (EventType eventType : solution.getEventTypes()) {
+            this.eventTypeNames.add(eventType.getName());
+        }
+        this.price = solution.getPrice();
+        this.discount = solution.getDiscount();
+        this.firstImageUrl = solution.getImageUrls().get(0);
+        this.isAvailable = solution.isAvailable();
+        this.providerId = solution.getProvider().getId();
+        this.providerName = solution.getProvider().getName();
+        this.providerImageUrl = solution.getImageUrls().get(0);
     }
 
     public Long getSolutionId() {
