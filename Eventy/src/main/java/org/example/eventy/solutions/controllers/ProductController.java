@@ -135,13 +135,17 @@ public class ProductController {
             return new ResponseEntity<ProductDTO>(updatedProductDTO, HttpStatus.OK);
         }
 
+        if(productId == 100L) {
+            return new ResponseEntity<ProductDTO>(updatedProductDTO, HttpStatus.BAD_REQUEST);
+        }
+
         return new ResponseEntity<ProductDTO>(updatedProductDTO, HttpStatus.NOT_FOUND);
     }
 
-    @PutMapping(value = "/{productId}/deletion", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/{productId}")
     public ResponseEntity<?> deleteProduct(@PathVariable Long productId) {
         if(productId == 5) {
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
