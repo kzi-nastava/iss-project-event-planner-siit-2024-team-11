@@ -1,12 +1,26 @@
 package org.example.eventy.solutions.models;
 
+import jakarta.persistence.*;
 import org.example.eventy.common.models.Status;
 
+@Entity
+@Table(name = "categories")
 public class Category {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String description;
+
+    @Column(nullable = false)
     private Status status;
+
+    @Column(name = "isDeleted")
+    private boolean isDeleted;
 
     public Category() {
 
