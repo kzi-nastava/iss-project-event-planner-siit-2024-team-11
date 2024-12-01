@@ -1,44 +1,18 @@
-package org.example.eventy.solutions.models;
+package org.example.eventy.solutions.dtos.categories;
 
-import jakarta.persistence.*;
 import org.example.eventy.common.models.Status;
 
-@Entity
-@Table(name = "categories")
-public class Category {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
+public class CreateCategoryDTO {
     private String name;
-
-    @Column(nullable = false)
     private String description;
-
-    @Column(nullable = false)
     private Status status;
 
-    @Column(name = "is_deleted")
-    private boolean isDeleted;
+    public CreateCategoryDTO() {}
 
-    public Category() {
-
-    }
-
-    public Category(Long id, String name, String description, Status status) {
-        this.id = id;
+    public CreateCategoryDTO(String name, String description, Status status) {
         this.name = name;
         this.description = description;
         this.status = status;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {
