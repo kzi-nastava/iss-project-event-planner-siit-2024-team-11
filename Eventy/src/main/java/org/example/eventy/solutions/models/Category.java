@@ -19,7 +19,7 @@ public class Category {
     @Column(nullable = false)
     private Status status;
 
-    @Column(name = "isDeleted")
+    @Column(name = "is_deleted")
     private boolean isDeleted;
 
     public Category() {
