@@ -1,21 +1,31 @@
 package org.example.eventy.events.models;
 
+import jakarta.persistence.*;
 import org.example.eventy.solutions.models.Category;
 
-import java.util.List;
+import java.util.Set;
 
+@Entity
+@Table(name = "EventTypes")
 public class EventType {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private String description;
+    @Column(nullable = false)
     private boolean isActive;
-    private List<Category> recommendedSolutionCategories;
+    @ManyToMany(cascade = CascadeType.REFRESH)
+    @JoinTable(name = "EventTypesRecommendedSolutionCategories", joinColumns = @JoinColumn(name = "event_type_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "recommended_category_id", referencedColumnName = "id"))
+    private Set<Category> recommendedSolutionCategories;
 
     public EventType() {
 
     }
 
-    public EventType(Long id, String name, String description, boolean isActive, List<Category> recommendedSolutionCategories) {
+    public EventType(Long id, String name, String description, boolean isActive, Set<Category> recommendedSolutionCategories) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -55,11 +65,11 @@ public class EventType {
         isActive = active;
     }
 
-    public List<Category> getRecommendedSolutionCategories() {
+    public Set<Category> getRecommendedSolutionCategories() {
         return recommendedSolutionCategories;
     }
 
-    public void setRecommendedSolutionCategories(List<Category> recommendedSolutionCategories) {
+    public void setRecommendedSolutionCategories(Set<Category> recommendedSolutionCategories) {
         this.recommendedSolutionCategories = recommendedSolutionCategories;
     }
 }
