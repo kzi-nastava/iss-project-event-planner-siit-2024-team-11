@@ -3,6 +3,7 @@ package org.example.eventy.solutions.dtos.services;
 import org.example.eventy.common.models.ReservationConfirmationType;
 import org.example.eventy.events.dtos.EventTypeDTO;
 import org.example.eventy.solutions.dtos.CategoryDTO;
+import org.example.eventy.solutions.dtos.categories.CategoryWithIDDTO;
 import org.example.eventy.solutions.models.Service;
 
 import java.util.ArrayList;
@@ -40,7 +41,8 @@ public class UpdatedServiceDTO {
         this.isAvailable = service.isAvailable();
         this.category = new CategoryDTO(service.getCategory());
         this.relatedEventTypes = new ArrayList<>();
-        service.getEventTypes().forEach(et -> this.relatedEventTypes.add(new EventTypeDTO(et.getName(), et.getDescription())));
+        // this may be too complicated, maybe there is an easier way
+        service.getEventTypes().forEach(et -> this.relatedEventTypes.add(new EventTypeDTO(et.getId(), et.getName(), et.getDescription(), et.getRecommendedSolutionCategories().stream().map(CategoryWithIDDTO::new).toList())));
         this.specifics = service.getSpecifics();
         this.minReservationTime = service.getMinReservationTime();
         this.maxReservationTime = service.getMaxReservationTime();
