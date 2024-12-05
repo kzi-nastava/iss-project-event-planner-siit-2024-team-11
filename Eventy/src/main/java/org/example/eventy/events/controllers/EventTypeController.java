@@ -36,7 +36,7 @@ public class EventTypeController {
 
     @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<EventTypeCardDTO>> getActiveTypes(@RequestParam(required = false) String search, Pageable pageable) {
-        List<EventType> eventTypes = eventTypeService.getTypes(search, pageable);
+        List<EventType> eventTypes = eventTypeService.getActiveTypes(search, pageable);
         List<EventTypeCardDTO> eventTypeDTOs = new ArrayList<EventTypeCardDTO>();
 
         for(EventType eventType : eventTypes) {

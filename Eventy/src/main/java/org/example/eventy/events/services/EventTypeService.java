@@ -22,12 +22,7 @@ public class EventTypeService {
     }
 
     public List<EventType> getActiveTypes(String search, Pageable pageable) {
-        if (search == null || search.isBlank()) {
-            return eventTypeRepository.findAll(pageable).getContent();
-        }
-
-        return eventTypeRepository.findByIsActiveTrueAndNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
-                search, search, pageable).getContent();
+        return eventTypeRepository.findActiveTypes(search, pageable).getContent();
     }
 
     public EventType get(Long eventTypeId) {
