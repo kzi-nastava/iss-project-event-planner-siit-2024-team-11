@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface EventTypeRepository extends JpaRepository<EventType, Long> {
     Page<EventType> findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String name, String description, Pageable pageable);
+    Page<EventType> findByIsActiveTrueAndNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+            String name, String description, Pageable pageable);
 }

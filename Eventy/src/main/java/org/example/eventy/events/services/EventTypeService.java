@@ -21,23 +21,36 @@ public class EventTypeService {
         return eventTypeRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(search, search, pageable).getContent();
     }
 
+    public List<EventType> getActiveTypes(String search, Pageable pageable) {
+        if (search == null || search.isBlank()) {
+            return eventTypeRepository.findAll(pageable).getContent();
+        }
+
+        return eventTypeRepository.findByIsActiveTrueAndNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+                search, search, pageable).getContent();
+    }
+
     public EventType get(Long eventTypeId) {
         return eventTypeRepository.findById(eventTypeId).orElse(null);
     }
 
     public EventType save(EventType eventType) {
-        return eventTypeRepository.save(eventType);
+        try {
+            return eventTypeRepository.save(eventType);
+        }
+        catch (Exception e) {
+            return null;
+        }
     }
 
-    public boolean deactivate(Long eventTypeId) {
+    public EventType toggleActivation(Long eventTypeId) {
         EventType eventType = eventTypeRepository.findById(eventTypeId).orElse(null);
 
         if(eventType != null) {
-            eventType.setActive(false);
+            eventType.setActive(!eventType.isActive());
             eventTypeRepository.save(eventType);
-            return true;
         }
 
-        return false;
+        return eventType;
     }
 }
