@@ -23,10 +23,10 @@ public class ServiceService {
         Category category1 = new Category(1L, "Category 1", "Description for Category 1", Status.ACCEPTED);
         Category category2 = new Category(2L, "Category 2", "Description for Category 2", Status.ACCEPTED);
 
-        Set<Category> recommendedCategoriesForEventType1 = new TreeSet<>();
+        Set<Category> recommendedCategoriesForEventType1 = new HashSet<>();
         recommendedCategoriesForEventType1.add(category1);
 
-        Set<Category> recommendedCategoriesForEventType2 = new TreeSet<>();
+        Set<Category> recommendedCategoriesForEventType2 = new HashSet<>();
         recommendedCategoriesForEventType2.add(category2);
 
         EventType eventType1 = new EventType(1L, "Event Type 1", "Description for Event Type 1", true, recommendedCategoriesForEventType1);
