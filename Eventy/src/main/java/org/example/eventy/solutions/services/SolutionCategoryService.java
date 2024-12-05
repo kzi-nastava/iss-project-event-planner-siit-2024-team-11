@@ -31,6 +31,12 @@ public class SolutionCategoryService {
         return solutionCategoryRepository.findAll(pageable).map(CategoryWithIDDTO::new);
     }
 
+    public Category getCategory(Long id) {
+        Optional<Category> category = solutionCategoryRepository.findById(id);
+        return category.orElse(null);
+
+    }
+
     public CategoryWithIDDTO updateCategory(CategoryWithIDDTO newCategory) {
         // check if exists
         Optional<Category> oldCategory = solutionCategoryRepository.findById(newCategory.getId());
