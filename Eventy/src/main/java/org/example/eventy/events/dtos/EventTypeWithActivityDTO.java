@@ -7,24 +7,27 @@ import org.example.eventy.solutions.models.Category;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventTypeDTO {
+public class EventTypeWithActivityDTO {
     private Long id;
     private String name;
     private String description;
     private List<CategoryWithIDDTO> recommendedSolutionCategories;
+    private boolean isActive;
 
-    public EventTypeDTO() {
+    public EventTypeWithActivityDTO() {
 
     }
 
-    public EventTypeDTO(Long id, String name, String description, List<CategoryWithIDDTO> recommendedSolutionCategories) {
+    public EventTypeWithActivityDTO(Long id, String name, String description, List<CategoryWithIDDTO> recommendedSolutionCategories,
+                                    boolean isActive) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.recommendedSolutionCategories = recommendedSolutionCategories;
+        this.isActive = isActive;
     }
 
-    public EventTypeDTO(EventType eventType) {
+    public EventTypeWithActivityDTO(EventType eventType) {
         this.id = eventType.getId();
         this.name = eventType.getName();
         this.description = eventType.getDescription();
@@ -33,6 +36,8 @@ public class EventTypeDTO {
         for(Category category : eventType.getRecommendedSolutionCategories()) {
             recommendedSolutionCategories.add(new CategoryWithIDDTO(category));
         }
+
+        this.isActive = eventType.isActive();
     }
 
     public Long getId() {
@@ -65,5 +70,13 @@ public class EventTypeDTO {
 
     public void setRecommendedSolutionCategories(List<CategoryWithIDDTO> recommendedSolutionCategories) {
         this.recommendedSolutionCategories = recommendedSolutionCategories;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }
