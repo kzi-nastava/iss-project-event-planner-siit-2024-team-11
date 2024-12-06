@@ -21,8 +21,8 @@ public class EventTypeService {
         return eventTypeRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(search, search, pageable).getContent();
     }
 
-    public List<EventType> getActiveTypes(String search, Pageable pageable) {
-        return eventTypeRepository.findActiveTypes(search, pageable).getContent();
+    public List<EventType> getActiveTypes() {
+        return eventTypeRepository.findByIsActiveTrue();
     }
 
     public EventType get(Long eventTypeId) {
@@ -47,5 +47,9 @@ public class EventTypeService {
         }
 
         return eventType;
+    }
+
+    public long getCount() {
+        return eventTypeRepository.count();
     }
 }
