@@ -13,6 +13,7 @@ import java.util.List;
 public class EventOrganizer extends User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // just current mocking so I can run and test the code
+    private Long fakeId;
     private String firstName;
     private String lastName;
 

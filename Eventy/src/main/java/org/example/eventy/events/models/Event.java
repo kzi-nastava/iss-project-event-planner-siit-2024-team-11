@@ -32,7 +32,7 @@ public class Event {
     @JoinColumn(name = "event_id", referencedColumnName = "id")
     private List<Activity> agenda;
     @ManyToOne(cascade = CascadeType.REFRESH)
-    @JoinColumn(name = "organizer_id", referencedColumnName = "firstName")
+    @JoinColumn(name = "organizer_id", referencedColumnName = "fakeId")
     private EventOrganizer organiser;
 
     public Event() {
