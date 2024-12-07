@@ -68,7 +68,10 @@ public class UserProfileController {
 
     @DeleteMapping(value="/{userId}")
     public ResponseEntity<?> deactivateProfile(@PathVariable Long userId) {
-        if(userId == 5) {
+        User user = userService.get(userId);
+        if(user != null) {
+            user.setActive(false);
+            userService.save(user);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
