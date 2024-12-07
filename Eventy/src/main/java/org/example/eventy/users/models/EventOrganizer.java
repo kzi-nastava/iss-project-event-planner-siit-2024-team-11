@@ -21,12 +21,13 @@ public class EventOrganizer extends User {
 
     }
 
-    public EventOrganizer(String firstName, String lastName) {
+    public EventOrganizer(Long fakeId, String firstName, String lastName) {
+        this.fakeId = fakeId;
         this.firstName = firstName;
         this.lastName = lastName;
     }
 
-    public EventOrganizer(String firstName, String lastName, List<Event> organizedEvents) {
+    public EventOrganizer(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
     }

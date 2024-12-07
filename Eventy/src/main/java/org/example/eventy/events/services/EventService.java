@@ -84,6 +84,7 @@ public class EventService {
             return eventRepository.save(event);
         }
         catch(Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
