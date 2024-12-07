@@ -6,24 +6,33 @@ import org.example.eventy.users.models.EventOrganizer;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Entity
+@Table(name = "Events")
 public class Event {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private String description;
+    @Column(nullable = false)
     private int maxNumberParticipants;
+    @Column(nullable = false)
     private PrivacyType privacy;
+    @Column(nullable = false)
     private LocalDateTime date;
     @ManyToOne(cascade = CascadeType.REFRESH)
-    @JoinColumn()
+    @JoinColumn(name = "event_type_id", referencedColumnName = "id")
     private EventType type;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn()
+    @JoinColumn(name = "location_id", referencedColumnName = "id")
     private Location location;
-    @ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
-    @JoinColumn()
+    @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "event_id", referencedColumnName = "id")
     private List<Activity> agenda;
     @ManyToOne(cascade = CascadeType.REFRESH)
-    @JoinColumn()
+    @JoinColumn(name = "organizer_id", referencedColumnName = "firstName")
     private EventOrganizer organiser;
 
     public Event() {
