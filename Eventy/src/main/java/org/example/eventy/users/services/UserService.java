@@ -17,7 +17,7 @@ public class UserService {
     private OrganizerRepository organizerRepository;
 
     public EventOrganizer getEventOrganizer(Long id) {
-        return organizerRepository.save(new EventOrganizer(5L, "Fake Name", "Fake Surname"));
+        return organizerRepository.save(new EventOrganizer("Fake Name", "Fake Surname"));
     }
 
     public boolean suspendUser(String userEmail, int daysDuration) {

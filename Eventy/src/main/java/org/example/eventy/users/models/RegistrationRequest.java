@@ -8,15 +8,17 @@ public class RegistrationRequest {
     private Long id;
     private LocalDateTime date;
     private Status status;
+    private User user;
 
     public RegistrationRequest() {
 
     }
 
-    public RegistrationRequest(Long id, LocalDateTime date, Status status) {
+    public RegistrationRequest(Long id, LocalDateTime date, Status status, User user) {
         this.id = id;
         this.date = date;
         this.status = status;
+        this.user = user;
     }
 
     public Long getId() {
@@ -41,5 +43,13 @@ public class RegistrationRequest {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

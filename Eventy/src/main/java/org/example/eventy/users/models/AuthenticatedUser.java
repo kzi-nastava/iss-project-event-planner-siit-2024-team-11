@@ -4,17 +4,17 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 
 @Entity
-public class Admin extends User {
+public class AuthenticatedUser extends User {
     @Column(nullable = false)
     private String firstName;
     @Column(nullable = false)
     private String lastName;
 
-    public Admin() {
+    public AuthenticatedUser() {
 
     }
 
-    public Admin(String firstName, String lastName) {
+    public AuthenticatedUser(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
     }
