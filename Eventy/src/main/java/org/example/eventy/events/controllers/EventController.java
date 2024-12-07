@@ -6,6 +6,7 @@ import org.example.eventy.events.services.ActivityService;
 import org.example.eventy.events.services.EventService;
 import org.example.eventy.events.services.EventTypeService;
 import org.example.eventy.events.services.LocationService;
+import org.example.eventy.users.models.EventOrganizer;
 import org.example.eventy.users.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -77,7 +78,7 @@ public class EventController {
             agenda.add(activity);
         }
         event.setAgenda(agenda);
-        event.setOrganiser(userService.getEventOrganizer(organizeEventDTO.getOrganizerId()));
+        event.setOrganiser((EventOrganizer) userService.get(organizeEventDTO.getOrganizerId()));
 
         event = eventService.save(event);
 

@@ -4,6 +4,8 @@ import org.example.eventy.users.dtos.RegistrationDTO;
 import org.example.eventy.users.dtos.UpdateUserProfileDTO;
 import org.example.eventy.users.dtos.UserDTO;
 import org.example.eventy.users.dtos.UserType;
+import org.example.eventy.users.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,9 @@ import java.util.ArrayList;
 @RestController
 @RequestMapping("/api/users")
 public class UserProfileController {
+    @Autowired
+    private UserService userService;
+
     @PutMapping(value = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> updateProfile(@RequestBody UpdateUserProfileDTO updateUserProfileDTO, @PathVariable Long userId) {
         UserDTO userDTO = new UserDTO();

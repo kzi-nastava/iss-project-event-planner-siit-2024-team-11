@@ -1,23 +1,18 @@
 package org.example.eventy.users.services;
 
-import org.example.eventy.users.dtos.ReportDTO;
 import org.example.eventy.users.dtos.UserDTO;
-import org.example.eventy.users.models.EventOrganizer;
 import org.example.eventy.users.models.User;
-import org.example.eventy.users.repositories.OrganizerRepository;
+import org.example.eventy.users.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
-    /*@Autowired
-    private UserRepository userRepository;*/
-
     @Autowired
-    private OrganizerRepository organizerRepository;
+    private UserRepository userRepository;
 
-    public EventOrganizer getEventOrganizer(Long id) {
-        return organizerRepository.save(new EventOrganizer("Fake Name", "Fake Surname"));
+    public User get(Long id) {
+        return userRepository.findById(id).orElse(null);
     }
 
     public boolean suspendUser(String userEmail, int daysDuration) {
