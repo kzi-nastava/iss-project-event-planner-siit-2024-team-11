@@ -53,7 +53,6 @@ public class EventService {
         event1.setType(eventType);
         event1.setLocation(loc);
         event1.setDate(LocalDateTime.of(2024, 12, 15, 18, 0));
-        event1.setEndDate(LocalDateTime.of(2024, 12, 15, 23, 0));
         event1.setOrganiser(new EventOrganizer());
         event1.getOrganiser().setFirstName("Tac Tac");
         event1.getOrganiser().setLastName("Jezickovic");
@@ -68,7 +67,6 @@ public class EventService {
         event2.setType(eventType);
         event2.setLocation(loc);
         event2.setDate(LocalDateTime.of(2025, 5, 20, 9, 0));
-        event2.setEndDate(LocalDateTime.of(2025, 5, 20, 17, 0));
         event2.setOrganiser(new EventOrganizer());
         event2.getOrganiser().setFirstName("Tac Tac");
         event2.getOrganiser().setLastName("Jezickovic");
