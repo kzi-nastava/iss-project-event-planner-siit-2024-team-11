@@ -1,11 +1,13 @@
 package org.example.eventy.events.controllers;
 
+import org.example.eventy.common.models.PagedResponse;
 import org.example.eventy.events.dtos.*;
 import org.example.eventy.events.models.EventType;
 import org.example.eventy.events.services.EventTypeService;
 import org.example.eventy.solutions.models.Category;
 import org.example.eventy.solutions.services.SolutionCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,7 +25,7 @@ public class EventTypeController {
     private SolutionCategoryService solutionCategoryService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<EventTypeCardDTO>> getTypes(@RequestParam(required = false) String search, Pageable pageable) {
+    public ResponseEntity<PagedResponse<EventTypeCardDTO>> getTypes(@RequestParam(required = false) String search, Pageable pageable) {
         List<EventType> eventTypes = eventTypeService.getTypes(search, pageable);
         List<EventTypeCardDTO> eventTypeDTOs = new ArrayList<EventTypeCardDTO>();
 
@@ -31,12 +33,16 @@ public class EventTypeController {
             eventTypeDTOs.add(new EventTypeCardDTO(eventType));
         }
 
-        return new ResponseEntity<Collection<EventTypeCardDTO>>(eventTypeDTOs, HttpStatus.OK);
+        long count = eventTypeService.getCount();
+
+        PagedResponse<EventTypeCardDTO> pagedResponse = new PagedResponse<>(eventTypeDTOs, (int) Math.ceil((double) count / pageable.getPageSize()), count);
+
+        return new ResponseEntity<PagedResponse<EventTypeCardDTO>>(pagedResponse, HttpStatus.OK);
     }
 
     @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<EventTypeCardDTO>> getActiveTypes(@RequestParam(required = false) String search, Pageable pageable) {
-        List<EventType> eventTypes = eventTypeService.getActiveTypes(search, pageable);
+    public ResponseEntity<Collection<EventTypeCardDTO>> getActiveTypes() {
+        List<EventType> eventTypes = eventTypeService.getActiveTypes();
         List<EventTypeCardDTO> eventTypeDTOs = new ArrayList<EventTypeCardDTO>();
 
         for(EventType eventType : eventTypes) {

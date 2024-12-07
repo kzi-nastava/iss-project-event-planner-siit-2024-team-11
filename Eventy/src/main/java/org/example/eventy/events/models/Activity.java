@@ -1,13 +1,24 @@
 package org.example.eventy.events.models;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "Agenda")
 public class Activity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private String description;
+    @Column(nullable = false)
     private LocalDateTime startTime;
+    @Column(nullable = false)
     private LocalDateTime endTime;
+    @Column(nullable = false)
     private String location;
 
     public Activity() {

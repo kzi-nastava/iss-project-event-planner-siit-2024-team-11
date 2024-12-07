@@ -29,8 +29,7 @@ public class EventCardDTO {
         this.isOpen = event.getPrivacy().equals("PUBLIC");
         this.eventTypeName = event.getType().getName();
         this.locationName = event.getLocation().getName();
-        this.startDate = event.getStartDate();
-        this.endDate = event.getEndDate();
+        this.startDate = event.getDate();
         this.organiserId = event.getOrganiser().getId();
         this.organiserName = event.getOrganiser().getFirstName() + " " + event.getOrganiser().getLastName();
         this.organiserImage = event.getOrganiser().getImageUrls().get(0);

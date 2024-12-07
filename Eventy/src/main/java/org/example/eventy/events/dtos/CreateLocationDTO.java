@@ -1,40 +1,20 @@
-package org.example.eventy.events.models;
+package org.example.eventy.events.dtos;
 
-import jakarta.persistence.*;
-
-@Entity
-@Table(name = "Locations")
-public class Location {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @Column()
+public class CreateLocationDTO {
     private String name;
-    @Column()
     private String address;
-    @Column(nullable = false)
     private double latitude;
-    @Column(nullable = false)
     private double longitude;
 
-    public Location() {
+    public CreateLocationDTO() {
 
     }
 
-    public Location(Long id, String name, String address, double latitude, double longitude) {
-        this.id = id;
+    public CreateLocationDTO(String name, String address, double latitude, double longitude) {
         this.name = name;
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {

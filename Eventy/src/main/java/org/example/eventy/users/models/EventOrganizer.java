@@ -1,29 +1,35 @@
 package org.example.eventy.users.models;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import org.example.eventy.events.models.Event;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
 public class EventOrganizer extends User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // just current mocking so I can run and test the code
+    private Long fakeId;
     private String firstName;
     private String lastName;
-    private List<Event> organizedEvents;
 
     public EventOrganizer() {
 
     }
 
+    public EventOrganizer(Long fakeId, String firstName, String lastName) {
+        this.fakeId = fakeId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
     public EventOrganizer(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.organizedEvents = new ArrayList<>();
-    }
-
-    public EventOrganizer(String firstName, String lastName, List<Event> organizedEvents) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.organizedEvents = organizedEvents;
     }
 
     public String getFirstName() {
@@ -40,13 +46,5 @@ public class EventOrganizer extends User {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public List<Event> getOrganizedEvents() {
-        return organizedEvents;
-    }
-
-    public void setOrganizedEvents(List<Event> organizedEvents) {
-        this.organizedEvents = organizedEvents;
     }
 }
