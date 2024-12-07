@@ -111,7 +111,7 @@ public abstract class User {
         return imageUrls;
     }
 
-    public void setImageUrls(ArrayList<PicturePath> imageUrls) {
+    public void setImageUrls(List<PicturePath> imageUrls) {
         this.imageUrls = imageUrls;
     }
 

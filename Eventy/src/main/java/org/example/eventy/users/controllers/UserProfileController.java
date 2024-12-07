@@ -1,9 +1,11 @@
 package org.example.eventy.users.controllers;
 
+import org.example.eventy.common.services.PictureService;
 import org.example.eventy.users.dtos.RegistrationDTO;
 import org.example.eventy.users.dtos.UpdateUserProfileDTO;
 import org.example.eventy.users.dtos.UserDTO;
 import org.example.eventy.users.dtos.UserType;
+import org.example.eventy.users.models.*;
 import org.example.eventy.users.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,28 +21,49 @@ public class UserProfileController {
     @Autowired
     private UserService userService;
 
-    @PutMapping(value = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDTO> updateProfile(@RequestBody UpdateUserProfileDTO updateUserProfileDTO, @PathVariable Long userId) {
-        UserDTO userDTO = new UserDTO();
-        if(userId.equals(updateUserProfileDTO.getId()) && updateUserProfileDTO.getEmail().equals("good@gmail.com")) {
-            userDTO.setEmail(updateUserProfileDTO.getEmail());
-            userDTO.setId(updateUserProfileDTO.getId());
-            userDTO.setProfilePictures(updateUserProfileDTO.getProfilePictures());
-            userDTO.setUserType(UserType.ORGANIZER);
-            userDTO.setFirstName(updateUserProfileDTO.getFirstName());
-            userDTO.setLastName(updateUserProfileDTO.getLastName());
-            userDTO.setAddress(updateUserProfileDTO.getAddress());
-            userDTO.setPhoneNumber(updateUserProfileDTO.getPhoneNumber());
-            return new ResponseEntity<UserDTO>(userDTO, HttpStatus.OK);
+    @Autowired
+    private PictureService pictureService;
+
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserDTO> updateProfile(@RequestBody UpdateUserProfileDTO updateUserProfileDTO) {
+        User user = userService.get(updateUserProfileDTO.getId());
+
+        if(user == null) {
+            return new ResponseEntity<UserDTO>(HttpStatus.NOT_FOUND);
         }
 
-        if(updateUserProfileDTO.getId() == 100) {
-            // validation failed
-            return new ResponseEntity<UserDTO>(userDTO, HttpStatus.BAD_REQUEST);
+        if(!user.getPassword().equals(updateUserProfileDTO.getOldPassword())) {
+            return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
         }
 
-        // user not found
-        return new ResponseEntity<UserDTO>(userDTO, HttpStatus.NOT_FOUND);
+        user.setEmail(updateUserProfileDTO.getEmail());
+        user.setAddress(updateUserProfileDTO.getAddress());
+        user.setPhoneNumber(updateUserProfileDTO.getPhoneNumber());
+        user.setPassword(updateUserProfileDTO.getPassword());
+        user.setImageUrls(pictureService.save(updateUserProfileDTO.getProfilePictures())); // update!
+
+        UserType userType = userService.getUserType(user);
+        if(userType == UserType.PROVIDER) {
+            ((SolutionProvider) user).setName(updateUserProfileDTO.getName());
+            ((SolutionProvider) user).setDescription(updateUserProfileDTO.getDescription());
+        } else if (userType == UserType.ORGANIZER) {
+            ((EventOrganizer) user).setFirstName(updateUserProfileDTO.getFirstName());
+            ((EventOrganizer) user).setLastName(updateUserProfileDTO.getLastName());
+        } else if (userType == UserType.ADMIN) {
+            ((Admin) user).setFirstName(updateUserProfileDTO.getFirstName());
+            ((Admin) user).setLastName(updateUserProfileDTO.getLastName());
+        } else {
+            ((AuthenticatedUser) user).setFirstName(updateUserProfileDTO.getFirstName());
+            ((AuthenticatedUser) user).setLastName(updateUserProfileDTO.getLastName());
+        }
+
+        user = userService.save(user);
+
+        if(user == null) {
+            return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<UserDTO>(new UserDTO(user, userType), HttpStatus.OK);
     }
 
     @DeleteMapping(value="/{userId}")
