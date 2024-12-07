@@ -1,60 +1,35 @@
 package org.example.eventy.events.dtos;
 
-import org.example.eventy.events.models.Event;
-import org.example.eventy.events.models.PrivacyType;
-
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class EventDTO {
-    private Long id;
+public class OrganizeEventDTO {
     private String name;
     private String description;
     private int maxNumberParticipants;
     private boolean isPublic;
-    private EventTypeDTO eventType;
-    private LocationDTO location;
+    private Long eventTypeId;
+    private CreateLocationDTO location;
     private LocalDateTime date;
-    private List<ActivityDTO> agenda;
+    private List<CreateActivityDTO> agenda;
+    private List<String> emails;
     private Long organizerId;
 
-    public EventDTO() {
+    public OrganizeEventDTO() {
 
     }
 
-    public EventDTO(Event event) {
-        this.id = event.getId();
-        this.name = event.getName();
-        this.description = event.getDescription();
-        this.maxNumberParticipants = event.getMaxNumberParticipants();
-        this.isPublic = event.getPrivacy() == PrivacyType.PUBLIC;
-        this.eventType = new EventTypeDTO(event.getType());
-        this.location = new LocationDTO(event.getLocation());
-        this.date = event.getDate();
-        this.agenda = event.getAgenda().stream().map(ActivityDTO::new).collect(Collectors.toList());
-        this.organizerId = event.getOrganiser().getId();
-    }
-
-    public EventDTO(Long id, String name, String description, int maxNumberParticipants, boolean isPublic, EventTypeDTO eventType, LocationDTO location, LocalDateTime date, List<ActivityDTO> agenda, Long organizerId) {
-        this.id = id;
+    public OrganizeEventDTO(String name, String description, int maxNumberParticipants, boolean isPublic, Long eventType, CreateLocationDTO location, LocalDateTime date, List<CreateActivityDTO> agenda, List<String> emails, Long organizerId) {
         this.name = name;
         this.description = description;
         this.maxNumberParticipants = maxNumberParticipants;
         this.isPublic = isPublic;
-        this.eventType = eventType;
+        this.eventTypeId = eventType;
         this.location = location;
         this.date = date;
         this.agenda = agenda;
+        this.emails = emails;
         this.organizerId = organizerId;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -89,19 +64,19 @@ public class EventDTO {
         isPublic = aPublic;
     }
 
-    public EventTypeDTO getEventType() {
-        return eventType;
+    public Long getEventTypeId() {
+        return eventTypeId;
     }
 
-    public void setEventType(EventTypeDTO eventType) {
-        this.eventType = eventType;
+    public void setEventTypeId(Long eventTypeId) {
+        this.eventTypeId = eventTypeId;
     }
 
-    public LocationDTO getLocation() {
+    public CreateLocationDTO getLocation() {
         return location;
     }
 
-    public void setLocation(LocationDTO location) {
+    public void setLocation(CreateLocationDTO location) {
         this.location = location;
     }
 
@@ -113,12 +88,19 @@ public class EventDTO {
         this.date = date;
     }
 
-    public List<ActivityDTO> getAgenda() {
+    public List<CreateActivityDTO> getAgenda() {
         return agenda;
     }
 
-    public void setAgenda(List<ActivityDTO> agenda) {
+    public void setAgenda(List<CreateActivityDTO> agenda) {
         this.agenda = agenda;
+    }
+    public List<String> getEmails() {
+        return emails;
+    }
+
+    public void setEmails(List<String> emails) {
+        this.emails = emails;
     }
 
     public Long getOrganizerId() {

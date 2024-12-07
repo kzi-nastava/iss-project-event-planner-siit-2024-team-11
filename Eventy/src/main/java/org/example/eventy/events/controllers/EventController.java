@@ -1,10 +1,12 @@
 package org.example.eventy.events.controllers;
 
-import org.example.eventy.events.dtos.EventCardDTO;
-import org.example.eventy.events.dtos.EventDTO;
-import org.example.eventy.events.dtos.EventStatsDTO;
-import org.example.eventy.events.models.Event;
+import org.example.eventy.events.dtos.*;
+import org.example.eventy.events.models.*;
+import org.example.eventy.events.services.ActivityService;
 import org.example.eventy.events.services.EventService;
+import org.example.eventy.events.services.EventTypeService;
+import org.example.eventy.events.services.LocationService;
+import org.example.eventy.users.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -26,6 +28,18 @@ public class EventController {
     @Autowired
     private EventService eventService;
 
+    @Autowired
+    private EventTypeService eventTypeService;
+
+    @Autowired
+    private LocationService locationService;
+
+    @Autowired
+    private ActivityService activityService;
+
+    @Autowired
+    UserService userService;
+
     @GetMapping(value = "/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EventDTO> getEvent(@PathVariable Long eventId) {
         if(eventId == 5) {
@@ -36,8 +50,41 @@ public class EventController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EventDTO> createEvent(@RequestBody EventDTO eventDTO) {
-        if(eventDTO.getName().equals("event")) {
+    public ResponseEntity<EventDTO> organizeEvent(@RequestBody OrganizeEventDTO organizeEventDTO) {
+        Event event = new Event();
+        event.setName(organizeEventDTO.getName());
+        event.setDescription(organizeEventDTO.getDescription());
+        event.setMaxNumberParticipants(organizeEventDTO.getMaxNumberParticipants());
+        event.setPrivacy(organizeEventDTO.isPublic() ? PrivacyType.PUBLIC : PrivacyType.PRIVATE);
+        event.setDate(organizeEventDTO.getDate());
+        event.setType(eventTypeService.get(organizeEventDTO.getEventTypeId()));
+        Location location = new Location();
+        location.setName(organizeEventDTO.getLocation().getName());
+        location.setAddress(organizeEventDTO.getLocation().getAddress());
+        location.setLatitude(organizeEventDTO.getLocation().getLatitude());
+        location.setLongitude(organizeEventDTO.getLocation().getLongitude());
+        locationService.save(location); // is this even necessary with CascadeType.ALL
+        event.setLocation(location);
+        List<Activity> agenda = new ArrayList<>();
+        for(CreateActivityDTO activityDTO : organizeEventDTO.getAgenda()) {
+            Activity activity = new Activity();
+            activity.setName(activityDTO.getName());
+            activity.setDescription(activityDTO.getDescription());
+            activity.setLocation(activityDTO.getLocation());
+            activity.setStartTime(activityDTO.getStartTime());
+            activity.setEndTime(activityDTO.getEndTime());
+            activityService.save(activity);
+            agenda.add(activity);
+        }
+        event.setAgenda(agenda);
+        event.setOrganiser(userService.getEventOrganizer(organizeEventDTO.getOrganizerId()));
+
+        event = eventService.save(event);
+
+        if(event != null) {
+            // SEND EMAIL INVITATIONS HERE, example: emailService.sendInviations(organizeEventDTO.getEmails())
+            // ofc, it doesn't have to be this example or anything similar, everything can be adjusted
+            EventDTO eventDTO = new EventDTO(event);
             return new ResponseEntity<EventDTO>(eventDTO, HttpStatus.CREATED);
         }
 

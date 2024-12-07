@@ -1,5 +1,6 @@
 package org.example.eventy.events.models;
 
+import jakarta.persistence.*;
 import org.example.eventy.users.models.EventOrganizer;
 
 import java.time.LocalDateTime;
@@ -11,25 +12,31 @@ public class Event {
     private String description;
     private int maxNumberParticipants;
     private PrivacyType privacy;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDateTime date;
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn()
     private EventType type;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn()
     private Location location;
+    @ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+    @JoinColumn()
     private List<Activity> agenda;
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn()
     private EventOrganizer organiser;
 
     public Event() {
 
     }
 
-    public Event(Long id, String name, String description, int maxNumberParticipants, PrivacyType privacy, LocalDateTime startDate, LocalDateTime endDate, EventType type, Location location, List<Activity> agenda, EventOrganizer organiser) {
+    public Event(Long id, String name, String description, int maxNumberParticipants, PrivacyType privacy, LocalDateTime date, EventType type, Location location, List<Activity> agenda, EventOrganizer organiser) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.maxNumberParticipants = maxNumberParticipants;
         this.privacy = privacy;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.date = date;
         this.type = type;
         this.location = location;
         this.agenda = agenda;
@@ -76,20 +83,12 @@ public class Event {
         this.privacy = privacy;
     }
 
-    public LocalDateTime getStartDate() {
-        return startDate;
+    public LocalDateTime getDate() {
+        return date;
     }
 
-    public void setStartDate(LocalDateTime startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDateTime getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDateTime endDate) {
-        this.endDate = endDate;
+    public void setDate(LocalDateTime date) {
+        this.date = date;
     }
 
     public EventType getType() {

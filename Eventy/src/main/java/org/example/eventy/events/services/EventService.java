@@ -1,7 +1,9 @@
 package org.example.eventy.events.services;
 
 import org.example.eventy.events.models.*;
+import org.example.eventy.events.repositories.EventRepository;
 import org.example.eventy.users.models.EventOrganizer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +14,8 @@ import java.util.ArrayList;
 @Service
 public class EventService {
 
-    /*@Autowired
-    private EventRepository eventRepository;*/
+    @Autowired
+    private EventRepository eventRepository;
 
     public ArrayList<Event> getEvents(String search, ArrayList<String> eventTypes, String location, LocalDate startDate, LocalDate endDate, Pageable pageable) {
         ArrayList<Event> events = generateEventExamples(1);
@@ -50,7 +52,7 @@ public class EventService {
         event1.setPrivacy(PrivacyType.PRIVATE);
         event1.setType(eventType);
         event1.setLocation(loc);
-        event1.setStartDate(LocalDateTime.of(2024, 12, 15, 18, 0));
+        event1.setDate(LocalDateTime.of(2024, 12, 15, 18, 0));
         event1.setEndDate(LocalDateTime.of(2024, 12, 15, 23, 0));
         event1.setOrganiser(new EventOrganizer());
         event1.getOrganiser().setFirstName("Tac Tac");
@@ -65,7 +67,7 @@ public class EventService {
         event2.setPrivacy(PrivacyType.PUBLIC);
         event2.setType(eventType);
         event2.setLocation(loc);
-        event2.setStartDate(LocalDateTime.of(2025, 5, 20, 9, 0));
+        event2.setDate(LocalDateTime.of(2025, 5, 20, 9, 0));
         event2.setEndDate(LocalDateTime.of(2025, 5, 20, 17, 0));
         event2.setOrganiser(new EventOrganizer());
         event2.getOrganiser().setFirstName("Tac Tac");
@@ -77,5 +79,14 @@ public class EventService {
         events.add(event2);
 
         return events;
+    }
+
+    public Event save(Event event) {
+        try {
+            return eventRepository.save(event);
+        }
+        catch(Exception e) {
+            return null;
+        }
     }
 }
