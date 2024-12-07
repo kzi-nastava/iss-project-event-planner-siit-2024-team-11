@@ -1,5 +1,6 @@
 package org.example.eventy.events.services;
 
+import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.events.models.*;
 import org.example.eventy.events.repositories.EventRepository;
 import org.example.eventy.users.models.EventOrganizer;
@@ -41,8 +42,8 @@ public class EventService {
         eventType.setName("Event type name");
         Location loc = new Location();
         loc.setName("Location name");
-        ArrayList<String> images = new ArrayList<String>();
-        images.add("Image 1"); images.add("Image 2");
+        ArrayList<PicturePath> images = new ArrayList<PicturePath>();
+        images.add(new PicturePath(1L, "Image 1")); images.add(new PicturePath(2L, "Image 2"));
 
         Event event1 = new Event();
         event1.setId(1L);

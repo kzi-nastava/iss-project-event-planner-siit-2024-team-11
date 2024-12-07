@@ -4,6 +4,7 @@ import org.example.eventy.common.models.Status;
 import org.example.eventy.events.models.Event;
 import org.example.eventy.reviews.dtos.UpdateReviewDTO;
 import org.example.eventy.reviews.models.Review;
+import org.example.eventy.solutions.models.Product;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.users.models.EventOrganizer;
 import org.example.eventy.users.models.SolutionProvider;
@@ -61,14 +62,14 @@ public class ReviewService {
 
     public ArrayList<Review> generateReviewExamples(int type) {
         Event event = new Event();
-        Solution solution = new Solution();
+        Solution solution = new Product();
         EventOrganizer organizer = new EventOrganizer();
         organizer.setEmail("johndoe123@gmail.com");
         event.setOrganiser(organizer);
         SolutionProvider provider = new SolutionProvider();
         provider.setEmail("exit.festival@gmail.com");
         solution.setProvider(provider);
-        User user = new User();
+        User user = new EventOrganizer();
         user.setEmail("sender@gmail.com");
 
         Review review1 = new Review(

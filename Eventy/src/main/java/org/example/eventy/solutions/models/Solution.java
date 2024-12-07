@@ -33,7 +33,7 @@ public abstract class Solution {
     @JoinTable(name = "SuggestedEventTypes", joinColumns = @JoinColumn(name = "solution_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "event_type_id", referencedColumnName = "id"))
     private List<EventType> eventTypes;
     @ManyToOne(cascade = CascadeType.REFRESH)
-    @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "provider_id", referencedColumnName = "id", nullable = false)
     private SolutionProvider provider;
 
     public Solution() {

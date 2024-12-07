@@ -1,5 +1,6 @@
 package org.example.eventy.solutions.dtos.services;
 
+import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.common.models.ReservationConfirmationType;
 import org.example.eventy.events.dtos.EventTypeDTO;
 import org.example.eventy.solutions.dtos.CategoryDTO;
@@ -8,6 +9,8 @@ import org.example.eventy.solutions.models.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class UpdatedServiceDTO {
 
@@ -16,7 +19,7 @@ public class UpdatedServiceDTO {
     private String description;
     private double price;
     private int discount;
-    private ArrayList<String> imageUrls;
+    private List<String> imageUrls;
     private boolean isVisible;
     private boolean isAvailable;
     private CategoryDTO category;
@@ -36,7 +39,7 @@ public class UpdatedServiceDTO {
         this.description = service.getDescription();
         this.price = service.getPrice();
         this.discount = service.getDiscount();
-        this.imageUrls = service.getImageUrls();
+        this.imageUrls = service.getImageUrls().stream().map(PicturePath::getPath).collect(Collectors.toList());
         this.isVisible = service.isVisible();
         this.isAvailable = service.isAvailable();
         this.category = new CategoryDTO(service.getCategory());
@@ -83,11 +86,11 @@ public class UpdatedServiceDTO {
         this.discount = discount;
     }
 
-    public ArrayList<String> getImageUrls() {
+    public List<String> getImageUrls() {
         return imageUrls;
     }
 
-    public void setImageUrls(ArrayList<String> imageUrls) {
+    public void setImageUrls(List<String> imageUrls) {
         this.imageUrls = imageUrls;
     }
 

@@ -1,5 +1,6 @@
 package org.example.eventy.solutions.services;
 
+import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.common.models.ReservationConfirmationType;
 import org.example.eventy.common.models.Status;
 import org.example.eventy.events.models.EventType;
@@ -39,31 +40,31 @@ public class ServiceService {
         eventTypeList2.add(eventType2);
 
         org.example.eventy.solutions.models.Service service1 = new org.example.eventy.solutions.models.Service(
-                1L, "Service 1", "Description for Service 1", 100.0, 10, new ArrayList<>(Arrays.asList("https://example.com/images/wedding_catering.jpg")),
+                1L, "Service 1", "Description for Service 1", 100.0, 10, new ArrayList<>(Arrays.asList(new PicturePath(4L, "https://example.com/images/wedding_catering.jpg"))),
                 true, true, false, category1, eventTypeList1,
                 null, "Specifics for Service 1", 10, 120, 30, 15, ReservationConfirmationType.AUTOMATIC, null
         );
 
         org.example.eventy.solutions.models.Service service2 = new org.example.eventy.solutions.models.Service(
-                2L, "Service 2", "Description for Service 2", 200.0, 20, new ArrayList<>(Arrays.asList("https://example.com/images/wedding_catering.jpg")),
+                2L, "Service 2", "Description for Service 2", 200.0, 20, new ArrayList<>(Arrays.asList(new PicturePath(6L, "https://example.com/images/wedding_catering.jpg"))),
                 true, true, false, category2, eventTypeList2,
                 null, "Specifics for Service 2", 15, 90, 45, 20, ReservationConfirmationType.MANUAL, null
         );
 
         org.example.eventy.solutions.models.Service service3 = new org.example.eventy.solutions.models.Service(
-                3L, "Service 3", "Description for Service 3", 150.0, 15, new ArrayList<>(Arrays.asList("https://example.com/images/wedding_catering.jpg")),
+                3L, "Service 3", "Description for Service 3", 150.0, 15, new ArrayList<>(Arrays.asList(new PicturePath(7L, "https://example.com/images/wedding_catering.jpg"))),
                 true, true, false, category1, eventTypeList2,
                 null, "Specifics for Service 3", 20, 100, 60, 30, ReservationConfirmationType.AUTOMATIC, null
         );
 
         org.example.eventy.solutions.models.Service service4 = new org.example.eventy.solutions.models.Service(
-                4L, "Service 4", "Description for Service 4", 250.0, 25, new ArrayList<>(Arrays.asList("https://example.com/images/wedding_catering.jpg")),
+                4L, "Service 4", "Description for Service 4", 250.0, 25, new ArrayList<>(Arrays.asList(new PicturePath(8L, "https://example.com/images/wedding_catering.jpg"))),
                 true, true, false, category2, eventTypeList1,
                 null, "Specifics for Service 4", 30, 150, 90, 45, ReservationConfirmationType.MANUAL, null
         );
 
         org.example.eventy.solutions.models.Service service5 = new org.example.eventy.solutions.models.Service(
-                5L, "Service 5", "Description for Service 5", 180.0, 18, new ArrayList<>(Arrays.asList("https://example.com/images/wedding_catering.jpg")),
+                5L, "Service 5", "Description for Service 5", 180.0, 18, new ArrayList<>(Arrays.asList(new PicturePath(9L, "https://example.com/images/wedding_catering.jpg"))),
                 true, true, false, category1, eventTypeList2,
                 null, "Specifics for Service 5", 25, 110, 75, 35, ReservationConfirmationType.AUTOMATIC, null
         );
@@ -160,8 +161,8 @@ public class ServiceService {
         eventType2.setName("Birthday");
         eventTypes.add(eventType1);
         eventTypes.add(eventType2);
-        ArrayList<String> imageUrls = new ArrayList<String>();
-        imageUrls.add("https://example.com/solution.png");
+        ArrayList<PicturePath> imageUrls = new ArrayList<PicturePath>();
+        imageUrls.add(new PicturePath(9L, "https://example.com/solution.png"));
         SolutionProvider provider = new SolutionProvider();
         provider.setName("TacTac");
         provider.setEmail("cakes.luxury@gmail.com");

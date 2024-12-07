@@ -32,7 +32,7 @@ public class EventCardDTO {
         this.startDate = event.getDate();
         this.organiserId = event.getOrganiser().getId();
         this.organiserName = event.getOrganiser().getFirstName() + " " + event.getOrganiser().getLastName();
-        this.organiserImage = event.getOrganiser().getImageUrls().get(0);
+        this.organiserImage = event.getOrganiser().getImageUrls().get(0).getPath();
     }
 
     public EventCardDTO(Long eventId, String name, String description, int maxNumberParticipants, boolean isOpen, String eventTypeName, String locationName, LocalDateTime startDate, LocalDateTime endDate, Long organiserId, String organiserName, String organiserImage) {

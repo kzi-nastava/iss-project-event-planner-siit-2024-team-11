@@ -1,5 +1,6 @@
 package org.example.eventy.solutions.services;
 
+import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.events.models.EventType;
 import org.example.eventy.solutions.models.Category;
 import org.example.eventy.solutions.models.Product;
@@ -37,8 +38,8 @@ public class ProductService {
         eventType2.setName("Birthday");
         eventTypes.add(eventType1);
         eventTypes.add(eventType2);
-        ArrayList<String> imageUrls = new ArrayList<String>();
-        imageUrls.add("https://example.com/solution.png");
+        ArrayList<PicturePath> imageUrls = new ArrayList<PicturePath>();
+        imageUrls.add(new PicturePath(3L, "https://example.com/solution.png"));
         SolutionProvider provider = new SolutionProvider();
         provider.setName("TacTac");
         provider.setEmail("cakes.luxury@gmail.com");

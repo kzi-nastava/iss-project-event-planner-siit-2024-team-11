@@ -3,6 +3,7 @@ package org.example.eventy.common.models;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "Pictures")
 public class PicturePath {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
