@@ -1,5 +1,7 @@
 package org.example.eventy.solutions.controllers;
 
+import org.example.eventy.events.dtos.EventCardDTO;
+import org.example.eventy.events.models.Event;
 import org.example.eventy.solutions.dtos.PriceListDTO;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
 import org.example.eventy.solutions.dtos.SolutionDTO;
@@ -19,6 +21,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/solutions")
@@ -40,13 +43,12 @@ public class SolutionController {
     }
 
     @GetMapping(value = "/catalog/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<SolutionDTO>> getProviderCatalog(@PathVariable Long userId) {
-        if(userId == 5) {
-            List<SolutionDTO> solutions = new ArrayList<SolutionDTO>();
-            return new ResponseEntity<Collection<SolutionDTO>>(solutions, HttpStatus.OK);
-        }
+    public ResponseEntity<Collection<SolutionCardDTO>> getProviderCatalog(@PathVariable Long userId, @RequestParam(required = false) String search,
+                                                                      Pageable pageable) {
+        List<Solution> providerSolutions = solutionService.getSolutionsByProvider(userId, search, pageable);
 
-        return new ResponseEntity<Collection<SolutionDTO>>(HttpStatus.NOT_FOUND);
+        List<SolutionCardDTO> solutionCards = providerSolutions.stream().map(SolutionCardDTO::new).collect(Collectors.toList());
+        return new ResponseEntity<Collection<SolutionCardDTO>>(solutionCards, HttpStatus.OK);
     }
 
     /* this returns SolutionCardDTOs, because there is NO CASE where:

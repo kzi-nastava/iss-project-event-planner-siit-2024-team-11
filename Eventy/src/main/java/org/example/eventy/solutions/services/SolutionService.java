@@ -94,7 +94,7 @@ public class SolutionService {
         return solutions;
     }
 
-    public List<Solution> getSolutionsByProvider(Long providerId) {
-        return solutionRepository.findAllByProviderId(providerId);
+    public List<Solution> getSolutionsByProvider(Long providerId, String search, Pageable pageable) {
+        return solutionRepository.findByProvider(providerId, search, pageable).getContent();
     }
 }
