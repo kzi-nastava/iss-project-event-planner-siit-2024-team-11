@@ -101,4 +101,12 @@ public class SolutionService {
     public long getSolutionsByProviderCount(Long providerId) {
         return solutionRepository.countByProviderId(providerId);
     }
+
+    public List<Solution> getFavoriteSolutionsByUser(Long userId, String search, Pageable pageable) {
+        return solutionRepository.findUsersFavoriteSolutions(userId, search, pageable).getContent();
+    }
+
+    public long getFavoriteSolutionsByUserCount(Long userId) {
+        return solutionRepository.countUsersFavoriteSolutions(userId);
+    }
 }

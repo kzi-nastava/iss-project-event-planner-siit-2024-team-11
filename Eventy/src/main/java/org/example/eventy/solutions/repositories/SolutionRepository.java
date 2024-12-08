@@ -17,4 +17,16 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
 
     @Query("SELECT COUNT(s) FROM Solution s WHERE s.provider.id = :providerId")
     long countByProviderId(@Param("providerId") Long providerId);
+
+    @Query("SELECT s FROM Solution s WHERE s.id IN " +
+            "(SELECT us.id FROM User u JOIN u.favoriteSolutions us WHERE u.id = :userId)" +
+            "AND (LOWER(s.name) LIKE LOWER(CONCAT('%', :search, '%')) " +
+            "OR LOWER(s.description) LIKE LOWER(CONCAT('%', :search, '%')))")
+    Page<Solution> findUsersFavoriteSolutions(@Param("userId") Long userId,
+                                        @Param("search") String search,
+                                        Pageable pageable);
+
+    @Query("SELECT COUNT(s) FROM Solution s WHERE s.id IN " +
+            "(SELECT us.id FROM User u JOIN u.favoriteSolutions us WHERE u.id = :userId)")
+    long countUsersFavoriteSolutions(@Param("userId") Long userId);
 }

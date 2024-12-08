@@ -1,11 +1,8 @@
 package org.example.eventy.solutions.controllers;
 
 import org.example.eventy.common.models.PagedResponse;
-import org.example.eventy.events.dtos.EventCardDTO;
-import org.example.eventy.events.models.Event;
 import org.example.eventy.solutions.dtos.PriceListDTO;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
-import org.example.eventy.solutions.dtos.SolutionDTO;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.services.ProductService;
 import org.example.eventy.solutions.services.ServiceService;
@@ -34,13 +31,14 @@ public class SolutionController {
     private ProductService productService;
 
     @GetMapping(value = "/favorite/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<SolutionDTO>> getFavoriteSolutions(@PathVariable Long userId) {
-        if(userId == 5) {
-            List<SolutionDTO> solutions = new ArrayList<SolutionDTO>();
-            return new ResponseEntity<Collection<SolutionDTO>>(solutions, HttpStatus.OK);
-        }
+    public ResponseEntity<PagedResponse<SolutionCardDTO>> getFavoriteSolutions(@PathVariable Long userId, @RequestParam(required = false) String search,
+                                                                        Pageable pageable) {
+        List<Solution> providerSolutions = solutionService.getFavoriteSolutionsByUser(userId, search, pageable);
 
-        return new ResponseEntity<Collection<SolutionDTO>>(HttpStatus.NOT_FOUND);
+        List<SolutionCardDTO> solutionCards = providerSolutions.stream().map(SolutionCardDTO::new).collect(Collectors.toList());
+        long count = solutionService.getFavoriteSolutionsByUserCount(userId);
+        PagedResponse<SolutionCardDTO> response = new PagedResponse<>(solutionCards, (int) Math.ceil((double) count / pageable.getPageSize()), count);
+        return new ResponseEntity<PagedResponse<SolutionCardDTO>>(response, HttpStatus.OK);
     }
 
     @GetMapping(value = "/catalog/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
