@@ -1,10 +1,9 @@
 package org.example.eventy.users.controllers;
 
 import org.example.eventy.common.services.PictureService;
-import org.example.eventy.users.dtos.RegistrationDTO;
-import org.example.eventy.users.dtos.UpdateUserProfileDTO;
-import org.example.eventy.users.dtos.UserDTO;
-import org.example.eventy.users.dtos.UserType;
+import org.example.eventy.events.services.EventService;
+import org.example.eventy.solutions.services.SolutionService;
+import org.example.eventy.users.dtos.*;
 import org.example.eventy.users.models.*;
 import org.example.eventy.users.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +22,12 @@ public class UserProfileController {
 
     @Autowired
     private PictureService pictureService;
+
+    @Autowired
+    private EventService eventService;
+
+    @Autowired
+    private SolutionService solutionService;
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> updateProfile(@RequestBody UpdateUserProfileDTO updateUserProfileDTO) {
@@ -87,9 +92,19 @@ public class UserProfileController {
         return new ResponseEntity<String>("Validation failed", HttpStatus.BAD_REQUEST);
     }
 
-    // 4. View my own profile (basic information, my calendar, my favorite events,
-    // my favorite products/services, my organized events or products/services)
-    // 5. View someone else's profile with their basic information and their organizes events/products/services
+    @GetMapping(value="/{userId}/other", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<OtherUserProfileDTO> getProfileOtherUser(@PathVariable Long userId) {
+        User user = userService.get(userId);
+
+        if(user != null) {
+            return new ResponseEntity<OtherUserProfileDTO>(new OtherUserProfileDTO(user, userService.getUserType(user),
+                    eventService.getEventsByEventOrganizer(userId), solutionService.getSolutionsByProvider(userId)),
+                    HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
     @GetMapping(value="/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> getProfile(@PathVariable Long userId) {
         UserDTO userDTO = new UserDTO();

@@ -6,18 +6,20 @@ import org.example.eventy.solutions.models.Category;
 import org.example.eventy.solutions.models.Product;
 import org.example.eventy.solutions.models.Service;
 import org.example.eventy.solutions.models.Solution;
+import org.example.eventy.solutions.repositories.SolutionRepository;
 import org.example.eventy.users.models.SolutionProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 @org.springframework.stereotype.Service
 public class SolutionService {
-    /*@Autowired
-    // will be changed probably..
-    private SolutionRepository solutionRepository;*/
+    @Autowired
+    private SolutionRepository solutionRepository;
 
     public ArrayList<Solution> getSolutions(String search, String type, String category, ArrayList<String> eventTypes, String company, double minPrice, double maxPrice, LocalDate startDate, LocalDate endDate, Boolean isAvailable, Pageable pageable) {
         ArrayList<Solution> solutions = generateSolutionExamples(1);
@@ -90,5 +92,9 @@ public class SolutionService {
         solutions.add(service1);
 
         return solutions;
+    }
+
+    public List<Solution> getSolutionsByProvider(Long providerId) {
+        return solutionRepository.findAllByProviderId(providerId);
     }
 }

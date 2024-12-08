@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class EventService {
@@ -88,5 +89,9 @@ public class EventService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public List<Event> getEventsByEventOrganizer(Long eventOrganizerId) {
+        return eventRepository.findAllByOrganizerId(eventOrganizerId);
     }
 }
