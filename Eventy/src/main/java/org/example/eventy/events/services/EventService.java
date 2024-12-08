@@ -98,4 +98,12 @@ public class EventService {
     public long getEventsByEventOrganizerCount(Long eventOrganizerId) {
         return eventRepository.countByEventOrganizerId(eventOrganizerId);
     }
+
+    public List<Event> getFavoriteEventsByUser(Long userId, String search, Pageable pageable) {
+        return eventRepository.findUsersFavoriteEvents(userId, search, pageable).getContent();
+    }
+
+    public long getFavoriteEventsByUserCount(Long userId) {
+        return eventRepository.countUsersFavoriteEvents(userId);
+    }
 }

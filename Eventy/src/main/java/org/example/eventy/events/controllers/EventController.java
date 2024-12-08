@@ -111,13 +111,14 @@ public class EventController {
     }
 
     @GetMapping(value = "/favorite/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<EventDTO>> getFavoriteEvents(@PathVariable Long userId) {
-        if(userId == 5) {
-            List<EventDTO> events = new ArrayList<EventDTO>();
-            return new ResponseEntity<Collection<EventDTO>>(events, HttpStatus.OK);
-        }
+    public ResponseEntity<PagedResponse<EventCardDTO>> getFavoriteEvents(@PathVariable Long userId, @RequestParam(required = false) String search,
+                                                                  Pageable pageable) {
+        List<Event> favoriteEvents = eventService.getFavoriteEventsByUser(userId, search, pageable);
 
-        return new ResponseEntity<Collection<EventDTO>>(HttpStatus.NOT_FOUND);
+        List<EventCardDTO> eventCards = favoriteEvents.stream().map(EventCardDTO::new).collect(Collectors.toList());
+        long count = eventService.getFavoriteEventsByUserCount(userId);
+        PagedResponse<EventCardDTO> response = new PagedResponse<>(eventCards, (int) Math.ceil((double) count / pageable.getPageSize()), count);
+        return new ResponseEntity<PagedResponse<EventCardDTO>>(response, HttpStatus.OK);
     }
 
     @GetMapping(value = "/organized/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
