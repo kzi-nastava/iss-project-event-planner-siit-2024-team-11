@@ -14,4 +14,7 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
     Page<Solution> findByProvider(@Param("providerId") Long providerId,
                                 @Param("search") String search,
                                 Pageable pageable);
+
+    @Query("SELECT COUNT(s) FROM Solution s WHERE s.provider.id = :providerId")
+    long countByProviderId(@Param("providerId") Long providerId);
 }

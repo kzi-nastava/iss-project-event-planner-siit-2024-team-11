@@ -16,4 +16,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     Page<Event> findByOrganizer(@Param("eventOrganizerId") Long eventOrganizerId,
                                               @Param("search") String search,
                                               Pageable pageable);
+
+    @Query("SELECT COUNT(e) FROM Event e WHERE e.organiser.id = :eventOrganizerId")
+    long countByEventOrganizerId(@Param("eventOrganizerId") Long eventOrganizerId);
 }

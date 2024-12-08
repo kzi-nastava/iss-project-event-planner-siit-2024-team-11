@@ -1,5 +1,6 @@
 package org.example.eventy.solutions.controllers;
 
+import org.example.eventy.common.models.PagedResponse;
 import org.example.eventy.events.dtos.EventCardDTO;
 import org.example.eventy.events.models.Event;
 import org.example.eventy.solutions.dtos.PriceListDTO;
@@ -43,12 +44,14 @@ public class SolutionController {
     }
 
     @GetMapping(value = "/catalog/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<SolutionCardDTO>> getProviderCatalog(@PathVariable Long userId, @RequestParam(required = false) String search,
-                                                                      Pageable pageable) {
+    public ResponseEntity<PagedResponse<SolutionCardDTO>> getProviderCatalog(@PathVariable Long userId, @RequestParam(required = false) String search,
+                                                                             Pageable pageable) {
         List<Solution> providerSolutions = solutionService.getSolutionsByProvider(userId, search, pageable);
 
         List<SolutionCardDTO> solutionCards = providerSolutions.stream().map(SolutionCardDTO::new).collect(Collectors.toList());
-        return new ResponseEntity<Collection<SolutionCardDTO>>(solutionCards, HttpStatus.OK);
+        long count = solutionService.getSolutionsByProviderCount(userId);
+        PagedResponse<SolutionCardDTO> response = new PagedResponse<>(solutionCards, (int) Math.ceil((double) count / pageable.getPageSize()), count);
+        return new ResponseEntity<PagedResponse<SolutionCardDTO>>(response, HttpStatus.OK);
     }
 
     /* this returns SolutionCardDTOs, because there is NO CASE where:

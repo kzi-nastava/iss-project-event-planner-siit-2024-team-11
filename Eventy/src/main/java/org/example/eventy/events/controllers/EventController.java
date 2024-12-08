@@ -1,5 +1,6 @@
 package org.example.eventy.events.controllers;
 
+import org.example.eventy.common.models.PagedResponse;
 import org.example.eventy.events.dtos.*;
 import org.example.eventy.events.models.*;
 import org.example.eventy.events.services.ActivityService;
@@ -120,12 +121,14 @@ public class EventController {
     }
 
     @GetMapping(value = "/organized/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<EventCardDTO>> getEventsOrganizedByUser(@PathVariable Long userId, @RequestParam(required = false) String search,
-                                                                         Pageable pageable) {
+    public ResponseEntity<PagedResponse<EventCardDTO>> getEventsOrganizedByUser(@PathVariable Long userId, @RequestParam(required = false) String search,
+                                                                                Pageable pageable) {
         List<Event> organizersEvents = eventService.getEventsByEventOrganizer(userId, search, pageable);
 
         List<EventCardDTO> eventCards = organizersEvents.stream().map(EventCardDTO::new).collect(Collectors.toList());
-        return new ResponseEntity<Collection<EventCardDTO>>(eventCards, HttpStatus.OK);
+        long count = eventService.getEventsByEventOrganizerCount(userId);
+        PagedResponse<EventCardDTO> response = new PagedResponse<>(eventCards, (int) Math.ceil((double) count / pageable.getPageSize()), count);
+        return new ResponseEntity<PagedResponse<EventCardDTO>>(response, HttpStatus.OK);
     }
 
     @GetMapping(value = "/accepted/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
