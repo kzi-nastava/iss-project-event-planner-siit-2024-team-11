@@ -91,7 +91,7 @@ public class EventService {
         }
     }
 
-    public List<Event> getEventsByEventOrganizer(Long eventOrganizerId) {
-        return eventRepository.findAllByOrganizerId(eventOrganizerId);
+    public List<Event> getEventsByEventOrganizer(Long eventOrganizerId, String search, Pageable pageable) {
+        return eventRepository.findByOrganizer(eventOrganizerId, search, pageable).getContent();
     }
 }

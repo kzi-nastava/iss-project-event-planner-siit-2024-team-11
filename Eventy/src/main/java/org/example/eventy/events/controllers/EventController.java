@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -119,14 +120,12 @@ public class EventController {
     }
 
     @GetMapping(value = "/organized/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<EventDTO>> getEventsOrganizedByUser(@PathVariable Long userId) {
-        if(userId == 5) {
-            // check if this is a valid id of a organizer first
-            List<EventDTO> events = new ArrayList<EventDTO>();
-            return new ResponseEntity<Collection<EventDTO>>(events, HttpStatus.OK);
-        }
+    public ResponseEntity<Collection<EventCardDTO>> getEventsOrganizedByUser(@PathVariable Long userId, @RequestParam(required = false) String search,
+                                                                         Pageable pageable) {
+        List<Event> organizersEvents = eventService.getEventsByEventOrganizer(userId, search, pageable);
 
-        return new ResponseEntity<Collection<EventDTO>>(HttpStatus.NOT_FOUND);
+        List<EventCardDTO> eventCards = organizersEvents.stream().map(EventCardDTO::new).collect(Collectors.toList());
+        return new ResponseEntity<Collection<EventCardDTO>>(eventCards, HttpStatus.OK);
     }
 
     @GetMapping(value = "/accepted/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
