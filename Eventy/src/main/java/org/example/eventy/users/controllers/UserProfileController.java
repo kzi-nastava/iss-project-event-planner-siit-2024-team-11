@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -22,12 +23,6 @@ public class UserProfileController {
 
     @Autowired
     private PictureService pictureService;
-
-    @Autowired
-    private EventService eventService;
-
-    @Autowired
-    private SolutionService solutionService;
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> updateProfile(@RequestBody UpdateUserProfileDTO updateUserProfileDTO) {
@@ -92,36 +87,15 @@ public class UserProfileController {
         return new ResponseEntity<String>("Validation failed", HttpStatus.BAD_REQUEST);
     }
 
-    @GetMapping(value="/{userId}/other", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<OtherUserProfileDTO> getProfileOtherUser(@PathVariable Long userId) {
+    @GetMapping(value="/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserDTO> getProfile(@PathVariable Long userId) {
         User user = userService.get(userId);
 
         if(user != null) {
-            return new ResponseEntity<OtherUserProfileDTO>(new OtherUserProfileDTO(user, userService.getUserType(user),
-                    eventService.getEventsByEventOrganizer(userId), solutionService.getSolutionsByProvider(userId)),
+            return new ResponseEntity<UserDTO>(new UserDTO(user, userService.getUserType(user)),
                     HttpStatus.OK);
         }
 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    @GetMapping(value="/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDTO> getProfile(@PathVariable Long userId) {
-        UserDTO userDTO = new UserDTO();
-        if(userId == 5) {
-            // if my JWT says that this is the logged-in users profile, then we send his profile view
-            // if it says it is someone else's profile, then we send the corresponding view
-            userDTO.setEmail("good@gmail.com");
-            userDTO.setId(5L);
-            userDTO.setProfilePictures(new ArrayList<>());
-            userDTO.setUserType(UserType.ORGANIZER);
-            userDTO.setFirstName("Ime");
-            userDTO.setLastName("Prezime");
-            userDTO.setAddress("Neka Adresa");
-            userDTO.setPhoneNumber("+13482192329");
-            return new ResponseEntity<UserDTO>(userDTO, HttpStatus.OK);
-        }
-
-        return new ResponseEntity<UserDTO>(userDTO, HttpStatus.NOT_FOUND);
     }
 }
