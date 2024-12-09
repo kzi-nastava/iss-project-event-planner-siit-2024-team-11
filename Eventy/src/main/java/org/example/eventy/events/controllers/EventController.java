@@ -1,11 +1,13 @@
 package org.example.eventy.events.controllers;
 
+import org.example.eventy.common.models.PagedResponse;
 import org.example.eventy.events.dtos.*;
 import org.example.eventy.events.models.*;
 import org.example.eventy.events.services.ActivityService;
 import org.example.eventy.events.services.EventService;
 import org.example.eventy.events.services.EventTypeService;
 import org.example.eventy.events.services.LocationService;
+import org.example.eventy.users.models.EventOrganizer;
 import org.example.eventy.users.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +21,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -77,7 +80,7 @@ public class EventController {
             agenda.add(activity);
         }
         event.setAgenda(agenda);
-        event.setOrganiser(userService.getEventOrganizer(organizeEventDTO.getOrganizerId()));
+        event.setOrganiser((EventOrganizer) userService.get(organizeEventDTO.getOrganizerId()));
 
         event = eventService.save(event);
 
@@ -108,24 +111,25 @@ public class EventController {
     }
 
     @GetMapping(value = "/favorite/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<EventDTO>> getFavoriteEvents(@PathVariable Long userId) {
-        if(userId == 5) {
-            List<EventDTO> events = new ArrayList<EventDTO>();
-            return new ResponseEntity<Collection<EventDTO>>(events, HttpStatus.OK);
-        }
+    public ResponseEntity<PagedResponse<EventCardDTO>> getFavoriteEvents(@PathVariable Long userId, @RequestParam(required = false) String search,
+                                                                  Pageable pageable) {
+        List<Event> favoriteEvents = eventService.getFavoriteEventsByUser(userId, search, pageable);
 
-        return new ResponseEntity<Collection<EventDTO>>(HttpStatus.NOT_FOUND);
+        List<EventCardDTO> eventCards = favoriteEvents.stream().map(EventCardDTO::new).collect(Collectors.toList());
+        long count = eventService.getFavoriteEventsByUserCount(userId);
+        PagedResponse<EventCardDTO> response = new PagedResponse<>(eventCards, (int) Math.ceil((double) count / pageable.getPageSize()), count);
+        return new ResponseEntity<PagedResponse<EventCardDTO>>(response, HttpStatus.OK);
     }
 
     @GetMapping(value = "/organized/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<EventDTO>> getEventsOrganizedByUser(@PathVariable Long userId) {
-        if(userId == 5) {
-            // check if this is a valid id of a organizer first
-            List<EventDTO> events = new ArrayList<EventDTO>();
-            return new ResponseEntity<Collection<EventDTO>>(events, HttpStatus.OK);
-        }
+    public ResponseEntity<PagedResponse<EventCardDTO>> getEventsOrganizedByUser(@PathVariable Long userId, @RequestParam(required = false) String search,
+                                                                                Pageable pageable) {
+        List<Event> organizersEvents = eventService.getEventsByEventOrganizer(userId, search, pageable);
 
-        return new ResponseEntity<Collection<EventDTO>>(HttpStatus.NOT_FOUND);
+        List<EventCardDTO> eventCards = organizersEvents.stream().map(EventCardDTO::new).collect(Collectors.toList());
+        long count = eventService.getEventsByEventOrganizerCount(userId);
+        PagedResponse<EventCardDTO> response = new PagedResponse<>(eventCards, (int) Math.ceil((double) count / pageable.getPageSize()), count);
+        return new ResponseEntity<PagedResponse<EventCardDTO>>(response, HttpStatus.OK);
     }
 
     @GetMapping(value = "/accepted/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)

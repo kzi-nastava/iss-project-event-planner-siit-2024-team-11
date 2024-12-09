@@ -65,11 +65,11 @@ public class SolutionCardDTO {
         }
         this.price = solution.getPrice();
         this.discount = solution.getDiscount();
-        this.firstImageUrl = solution.getImageUrls().get(0);
+        this.firstImageUrl = solution.getImageUrls().get(0).getPath();
         this.isAvailable = solution.isAvailable();
         this.providerId = solution.getProvider().getId();
         this.providerName = solution.getProvider().getName();
-        this.providerImageUrl = solution.getImageUrls().get(0);
+        this.providerImageUrl = solution.getImageUrls().get(0).getPath();
     }
 
     public Long getSolutionId() {

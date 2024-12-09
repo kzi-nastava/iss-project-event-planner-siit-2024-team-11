@@ -1,5 +1,7 @@
 package org.example.eventy.users.models;
 
+import jakarta.persistence.*;
+import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.events.models.Event;
 import org.example.eventy.solutions.models.Solution;
 
@@ -7,28 +9,63 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class User {
+@Entity
+@Table(name = "Users")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
+public abstract class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private ArrayList<String> imageUrls;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private List<PicturePath> imageUrls;
+
+    @Column(unique = true, nullable = false)
     private String email;
+
+    @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
     private String address;
+
+    @Column(nullable = false)
     private String phoneNumber;
+
+    @Column(nullable = false)
     private boolean isActive;
+
+    @Column(nullable = false)
     private boolean isDeactivated;
+
+    @Column(nullable = false)
     private boolean hasSilencedNotifications;
+
+    @Column()
     private LocalDateTime suspensionDeadline;
+
+    @ManyToMany(cascade = CascadeType.REFRESH)
+    @JoinTable(name = "BlockedUsers", joinColumns = @JoinColumn(name = "blocker_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "blocked_id", referencedColumnName = "id"))
     private List<User> blocked;
-    private RegistrationRequest registrationRequest;
+
+
+    @ManyToMany(cascade = CascadeType.REFRESH)
+    @JoinTable(name = "UsersAttendingEvents", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id"))
     private List<Event> acceptedEvents;
+    @ManyToMany(cascade = CascadeType.REFRESH)
+    @JoinTable(name = "UsersFavoriteEvents", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id"))
     private List<Event> favoriteEvents;
+    @ManyToMany(cascade = CascadeType.REFRESH)
+    @JoinTable(name = "UsersFavoriteSolutions", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "solution_id", referencedColumnName = "id"))
     private List<Solution> favoriteSolutions;
 
     public User() {
 
     }
 
-    public User(Long id, ArrayList<String> imageUrls, String email, String password, String address, String phoneNumber, boolean isActive, boolean isDeactivated, boolean hasSilencedNotifications, LocalDateTime suspensionDeadline) {
+    public User(Long id, ArrayList<PicturePath> imageUrls, String email, String password, String address, String phoneNumber, boolean isActive, boolean isDeactivated, boolean hasSilencedNotifications, LocalDateTime suspensionDeadline) {
         this.id = id;
         this.imageUrls = imageUrls;
         this.email = email;
@@ -45,7 +82,7 @@ public class User {
         this.favoriteSolutions = new ArrayList<>();
     }
 
-    public User(Long id, ArrayList<String> imageUrls, String email, String password, String address, String phoneNumber, boolean isActive, boolean isDeactivated, boolean hasSilencedNotifications, LocalDateTime suspensionDeadline, List<User> blocked, RegistrationRequest registrationRequest, List<Event> acceptedEvents, List<Event> favoriteEvents, List<Solution> favoriteSolutions) {
+    public User(Long id, ArrayList<PicturePath> imageUrls, String email, String password, String address, String phoneNumber, boolean isActive, boolean isDeactivated, boolean hasSilencedNotifications, LocalDateTime suspensionDeadline, List<User> blocked, RegistrationRequest registrationRequest, List<Event> acceptedEvents, List<Event> favoriteEvents, List<Solution> favoriteSolutions) {
         this.id = id;
         this.imageUrls = imageUrls;
         this.email = email;
@@ -57,7 +94,6 @@ public class User {
         this.hasSilencedNotifications = hasSilencedNotifications;
         this.suspensionDeadline = suspensionDeadline;
         this.blocked = blocked;
-        this.registrationRequest = registrationRequest;
         this.acceptedEvents = acceptedEvents;
         this.favoriteEvents = favoriteEvents;
         this.favoriteSolutions = favoriteSolutions;
@@ -71,11 +107,11 @@ public class User {
         this.id = id;
     }
 
-    public ArrayList<String> getImageUrls() {
+    public List<PicturePath> getImageUrls() {
         return imageUrls;
     }
 
-    public void setImageUrls(ArrayList<String> imageUrls) {
+    public void setImageUrls(List<PicturePath> imageUrls) {
         this.imageUrls = imageUrls;
     }
 
@@ -149,14 +185,6 @@ public class User {
 
     public void setBlocked(List<User> blocked) {
         this.blocked = blocked;
-    }
-
-    public RegistrationRequest getRegistrationRequest() {
-        return registrationRequest;
-    }
-
-    public void setRegistrationRequest(RegistrationRequest registrationRequest) {
-        this.registrationRequest = registrationRequest;
     }
 
     public List<Event> getAcceptedEvents() {

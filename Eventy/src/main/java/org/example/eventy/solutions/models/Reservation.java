@@ -1,14 +1,27 @@
 package org.example.eventy.solutions.models;
 
+import jakarta.persistence.*;
 import org.example.eventy.events.models.Event;
 
 import java.util.Calendar;
 
+@Entity
+@Table(name = "Reservations")
 public class Reservation {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "selected_event_id", referencedColumnName = "id")
     private Event selectedEvent;
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "selected_service_id", referencedColumnName = "id")
     private Solution selectedService;
+    @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private Calendar reservationStartDateTime;
+    @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private Calendar reservationEndDateTime;
 
     public Reservation() {

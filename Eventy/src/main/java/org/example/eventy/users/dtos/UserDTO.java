@@ -1,6 +1,10 @@
 package org.example.eventy.users.dtos;
 
+import org.example.eventy.common.models.PicturePath;
+import org.example.eventy.users.models.*;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UserDTO {
     private Long id;
@@ -16,6 +20,30 @@ public class UserDTO {
 
     public UserDTO() {
 
+    }
+
+    public UserDTO(User user, UserType userType) {
+        this.id = user.getId();
+        this.email = user.getEmail();
+        this.userType = userType;
+        this.phoneNumber = user.getPhoneNumber();
+        this.address = user.getAddress();
+
+        if (userType == UserType.PROVIDER) {
+            this.name = ((SolutionProvider) user).getName();
+            this.description = ((SolutionProvider) user).getDescription();
+        } else if (userType == UserType.ORGANIZER) {
+            this.firstName = ((EventOrganizer) user).getFirstName();
+            this.lastName = ((EventOrganizer) user).getLastName();
+        } else if (userType == UserType.ADMIN) {
+            this.firstName = ((Admin) user).getFirstName();
+            this.lastName = ((Admin) user).getLastName();
+        } else {
+            this.firstName = ((AuthenticatedUser) user).getFirstName();
+            this.lastName = ((AuthenticatedUser) user).getLastName();
+        }
+
+        this.profilePictures = user.getImageUrls().stream().map(PicturePath::getPath).collect(Collectors.toList());
     }
 
     public UserDTO(Long id, List<String> profilePictures, UserType userType, String email, String firstName, String lastName, String name, String description, String address, String phoneNumber) {

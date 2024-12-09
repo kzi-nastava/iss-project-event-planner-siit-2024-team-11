@@ -1,22 +1,25 @@
 package org.example.eventy.solutions.services;
 
+import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.events.models.EventType;
 import org.example.eventy.solutions.models.Category;
 import org.example.eventy.solutions.models.Product;
 import org.example.eventy.solutions.models.Service;
 import org.example.eventy.solutions.models.Solution;
+import org.example.eventy.solutions.repositories.SolutionRepository;
 import org.example.eventy.users.models.SolutionProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 @org.springframework.stereotype.Service
 public class SolutionService {
-    /*@Autowired
-    // will be changed probably..
-    private SolutionRepository solutionRepository;*/
+    @Autowired
+    private SolutionRepository solutionRepository;
 
     public ArrayList<Solution> getSolutions(String search, String type, String category, ArrayList<String> eventTypes, String company, double minPrice, double maxPrice, LocalDate startDate, LocalDate endDate, Boolean isAvailable, Pageable pageable) {
         ArrayList<Solution> solutions = generateSolutionExamples(1);
@@ -47,8 +50,8 @@ public class SolutionService {
         eventType2.setName("Birthday");
         eventTypes.add(eventType1);
         eventTypes.add(eventType2);
-        ArrayList<String> imageUrls = new ArrayList<String>();
-        imageUrls.add("https://example.com/solution.png");
+        ArrayList<PicturePath> imageUrls = new ArrayList<PicturePath>();
+        imageUrls.add(new PicturePath(5L, "https://example.com/solution.png"));
         SolutionProvider provider = new SolutionProvider();
         provider.setName("TacTac");
         provider.setEmail("cakes.luxury@gmail.com");
@@ -89,5 +92,21 @@ public class SolutionService {
         solutions.add(service1);
 
         return solutions;
+    }
+
+    public List<Solution> getSolutionsByProvider(Long providerId, String search, Pageable pageable) {
+        return solutionRepository.findByProvider(providerId, search, pageable).getContent();
+    }
+
+    public long getSolutionsByProviderCount(Long providerId) {
+        return solutionRepository.countByProviderId(providerId);
+    }
+
+    public List<Solution> getFavoriteSolutionsByUser(Long userId, String search, Pageable pageable) {
+        return solutionRepository.findUsersFavoriteSolutions(userId, search, pageable).getContent();
+    }
+
+    public long getFavoriteSolutionsByUserCount(Long userId) {
+        return solutionRepository.countUsersFavoriteSolutions(userId);
     }
 }

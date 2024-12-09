@@ -1,5 +1,6 @@
 package org.example.eventy.events.services;
 
+import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.events.models.*;
 import org.example.eventy.events.repositories.EventRepository;
 import org.example.eventy.users.models.EventOrganizer;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class EventService {
@@ -41,8 +43,8 @@ public class EventService {
         eventType.setName("Event type name");
         Location loc = new Location();
         loc.setName("Location name");
-        ArrayList<String> images = new ArrayList<String>();
-        images.add("Image 1"); images.add("Image 2");
+        ArrayList<PicturePath> images = new ArrayList<PicturePath>();
+        images.add(new PicturePath(1L, "Image 1")); images.add(new PicturePath(2L, "Image 2"));
 
         Event event1 = new Event();
         event1.setId(1L);
@@ -87,5 +89,29 @@ public class EventService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public List<Event> getEventsByEventOrganizer(Long eventOrganizerId, String search, Pageable pageable) {
+        return eventRepository.findByOrganizer(eventOrganizerId, search, pageable).getContent();
+    }
+
+    public long getEventsByEventOrganizerCount(Long eventOrganizerId) {
+        return eventRepository.countByEventOrganizerId(eventOrganizerId);
+    }
+
+    public List<Event> getFavoriteEventsByUser(Long userId, String search, Pageable pageable) {
+        return eventRepository.findUsersFavoriteEvents(userId, search, pageable).getContent();
+    }
+
+    public long getFavoriteEventsByUserCount(Long userId) {
+        return eventRepository.countUsersFavoriteEvents(userId);
+    }
+
+    public List<Event> getOrganizedEventsByUserBetween(Long userId, LocalDate startDate, LocalDate endDate) {
+        return eventRepository.findOrganizedEventsByUserBetween(userId, startDate, endDate);
+    }
+
+    public List<Event> getAttendingEventsByUserBetween(Long userId, LocalDate startDate, LocalDate endDate) {
+        return eventRepository.findAttendingEventsByUserBetween(userId, startDate, endDate);
     }
 }

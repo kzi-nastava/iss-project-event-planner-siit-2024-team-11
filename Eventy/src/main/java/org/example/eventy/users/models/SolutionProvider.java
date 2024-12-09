@@ -1,14 +1,18 @@
 package org.example.eventy.users.models;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import org.example.eventy.solutions.models.Solution;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
 public class SolutionProvider extends User {
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private String description;
-    private List<Solution> solutionCatalog;
 
     public SolutionProvider() {
 
@@ -17,13 +21,6 @@ public class SolutionProvider extends User {
     public SolutionProvider(String name, String description) {
         this.name = name;
         this.description = description;
-        this.solutionCatalog = new ArrayList<>();
-    }
-
-    public SolutionProvider(String name, String description, List<Solution> solutionCatalog) {
-        this.name = name;
-        this.description = description;
-        this.solutionCatalog = solutionCatalog;
     }
 
     public String getName() {
@@ -40,13 +37,5 @@ public class SolutionProvider extends User {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public List<Solution> getSolutionCatalog() {
-        return solutionCatalog;
-    }
-
-    public void setSolutionCatalog(List<Solution> solutionCatalog) {
-        this.solutionCatalog = solutionCatalog;
     }
 }
