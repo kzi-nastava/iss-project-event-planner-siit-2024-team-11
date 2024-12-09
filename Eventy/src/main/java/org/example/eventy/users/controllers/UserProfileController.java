@@ -1,7 +1,12 @@
 package org.example.eventy.users.controllers;
 
 import org.example.eventy.common.services.PictureService;
+import org.example.eventy.events.models.Event;
 import org.example.eventy.events.services.EventService;
+import org.example.eventy.solutions.models.Reservation;
+import org.example.eventy.solutions.models.Service;
+import org.example.eventy.solutions.models.Solution;
+import org.example.eventy.solutions.services.ReservationService;
 import org.example.eventy.solutions.services.SolutionService;
 import org.example.eventy.users.dtos.*;
 import org.example.eventy.users.models.*;
@@ -12,6 +17,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +31,12 @@ public class UserProfileController {
 
     @Autowired
     private PictureService pictureService;
+
+    @Autowired
+    private EventService eventService;
+
+    @Autowired
+    private ReservationService reservationService;
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> updateProfile(@RequestBody UpdateUserProfileDTO updateUserProfileDTO) {
@@ -97,5 +111,39 @@ public class UserProfileController {
         }
 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping(value = "/{userId}/calendar", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<CalendarOccupancyDTO>> getCalendar(@PathVariable Long userId,
+                                                                  @RequestParam(required = false) LocalDate startDate,
+                                                                  @RequestParam(required = false) LocalDate endDate) {
+        List<CalendarOccupancyDTO> calendar = new ArrayList<>();
+
+        for(Event event : eventService.getOrganizedEventsByUserBetween(userId, startDate, endDate)) {
+            CalendarOccupancyDTO calendarOccupancyDTO = new CalendarOccupancyDTO(event.getName(), event.getId(),
+                    OccupancyType.EVENT, event.getDate().toLocalDate(), event.getDate().toLocalDate());
+
+            calendar.add(calendarOccupancyDTO);
+        }
+
+        for(Event event : eventService.getAttendingEventsByUserBetween(userId, startDate, endDate)) {
+            CalendarOccupancyDTO calendarOccupancyDTO = new CalendarOccupancyDTO(event.getName(), event.getId(),
+                    OccupancyType.EVENT, event.getDate().toLocalDate(), event.getDate().toLocalDate());
+
+            calendar.add(calendarOccupancyDTO);
+        }
+
+        for(Reservation reservation : reservationService.getReservationByProviderBetween(userId, startDate, endDate)) {
+            Solution service = reservation.getSelectedService();
+            CalendarOccupancyDTO calendarOccupancyDTO = new CalendarOccupancyDTO(service.getName(), service.getId(),
+                    OccupancyType.SERVICE, Instant.ofEpochMilli(reservation.getReservationStartDateTime().getTimeInMillis())
+                    .atZone(ZoneId.systemDefault()).toLocalDate(),
+                    Instant.ofEpochMilli(reservation.getReservationEndDateTime().getTimeInMillis())
+                            .atZone(ZoneId.systemDefault()).toLocalDate());
+
+            calendar.add(calendarOccupancyDTO);
+        }
+
+        return new ResponseEntity<List<CalendarOccupancyDTO>>(calendar, HttpStatus.OK);
     }
 }

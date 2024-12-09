@@ -106,4 +106,12 @@ public class EventService {
     public long getFavoriteEventsByUserCount(Long userId) {
         return eventRepository.countUsersFavoriteEvents(userId);
     }
+
+    public List<Event> getOrganizedEventsByUserBetween(Long userId, LocalDate startDate, LocalDate endDate) {
+        return eventRepository.findOrganizedEventsByUserBetween(userId, startDate, endDate);
+    }
+
+    public List<Event> getAttendingEventsByUserBetween(Long userId, LocalDate startDate, LocalDate endDate) {
+        return eventRepository.findAttendingEventsByUserBetween(userId, startDate, endDate);
+    }
 }
