@@ -1,5 +1,6 @@
 package org.example.eventy.solutions.controllers;
 
+import org.example.eventy.common.models.PagedResponse;
 import org.example.eventy.solutions.dtos.categories.CreateCategoryDTO;
 import org.example.eventy.solutions.dtos.categories.CategoryWithIDDTO;
 import org.example.eventy.solutions.services.SolutionCategoryService;
@@ -27,10 +28,19 @@ public class SolutionCategoryController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<CategoryWithIDDTO>> getCategories(Pageable pageable) {
-        Page<CategoryWithIDDTO> categories = service.getCategories(pageable);
-        Collection<CategoryWithIDDTO> categoriesDTO = categories.getContent();
-        return new ResponseEntity<>(categoriesDTO, HttpStatus.OK);
+    public ResponseEntity<PagedResponse<CategoryWithIDDTO>> getAcceptedCategories(Pageable pageable) {
+        Page<CategoryWithIDDTO> categories = service.getAcceptedCategories(pageable);
+        long count = service.getAcceptedCategoryCount();
+        PagedResponse<CategoryWithIDDTO> pagedCategoriesDTO = new PagedResponse<>(categories.getContent(), (int) Math.ceil((double) count / pageable.getPageSize()), count);
+        return new ResponseEntity<>(pagedCategoriesDTO, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/requests", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PagedResponse<CategoryWithIDDTO>> getCategoryRequests(Pageable pageable) {
+        Page<CategoryWithIDDTO> categories = service.getCategoryRequests(pageable);
+        long count = service.getCategoryRequestCount();
+        PagedResponse<CategoryWithIDDTO> pagedCategoriesDTO = new PagedResponse<>(categories.getContent(), (int) Math.ceil((double) count / pageable.getPageSize()), count);
+        return new ResponseEntity<>(pagedCategoriesDTO, HttpStatus.OK);
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -50,6 +60,4 @@ public class SolutionCategoryController {
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-
-
 }

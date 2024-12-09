@@ -1,5 +1,6 @@
 package org.example.eventy.solutions.services;
 
+import org.example.eventy.common.models.Status;
 import org.example.eventy.solutions.dtos.CategoryDTO;
 import org.example.eventy.solutions.dtos.categories.CreateCategoryDTO;
 import org.example.eventy.solutions.dtos.categories.CategoryWithIDDTO;
@@ -18,6 +19,14 @@ public class SolutionCategoryService {
     @Autowired
     private SolutionCategoryRepository solutionCategoryRepository;
 
+    public long getAcceptedCategoryCount() {
+        return solutionCategoryRepository.countByStatus(Status.ACCEPTED);
+    }
+
+    public long getCategoryRequestCount() {
+        return solutionCategoryRepository.countByStatus(Status.PENDING);
+    }
+
     public CategoryWithIDDTO createCategory(CreateCategoryDTO newCategory) {
         Category category = new Category();
         category.setName(newCategory.getName());
@@ -27,8 +36,12 @@ public class SolutionCategoryService {
         return new CategoryWithIDDTO(solutionCategoryRepository.save(category));
     }
 
-    public Page<CategoryWithIDDTO> getCategories(Pageable pageable) {
-        return solutionCategoryRepository.findAll(pageable).map(CategoryWithIDDTO::new);
+    public Page<CategoryWithIDDTO> getCategoryRequests(Pageable pageable) {
+        return solutionCategoryRepository.findByStatus(pageable, Status.PENDING).map(CategoryWithIDDTO::new);
+    }
+
+    public Page<CategoryWithIDDTO> getAcceptedCategories(Pageable pageable) {
+        return solutionCategoryRepository.findByStatus(pageable, Status.ACCEPTED).map(CategoryWithIDDTO::new);
     }
 
     public Category getCategory(Long id) {
