@@ -8,12 +8,24 @@ import org.example.eventy.users.models.SolutionProvider;
 import org.example.eventy.users.models.User;
 import org.example.eventy.users.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private RoleService roleService;
+
+    public User findByEmail(String email) throws UsernameNotFoundException {
+        return userRepository.findByEmail(email);
+    }
 
     public User get(Long id) {
         return userRepository.findById(id).orElse(null);

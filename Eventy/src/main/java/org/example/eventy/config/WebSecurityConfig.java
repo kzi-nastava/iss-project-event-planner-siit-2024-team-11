@@ -1,5 +1,8 @@
 package org.example.eventy.config;
 
+import org.example.eventy.security.RestAuthenticationEntryPoint;
+import org.example.eventy.security.TokenAuthenticationFilter;
+import org.example.eventy.users.services.CustomUserDetailsService;
 import org.example.eventy.util.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
