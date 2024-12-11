@@ -17,7 +17,7 @@ import java.util.Date;
 public class TokenUtils {
 
 	// Izdavac tokena
-	@Value("spring-security-example")
+	@Value("eventy")
 	private String APP_NAME;
 
 	// Tajna koju samo backend aplikacija treba da zna kako bi mogla da generise i proveri JWT https://jwt.io/
@@ -40,6 +40,7 @@ public class TokenUtils {
 	//	private static final String AUDIENCE_TABLET = "tablet";
 	
 	private static final String AUDIENCE_WEB = "web";
+	private static final String AUDIENCE_MOBILE = "mobile";
 
 	// Algoritam za potpisivanje JWT
 	private SignatureAlgorithm SIGNATURE_ALGORITHM = SignatureAlgorithm.HS512;
@@ -59,7 +60,7 @@ public class TokenUtils {
 				.setSubject(user.getEmail())
 				.setAudience(generateAudience())
 				.setIssuedAt(new Date())
-				.claim("roles", user.getRoles().toString())
+				.claim("role", user.getRole().toString())
 				.setExpiration(generateExpirationDate())
 				.signWith(SIGNATURE_ALGORITHM, SECRET).compact();
 		
@@ -72,6 +73,8 @@ public class TokenUtils {
 	 * @return Tip uređaja. 
 	 */
 	private String generateAudience() {
+
+		// Maybe change this for mobile too?
 		
 		//	Moze se iskoristiti org.springframework.mobile.device.Device objekat za odredjivanje tipa uredjaja sa kojeg je zahtev stigao.
 		//	https://spring.io/projects/spring-mobile

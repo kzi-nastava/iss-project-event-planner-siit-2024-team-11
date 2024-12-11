@@ -1,19 +1,23 @@
 package org.example.eventy.users.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.events.models.Event;
 import org.example.eventy.solutions.models.Solution;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.lang.reflect.Array;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "Users")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
-public abstract class User {
+public abstract class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -60,6 +64,9 @@ public abstract class User {
     @ManyToMany(cascade = CascadeType.REFRESH)
     @JoinTable(name = "UsersFavoriteSolutions", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "solution_id", referencedColumnName = "id"))
     private List<Solution> favoriteSolutions;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id", referencedColumnName = "id")
+    private Role role;
 
     public User() {
 
@@ -128,6 +135,8 @@ public abstract class User {
     }
 
     public void setPassword(String password) {
+        Timestamp now = new Timestamp(new Date().getTime());
+        this.setLastPasswordResetDate(now);
         this.password = password;
     }
 
@@ -209,5 +218,60 @@ public abstract class User {
 
     public void setFavoriteSolutions(List<Solution> favoriteSolutions) {
         this.favoriteSolutions = favoriteSolutions;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    @JsonIgnore
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return new ArrayList<>(Collections.singletonList(this.getRole()));
+    }
+
+    @Column(name = "enabled")
+    private boolean enabled;
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    @Column(name = "last_password_reset_date")
+    private Timestamp lastPasswordResetDate;
+
+    public Timestamp getLastPasswordResetDate() {
+        return lastPasswordResetDate;
+    }
+
+    public void setLastPasswordResetDate(Timestamp lastPasswordResetDate) {
+        this.lastPasswordResetDate = lastPasswordResetDate;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 }
