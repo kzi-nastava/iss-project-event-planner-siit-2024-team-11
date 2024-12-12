@@ -2,7 +2,9 @@ package org.example.eventy.users.controllers;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.eventy.users.dtos.*;
+import org.example.eventy.users.models.RegistrationRequest;
 import org.example.eventy.users.models.User;
+import org.example.eventy.users.services.RegistrationRequestService;
 import org.example.eventy.users.services.UserService;
 import org.example.eventy.util.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +18,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/authentication")
@@ -29,6 +30,9 @@ public class AuthenticationController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RegistrationRequestService registrationRequestService;
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserTokenState> login(@RequestBody LoginDTO authenticationRequest, HttpServletResponse response) {
