@@ -1,6 +1,7 @@
 package org.example.eventy.users.controllers;
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.eventy.common.services.EmailService;
 import org.example.eventy.users.dtos.*;
 import org.example.eventy.users.models.RegistrationRequest;
 import org.example.eventy.users.models.User;
@@ -33,6 +34,9 @@ public class AuthenticationController {
 
     @Autowired
     private RegistrationRequestService registrationRequestService;
+
+    @Autowired
+    private EmailService emailService;
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserTokenState> login(@RequestBody LoginDTO authenticationRequest, HttpServletResponse response) {
