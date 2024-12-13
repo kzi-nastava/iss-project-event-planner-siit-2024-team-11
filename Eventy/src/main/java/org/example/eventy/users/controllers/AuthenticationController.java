@@ -69,27 +69,27 @@ public class AuthenticationController {
 
     @PutMapping(value="/registration-confirmation/{requestId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> confirmRegistration(@PathVariable Long requestId) {
-        UserDTO userDTO = new UserDTO();
-        if(requestId == 5) {
-            userDTO.setEmail("good@gmail.com");
-            userDTO.setId(5L);
-            userDTO.setProfilePictures(new ArrayList<>());
-            userDTO.setUserType(UserType.ORGANIZER);
-            userDTO.setFirstName("Ime");
-            userDTO.setLastName("Prezime");
-            userDTO.setAddress("Neka Adresa");
-            userDTO.setPhoneNumber("+13482192329");
-            return new ResponseEntity<UserDTO>(userDTO, HttpStatus.OK);
-            // redirect to the home page?
+        RequestUpdateStatus status = registrationRequestService.update(requestId);
+
+        if(status == RequestUpdateStatus.NOT_FOUND) {
+            return new ResponseEntity<UserDTO>(HttpStatus.NOT_FOUND);
+        }
+        else if(status == RequestUpdateStatus.TOO_LATE) {
+            // maybe send new reg request?
+            return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
         }
 
-        if(requestId == 100) {
-            // 24 hours have passed
-            return new ResponseEntity<UserDTO>(userDTO, HttpStatus.BAD_REQUEST);
+        User user = registrationRequestService.getUserForRequest(requestId);
+        user.setActive(true);
+        user = userService.save(user);
+
+        if(user == null) {
+            return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
         }
 
-        // registration request not found
-        return new ResponseEntity<UserDTO>(userDTO, HttpStatus.NOT_FOUND);
-        // redirect to some kind of error page?
+        user.setActive(true);
+        userService.save(user);
+
+        return new ResponseEntity<UserDTO>(new UserDTO(user, userService.getUserType(user)), HttpStatus.OK);
     }
 }

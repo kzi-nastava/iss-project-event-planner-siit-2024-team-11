@@ -33,15 +33,16 @@ public class RegistrationRequestService {
         return registrationRequestRepository.findById(id).orElse(null);
     }
 
-    public RequestUpdateStatus update(long id, Status status) {
+    public RequestUpdateStatus update(long id) {
         try {
             RegistrationRequest registrationRequest = get(id);
 
             if(registrationRequest.getDate().isBefore(LocalDateTime.now().minusHours(24))) {
+                registrationRequest.setStatus(Status.DENIED);
                 return RequestUpdateStatus.TOO_LATE;
             }
 
-            registrationRequest.setStatus(status);
+            registrationRequest.setStatus(Status.ACCEPTED);
 
             registrationRequestRepository.save(registrationRequest);
             return RequestUpdateStatus.VALID;
@@ -49,5 +50,12 @@ public class RegistrationRequestService {
         catch (Exception e) {
             return RequestUpdateStatus.NOT_FOUND;
         }
+    }
+
+    public User getUserForRequest(Long requestId) {
+        RegistrationRequest registrationRequest = registrationRequestRepository.findById(requestId).orElse(null);
+        if(registrationRequest == null) return null;
+
+        return registrationRequest.getUser();
     }
 }
