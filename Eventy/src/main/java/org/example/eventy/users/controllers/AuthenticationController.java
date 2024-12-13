@@ -180,5 +180,6 @@ public class AuthenticationController {
         userService.save(user);
 
         return new ResponseEntity<UserDTO>(new UserDTO(user, userService.getUserType(user)), HttpStatus.OK);
+        // DA SE VRACA
     }
 }
