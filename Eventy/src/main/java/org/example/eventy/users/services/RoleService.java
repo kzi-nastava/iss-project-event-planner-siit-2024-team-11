@@ -5,8 +5,6 @@ import org.example.eventy.users.repositories.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class RoleService  {
     @Autowired
@@ -17,8 +15,7 @@ public class RoleService  {
         return auth;
     }
 
-    public List<Role> findByName(String name) {
-        List<Role> roles = this.roleRepository.findByName(name);
-        return roles;
+    public Role findByName(String name) {
+        return this.roleRepository.findByName(name);
     }
 }
