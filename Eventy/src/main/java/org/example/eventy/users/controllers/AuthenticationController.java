@@ -59,6 +59,11 @@ public class AuthenticationController {
 
         // Kreiraj token za tog korisnika
         User user = (User) authentication.getPrincipal();
+
+        if(!user.isActive() || user.isDeactivated()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
         String jwt = tokenUtils.generateToken(user);
         int expiresIn = tokenUtils.getExpiredIn();
 
@@ -143,7 +148,7 @@ public class AuthenticationController {
             emailService.sendEmail(
                     user.getEmail(),
                     "Confirm registration",
-                    "Click on this link to confirm registration: " +
+                    "Click on this link to confirm registration (the link is valid in the next 24h): " +
                             "<a href=\"http://localhost:4200/confirm-registration/" + registrationRequest.getId() + "\">Activate account</a>"
             );
         }
@@ -170,8 +175,12 @@ public class AuthenticationController {
             }
 
             try {
-                emailService.sendEmail(user.getEmail(), "Confirm registration", "Click on this link to confirm registration: localhost:8080/api/authentication/registration-confirmation/" + registrationRequest.getId());
-            }
+                emailService.sendEmail(
+                        user.getEmail(),
+                        "Confirm registration",
+                        "Click on this link to confirm registration (the link is valid in the next 24h): " +
+                                "<a href=\"http://localhost:4200/confirm-registration/" + registrationRequest.getId() + "\">Activate account</a>"
+                );            }
             catch (Exception e) {
                 return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
             }
