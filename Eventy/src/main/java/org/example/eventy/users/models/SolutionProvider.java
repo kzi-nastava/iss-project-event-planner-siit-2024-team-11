@@ -1,6 +1,7 @@
 package org.example.eventy.users.models;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import org.example.eventy.solutions.models.Solution;
 
@@ -8,10 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@DiscriminatorValue("Provider")
 public class SolutionProvider extends User {
-    @Column(nullable = false)
+    @Column()
     private String name;
-    @Column(nullable = false)
+    @Column()
     private String description;
 
     public SolutionProvider() {

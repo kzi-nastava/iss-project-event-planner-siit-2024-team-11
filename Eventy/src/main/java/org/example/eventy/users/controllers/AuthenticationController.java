@@ -3,7 +3,6 @@ package org.example.eventy.users.controllers;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.common.services.EmailService;
-import org.example.eventy.common.services.PictureService;
 import org.example.eventy.users.dtos.*;
 import org.example.eventy.users.models.EventOrganizer;
 import org.example.eventy.users.models.RegistrationRequest;
@@ -91,9 +90,13 @@ public class AuthenticationController {
             }
             newOrganizer.setImageUrls(profilePictures);
 
+            if(registrationDTO.getFirstName() == null || registrationDTO.getLastName() == null) {
+                return new ResponseEntity<String>("Organizer validation failed!", HttpStatus.BAD_REQUEST);
+            }
+
             newOrganizer = (EventOrganizer) userService.save(newOrganizer);
             if(newOrganizer == null) {
-                return new ResponseEntity<String>("Validation failed!", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<String>("Organizer validation failed!", HttpStatus.BAD_REQUEST);
             }
 
             user = newOrganizer;
@@ -119,9 +122,13 @@ public class AuthenticationController {
             }
             newProvider.setImageUrls(profilePictures);
 
+            if(registrationDTO.getName() == null || registrationDTO.getDescription() == null) {
+                return new ResponseEntity<String>("Provider validation failed!", HttpStatus.BAD_REQUEST);
+            }
+
             newProvider = (SolutionProvider) userService.save(newProvider);
             if(newProvider == null) {
-                return new ResponseEntity<String>("Validation failed!", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<String>("Provider validation failed!", HttpStatus.BAD_REQUEST);
             }
 
             user = newProvider;
@@ -133,7 +140,12 @@ public class AuthenticationController {
         }
 
         try {
-            emailService.sendEmail(user.getEmail(), "Confirm registration", "Click on this link to confirm registration: localhost:8080/api/authentication/registration-confirmation/" + registrationRequest.getId());
+            emailService.sendEmail(
+                    user.getEmail(),
+                    "Confirm registration",
+                    "Click on this link to confirm registration: " +
+                            "<a href=\"http://localhost:4200/confirm-registration/" + registrationRequest.getId() + "\">Activate account</a>"
+            );
         }
         catch (Exception e) {
             return new ResponseEntity<String>("Sending email failed!", HttpStatus.BAD_REQUEST);

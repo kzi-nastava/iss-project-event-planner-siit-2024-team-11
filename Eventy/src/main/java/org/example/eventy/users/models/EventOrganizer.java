@@ -3,10 +3,11 @@ package org.example.eventy.users.models;
 import jakarta.persistence.*;
 
 @Entity
+@DiscriminatorValue("Organizer")
 public class EventOrganizer extends User {
-    @Column(nullable = false)
+    @Column()
     private String firstName;
-    @Column(nullable = false)
+    @Column()
     private String lastName;
 
     public EventOrganizer() {
