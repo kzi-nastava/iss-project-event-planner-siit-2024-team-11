@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -38,6 +39,9 @@ public class UserProfileController {
     @Autowired
     private ReservationService reservationService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> updateProfile(@RequestBody UpdateUserProfileDTO updateUserProfileDTO) {
         User user = userService.get(updateUserProfileDTO.getId());
@@ -46,7 +50,7 @@ public class UserProfileController {
             return new ResponseEntity<UserDTO>(HttpStatus.NOT_FOUND);
         }
 
-        if(!user.getPassword().equals(updateUserProfileDTO.getOldPassword())) {
+        if(!user.getPassword().equals(passwordEncoder.encode(updateUserProfileDTO.getOldPassword()))) {
             return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
         }
 

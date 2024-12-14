@@ -20,9 +20,6 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private RoleService roleService;
-
     public User findByEmail(String email) throws UsernameNotFoundException {
         return userRepository.findByEmail(email);
     }
@@ -33,6 +30,7 @@ public class UserService {
 
     public User save(User user) {
         try {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
             return userRepository.save(user);
         }
         catch (Exception e) {
