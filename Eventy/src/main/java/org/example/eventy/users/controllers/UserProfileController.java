@@ -75,7 +75,7 @@ public class UserProfileController {
             ((AuthenticatedUser) user).setLastName(updateUserProfileDTO.getLastName());
         }
 
-        user = userService.save(user);
+        user = userService.save(user, true);
 
         if(user == null) {
             return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
@@ -89,7 +89,7 @@ public class UserProfileController {
         User user = userService.get(userId);
         if(user != null) {
             user.setActive(false);
-            userService.save(user);
+            userService.save(user, false);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 

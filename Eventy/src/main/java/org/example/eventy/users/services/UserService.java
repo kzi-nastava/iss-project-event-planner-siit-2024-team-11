@@ -28,9 +28,12 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
-    public User save(User user) {
+    public User save(User user, boolean changedPassword) {
         try {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            if(changedPassword) {
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+            }
+
             return userRepository.save(user);
         }
         catch (Exception e) {

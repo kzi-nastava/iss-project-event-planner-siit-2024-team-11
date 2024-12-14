@@ -99,7 +99,7 @@ public class AuthenticationController {
                 return new ResponseEntity<String>("Organizer validation failed!", HttpStatus.BAD_REQUEST);
             }
 
-            newOrganizer = (EventOrganizer) userService.save(newOrganizer);
+            newOrganizer = (EventOrganizer) userService.save(newOrganizer, true);
             if(newOrganizer == null) {
                 return new ResponseEntity<String>("Organizer validation failed!", HttpStatus.BAD_REQUEST);
             }
@@ -131,7 +131,7 @@ public class AuthenticationController {
                 return new ResponseEntity<String>("Provider validation failed!", HttpStatus.BAD_REQUEST);
             }
 
-            newProvider = (SolutionProvider) userService.save(newProvider);
+            newProvider = (SolutionProvider) userService.save(newProvider, true);
             if(newProvider == null) {
                 return new ResponseEntity<String>("Provider validation failed!", HttpStatus.BAD_REQUEST);
             }
@@ -188,8 +188,6 @@ public class AuthenticationController {
         }
 
         User user = registrationRequestService.getUserForRequest(requestId);
-        user.setActive(true);
-        user = userService.save(user);
 
         if(user == null) {
             return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
@@ -197,7 +195,7 @@ public class AuthenticationController {
 
         user.setActive(true);
         user.setEnabled(true);
-        userService.save(user);
+        userService.save(user, false);
 
         String jwt = tokenUtils.generateToken(user);
         int expiresIn = tokenUtils.getExpiredIn();
