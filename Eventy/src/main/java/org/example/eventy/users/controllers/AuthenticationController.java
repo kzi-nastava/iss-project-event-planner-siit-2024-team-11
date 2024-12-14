@@ -21,11 +21,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -145,27 +143,27 @@ public class AuthenticationController {
     }
 
     @PutMapping(value="/registration-confirmation/{requestId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDTO> confirmRegistration(@PathVariable Long requestId) {
+    public ResponseEntity<UserTokenState> confirmRegistration(@PathVariable Long requestId) {
         RequestUpdateStatus status = registrationRequestService.update(requestId);
 
         if(status == RequestUpdateStatus.NOT_FOUND) {
-            return new ResponseEntity<UserDTO>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<UserTokenState>(HttpStatus.NOT_FOUND);
         }
         else if(status == RequestUpdateStatus.TOO_LATE) {
             User user = registrationRequestService.getUserForRequest(requestId);
 
             RegistrationRequest registrationRequest = registrationRequestService.create(user);
             if(registrationRequest == null) {
-                return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
             }
 
             try {
                 emailService.sendEmail(user.getEmail(), "Confirm registration", "Click on this link to confirm registration: localhost:8080/api/authentication/registration-confirmation/" + registrationRequest.getId());
             }
             catch (Exception e) {
-                return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
             }
-            return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
         }
 
         User user = registrationRequestService.getUserForRequest(requestId);
@@ -173,13 +171,15 @@ public class AuthenticationController {
         user = userService.save(user);
 
         if(user == null) {
-            return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
         }
 
         user.setActive(true);
         userService.save(user);
 
-        return new ResponseEntity<UserDTO>(new UserDTO(user, userService.getUserType(user)), HttpStatus.OK);
-        // DA SE VRACA JWT UMESTO OVOGA
+        String jwt = tokenUtils.generateToken(user);
+        int expiresIn = tokenUtils.getExpiredIn();
+
+        return new ResponseEntity<UserTokenState>(new UserTokenState(jwt, expiresIn, user.getId()), HttpStatus.OK);
     }
 }
