@@ -196,6 +196,7 @@ public class AuthenticationController {
         }
 
         user.setActive(true);
+        user.setEnabled(true);
         userService.save(user);
 
         String jwt = tokenUtils.generateToken(user);
