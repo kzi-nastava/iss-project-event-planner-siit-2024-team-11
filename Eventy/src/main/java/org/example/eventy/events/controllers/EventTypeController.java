@@ -7,17 +7,18 @@ import org.example.eventy.events.services.EventTypeService;
 import org.example.eventy.solutions.models.Category;
 import org.example.eventy.solutions.services.SolutionCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
 @RestController
 @RequestMapping("/api/events/types")
+@PreAuthorize("hasRole('Admin')")
 public class EventTypeController {
     @Autowired
     private EventTypeService eventTypeService;

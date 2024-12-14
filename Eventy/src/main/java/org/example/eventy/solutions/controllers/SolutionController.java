@@ -12,6 +12,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
 
@@ -31,6 +32,7 @@ public class SolutionController {
     private ProductService productService;
 
     @GetMapping(value = "/favorite/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PagedResponse<SolutionCardDTO>> getFavoriteSolutions(@PathVariable Long userId, @RequestParam(required = false) String search,
                                                                         Pageable pageable) {
         List<Solution> providerSolutions = solutionService.getFavoriteSolutionsByUser(userId, search, pageable);
@@ -42,6 +44,7 @@ public class SolutionController {
     }
 
     @GetMapping(value = "/catalog/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Provider')")
     public ResponseEntity<PagedResponse<SolutionCardDTO>> getProviderCatalog(@PathVariable Long userId, @RequestParam(required = false) String search,
                                                                              Pageable pageable) {
         List<Solution> providerSolutions = solutionService.getSolutionsByProvider(userId, search, pageable);
