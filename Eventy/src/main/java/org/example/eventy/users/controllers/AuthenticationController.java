@@ -85,7 +85,7 @@ public class AuthenticationController {
             newOrganizer.setActive(false);
             newOrganizer.setDeactivated(false);
             newOrganizer.setHasSilencedNotifications(false);
-            newOrganizer.setRole(roleRepository.findByName("Organizer"));
+            newOrganizer.setRole(roleRepository.findByName("ROLE_Organizer"));
             List<PicturePath> profilePictures = new ArrayList<>();
             for(String path : registrationDTO.getProfilePictures()) {
                 PicturePath picturePath = new PicturePath();
@@ -117,7 +117,7 @@ public class AuthenticationController {
             newProvider.setActive(false);
             newProvider.setDeactivated(false);
             newProvider.setHasSilencedNotifications(false);
-            newProvider.setRole(roleRepository.findByName("Provider"));
+            newProvider.setRole(roleRepository.findByName("ROLE_Provider"));
             List<PicturePath> profilePictures = new ArrayList<>();
             for(String path : registrationDTO.getProfilePictures()) {
                 PicturePath picturePath = new PicturePath();

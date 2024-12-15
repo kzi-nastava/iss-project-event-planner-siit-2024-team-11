@@ -18,9 +18,9 @@ public class EventyApplication {
 
     @PostConstruct
     public void seedRoles() {
-        roleRepository.save(new Role("Admin"));
-        roleRepository.save(new Role("AuthenticatedUser"));
-        roleRepository.save(new Role("Organizer"));
-        roleRepository.save(new Role("Provider"));
+        roleRepository.save(new Role("ROLE_Admin"));
+        roleRepository.save(new Role("ROLE_AuthenticatedUser"));
+        roleRepository.save(new Role("ROLE_Organizer"));
+        roleRepository.save(new Role("ROLE_Provider"));
     }
 }

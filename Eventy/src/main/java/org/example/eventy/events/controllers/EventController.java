@@ -124,7 +124,7 @@ public class EventController {
     }
 
     @GetMapping(value = "/organized/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('Organizer')")
     public ResponseEntity<PagedResponse<EventCardDTO>> getEventsOrganizedByUser(@PathVariable Long userId, @RequestParam(required = false) String search,
                                                                                 Pageable pageable) {
         List<Event> organizersEvents = eventService.getEventsByEventOrganizer(userId, search, pageable);
