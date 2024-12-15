@@ -1,13 +1,15 @@
 package org.example.eventy.users.models;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 @Entity
+@DiscriminatorValue("Admin")
 public class Admin extends User {
-    @Column(nullable = false)
+    @Column()
     private String firstName;
-    @Column(nullable = false)
+    @Column()
     private String lastName;
 
     public Admin() {

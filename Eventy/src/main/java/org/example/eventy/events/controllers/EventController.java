@@ -15,6 +15,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -53,6 +54,7 @@ public class EventController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Organizer')")
     public ResponseEntity<EventDTO> organizeEvent(@RequestBody OrganizeEventDTO organizeEventDTO) {
         Event event = new Event();
         event.setName(organizeEventDTO.getName());
@@ -122,6 +124,7 @@ public class EventController {
     }
 
     @GetMapping(value = "/organized/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PagedResponse<EventCardDTO>> getEventsOrganizedByUser(@PathVariable Long userId, @RequestParam(required = false) String search,
                                                                                 Pageable pageable) {
         List<Event> organizersEvents = eventService.getEventsByEventOrganizer(userId, search, pageable);
@@ -133,6 +136,7 @@ public class EventController {
     }
 
     @GetMapping(value = "/accepted/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Collection<EventDTO>> getAcceptedEventsByUser(@PathVariable Long userId) {
         if(userId == 5) {
             List<EventDTO> events = new ArrayList<EventDTO>();

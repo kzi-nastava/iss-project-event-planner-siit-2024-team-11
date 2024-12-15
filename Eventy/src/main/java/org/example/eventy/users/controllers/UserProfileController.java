@@ -4,10 +4,8 @@ import org.example.eventy.common.services.PictureService;
 import org.example.eventy.events.models.Event;
 import org.example.eventy.events.services.EventService;
 import org.example.eventy.solutions.models.Reservation;
-import org.example.eventy.solutions.models.Service;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.services.ReservationService;
-import org.example.eventy.solutions.services.SolutionService;
 import org.example.eventy.users.dtos.*;
 import org.example.eventy.users.models.*;
 import org.example.eventy.users.services.UserService;
@@ -15,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -25,6 +25,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
+@PreAuthorize("isAuthenticated()")
 public class UserProfileController {
     @Autowired
     private UserService userService;
@@ -38,6 +39,9 @@ public class UserProfileController {
     @Autowired
     private ReservationService reservationService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> updateProfile(@RequestBody UpdateUserProfileDTO updateUserProfileDTO) {
         User user = userService.get(updateUserProfileDTO.getId());
@@ -46,7 +50,7 @@ public class UserProfileController {
             return new ResponseEntity<UserDTO>(HttpStatus.NOT_FOUND);
         }
 
-        if(!user.getPassword().equals(updateUserProfileDTO.getOldPassword())) {
+        if(!user.getPassword().equals(passwordEncoder.encode(updateUserProfileDTO.getOldPassword()))) {
             return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
         }
 
@@ -71,7 +75,7 @@ public class UserProfileController {
             ((AuthenticatedUser) user).setLastName(updateUserProfileDTO.getLastName());
         }
 
-        user = userService.save(user);
+        user = userService.save(user, true);
 
         if(user == null) {
             return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
@@ -85,7 +89,7 @@ public class UserProfileController {
         User user = userService.get(userId);
         if(user != null) {
             user.setActive(false);
-            userService.save(user);
+            userService.save(user, false);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
@@ -93,6 +97,7 @@ public class UserProfileController {
     }
 
     @PostMapping(value="/{userId}/upgrade", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
+    @PreAuthorize("hasRole('AuthenticatedUser')")
     public ResponseEntity<String> upgradeProfile(@RequestBody RegistrationDTO registrationDTO, @PathVariable Long userId) {
         if(registrationDTO.getEmail().equals("good@gmail.com")) {
             return new ResponseEntity<String>("Confirmation email sent!", HttpStatus.OK);
