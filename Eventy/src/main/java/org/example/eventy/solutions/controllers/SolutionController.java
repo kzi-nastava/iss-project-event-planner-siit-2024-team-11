@@ -44,7 +44,7 @@ public class SolutionController {
     }
 
     @GetMapping(value = "/catalog/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('Provider')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PagedResponse<SolutionCardDTO>> getProviderCatalog(@PathVariable Long userId, @RequestParam(required = false) String search,
                                                                              Pageable pageable) {
         List<Solution> providerSolutions = solutionService.getSolutionsByProvider(userId, search, pageable);
