@@ -1,13 +1,22 @@
 package org.example.eventy.users.models;
 
+import jakarta.persistence.*;
 import org.example.eventy.common.models.Status;
 
 import java.time.LocalDateTime;
 
+@Entity
 public class RegistrationRequest {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private LocalDateTime date;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Status status;
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
     public RegistrationRequest() {
