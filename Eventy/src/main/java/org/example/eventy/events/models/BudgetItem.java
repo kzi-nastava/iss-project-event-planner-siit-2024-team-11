@@ -1,11 +1,30 @@
 package org.example.eventy.events.models;
 
+import jakarta.persistence.*;
+import org.example.eventy.solutions.models.Category;
 import org.example.eventy.solutions.models.Solution;
 
 import java.util.ArrayList;
+import java.util.List;
 
+@Entity
+@Table(name = "BudgetItems")
 public class BudgetItem {
-    private ArrayList<Solution> reservedItems;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+    @JoinColumn(name="category_id", referencedColumnName = "id")
+    private Category category;
+
+    @ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+    @JoinTable(name = "Solutions", joinColumns = @JoinColumn(name = "solution_id", referencedColumnName = "id"))
+
+    private List<Solution> reservedItems;
+
+    @Column(nullable = false)
     private double plannedFunds;
 
     public BudgetItem()
@@ -13,15 +32,23 @@ public class BudgetItem {
 
     }
 
-    public BudgetItem(ArrayList<Solution> reservedItems, double plannedFunds) {
+    public BudgetItem(Category category, double plannedFunds) {
+        this.category = category;
+        this.reservedItems = new ArrayList<>();
+        this.plannedFunds = plannedFunds;
+    }
+
+    public BudgetItem(Category category, double plannedFunds, List<Solution> reservedItems) {
+        this.category = category;
         this.reservedItems = reservedItems;
         this.plannedFunds = plannedFunds;
     }
 
-    public BudgetItem(double plannedFunds) {
+    public BudgetItem(List<Solution> reservedItems, double plannedFunds) {
+        this.reservedItems = reservedItems;
         this.plannedFunds = plannedFunds;
-        this.reservedItems = new ArrayList<>();
     }
+
 
     public boolean isOverbudget() {
         double totalSum = 0.0;
@@ -39,11 +66,11 @@ public class BudgetItem {
         return plannedFunds - totalSum;
     }
 
-    public ArrayList<Solution> getReservedItems() {
+    public List<Solution> getReservedItems() {
         return reservedItems;
     }
 
-    public void setReservedItems(ArrayList<Solution> reservedItems) {
+    public void setReservedItems(List<Solution> reservedItems) {
         this.reservedItems = reservedItems;
     }
 
@@ -53,5 +80,21 @@ public class BudgetItem {
 
     public void setPlannedFunds(double plannedFunds) {
         this.plannedFunds = plannedFunds;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
