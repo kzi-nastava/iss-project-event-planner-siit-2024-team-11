@@ -5,6 +5,7 @@ import org.example.eventy.events.models.*;
 import org.example.eventy.events.repositories.EventRepository;
 import org.example.eventy.users.models.EventOrganizer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +20,8 @@ public class EventService {
     @Autowired
     private EventRepository eventRepository;
 
-    public ArrayList<Event> getEvents(String search, ArrayList<String> eventTypes, String location, LocalDate startDate, LocalDate endDate, Pageable pageable) {
-        ArrayList<Event> events = generateEventExamples(1);
-        return events;
-        //return eventRepository.findAll(search, eventTypes, location, startDate, endDate, pageable);
+    public Page<Event> getEvents(String search, ArrayList<String> eventTypes, String location, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+        return eventRepository.findAll(search, eventTypes, location, startDate, endDate, pageable);
     }
 
     public Event getEvent(Long eventId) {

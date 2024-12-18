@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -49,4 +51,17 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findAttendingEventsByUserBetween(@Param("userId") Long userId,
                                                  @Param("startDate") LocalDate startDate,
                                                  @Param("endDate")LocalDate endDate);
+
+    @Query("SELECT e FROM Event e " +
+            "WHERE (:search = '' OR LOWER(e.name) = LOWER(:search)) " +
+            "   OR (:search = '' OR LOWER(e.description) = LOWER(:search)) " +
+            "AND (:location IS NULL OR e.location.name = :location) " +
+            "AND (CAST(:startDate AS timestamp) IS NULL OR CAST(:endDate AS timestamp) IS NULL OR e.date BETWEEN CAST(:startDate AS timestamp) AND CAST(:endDate AS timestamp)) " +
+            "AND (:eventTypes IS NULL OR e.type.name IN :eventTypes)")
+    Page<Event> findAll(@Param("search") String search,
+                        @Param("eventTypes") List<String> eventTypes,
+                        @Param("location") String location,
+                        @Param("startDate") LocalDateTime startDate,
+                        @Param("endDate") LocalDateTime endDate,
+                        Pageable pageable);
 }
