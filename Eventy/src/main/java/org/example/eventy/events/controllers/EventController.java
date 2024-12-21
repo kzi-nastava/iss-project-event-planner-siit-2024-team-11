@@ -10,6 +10,7 @@ import org.example.eventy.events.services.LocationService;
 import org.example.eventy.users.models.EventOrganizer;
 import org.example.eventy.users.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -150,35 +151,46 @@ public class EventController {
        1) we need ALL events
        2) they are NOT in card shapes (they always will be if we are getting all events) */
     /* NOTE: search: Jane & Mark Wedding (%20 == " ", %26 == "&") */
-    // GET /api/events?search=Jane%20%26%20Mark%20Wedding&eventTypes=Wedding,Party&location=BeachResort&startDate=2024-05-01&endDate=2024-05-31&page=0&size=5&sort=date,asc
+    // GET /api/events?search=Jane%20%26%20Mark%20Wedding&eventTypes=Wedding,Party&location=BeachResort&startDate=2024-05-01T00:00:00&endDate=2024-05-01T00:00:00&page=0&size=5&sort=date,asc
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<EventCardDTO>> getEvents(
-            @RequestParam(required = false) String search,
+    public ResponseEntity<PagedResponse<EventCardDTO>> getEvents(
+            @RequestParam(required = false, defaultValue = "") String search,
             @RequestParam(required = false) ArrayList<String> eventTypes,
-            @RequestParam(required = false) String location,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false, defaultValue = "") String location,
+            @RequestParam(required = false, defaultValue = "9999") Integer maxParticipants,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
             Pageable pageable) {
         // Pageable - page, size, sort
         // sort by: "eventType", "name", "maxParticipants,asc", "maxParticipants,desc", "location", "date,asc", "date,desc"
-        ArrayList<Event> eventModels = eventService.getEvents(search, eventTypes, location, startDate, endDate, pageable);
 
-        ArrayList<EventCardDTO> events = new ArrayList<>();
-        for (Event event : eventModels) {
-            events.add(new EventCardDTO(event));
+        // Set default values for startDate and endDate
+        if (startDate == null) {
+            startDate = LocalDateTime.of(1970, 1, 1, 0, 0); // Very small date
         }
+        if (endDate == null) {
+            endDate = LocalDateTime.of(2099, 12, 31, 23, 59); // Very large date
+        }
+        Page<Event> events = eventService.getEvents(search, eventTypes, maxParticipants, location, startDate, endDate, pageable);
 
-        return new ResponseEntity<Collection<EventCardDTO>>(events, HttpStatus.OK);
+        List<EventCardDTO> eventsDTO = new ArrayList<>();
+        for (Event event : events) {
+            eventsDTO.add(new EventCardDTO(event));
+        }
+        long count = events.getTotalElements();
+
+        PagedResponse<EventCardDTO> response = new PagedResponse<>(eventsDTO, (int) Math.ceil((double) count / pageable.getPageSize()), count);
+        return new ResponseEntity<PagedResponse<EventCardDTO>>(response, HttpStatus.OK);
     }
 
     // GET "/api/events/cards/5"
     @GetMapping(value = "/cards/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EventCardDTO> getEventCard(@PathVariable Long eventId) {
-        if (eventId == 5) {
-            Event eventModel = eventService.getEvent(eventId);
-            EventCardDTO eventCard = new EventCardDTO(eventModel);
+        Event event = eventService.getEvent(eventId);
 
-            return new ResponseEntity<EventCardDTO>(eventCard, HttpStatus.OK);
+        if (event != null) {
+            EventCardDTO eventCardDTO = new EventCardDTO(event);
+            return new ResponseEntity<EventCardDTO>(eventCardDTO, HttpStatus.OK);
         }
 
         return new ResponseEntity<EventCardDTO>(HttpStatus.NOT_FOUND);
@@ -190,14 +202,14 @@ public class EventController {
     // GET "/api/events/featured"
     @GetMapping(value = "/featured", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<EventCardDTO>> getFeaturedEvents() {
-        ArrayList<Event> featuredEventModels = eventService.getFeaturedEvents();
+        ArrayList<Event> featuredEvents = eventService.getFeaturedEvents();
 
-        ArrayList<EventCardDTO> featuredEvents = new ArrayList<>();
-        for (Event event : featuredEventModels) {
-            featuredEvents.add(new EventCardDTO(event));
+        ArrayList<EventCardDTO> featuredEventsDTO = new ArrayList<>();
+        for (Event event : featuredEvents) {
+            featuredEventsDTO.add(new EventCardDTO(event));
         }
 
-        return new ResponseEntity<Collection<EventCardDTO>>(featuredEvents, HttpStatus.OK);
+        return new ResponseEntity<Collection<EventCardDTO>>(featuredEventsDTO, HttpStatus.OK);
     }
 }
 

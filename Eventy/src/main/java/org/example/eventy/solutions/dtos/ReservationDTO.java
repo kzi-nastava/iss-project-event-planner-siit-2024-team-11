@@ -2,14 +2,15 @@ package org.example.eventy.solutions.dtos;
 
 import org.example.eventy.solutions.models.Reservation;
 
+import java.time.LocalDateTime;
 import java.util.Calendar;
 
 public class ReservationDTO {
     private Long id;
     private Long selectedEventId;
     private Long selectedServiceId;
-    private Calendar reservationStartDateTime;
-    private Calendar reservationEndDateTime;
+    private LocalDateTime reservationStartDateTime;
+    private LocalDateTime reservationEndDateTime;
 
     public ReservationDTO() {
 
@@ -23,7 +24,7 @@ public class ReservationDTO {
         this.reservationEndDateTime = reservation.getReservationEndDateTime();
     }
 
-    public ReservationDTO(Long id, Long selectedEventId, Long selectedServiceId, Calendar reservationStartDateTime, Calendar reservationEndDateTime) {
+    public ReservationDTO(Long id, Long selectedEventId, Long selectedServiceId, LocalDateTime reservationStartDateTime, LocalDateTime reservationEndDateTime) {
         this.id = id;
         this.selectedEventId = selectedEventId;
         this.selectedServiceId = selectedServiceId;
@@ -55,19 +56,19 @@ public class ReservationDTO {
         this.selectedServiceId = selectedServiceId;
     }
 
-    public Calendar getReservationStartDateTime() {
+    public LocalDateTime getReservationStartDateTime() {
         return reservationStartDateTime;
     }
 
-    public void setReservationStartDateTime(Calendar reservationStartDateTime) {
+    public void setReservationStartDateTime(LocalDateTime reservationStartDateTime) {
         this.reservationStartDateTime = reservationStartDateTime;
     }
 
-    public Calendar getReservationEndDateTime() {
+    public LocalDateTime getReservationEndDateTime() {
         return reservationEndDateTime;
     }
 
-    public void setReservationEndDateTime(Calendar reservationEndDateTime) {
+    public void setReservationEndDateTime(LocalDateTime reservationEndDateTime) {
         this.reservationEndDateTime = reservationEndDateTime;
     }
 }

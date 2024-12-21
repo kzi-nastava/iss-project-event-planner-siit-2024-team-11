@@ -141,10 +141,7 @@ public class UserProfileController {
         for(Reservation reservation : reservationService.getReservationByProviderBetween(userId, startDate, endDate)) {
             Solution service = reservation.getSelectedService();
             CalendarOccupancyDTO calendarOccupancyDTO = new CalendarOccupancyDTO(service.getName(), service.getId(),
-                    OccupancyType.SERVICE, Instant.ofEpochMilli(reservation.getReservationStartDateTime().getTimeInMillis())
-                    .atZone(ZoneId.systemDefault()).toLocalDate(),
-                    Instant.ofEpochMilli(reservation.getReservationEndDateTime().getTimeInMillis())
-                            .atZone(ZoneId.systemDefault()).toLocalDate());
+                    OccupancyType.SERVICE, reservation.getReservationStartDateTime().toLocalDate(), reservation.getReservationEndDateTime().toLocalDate());
 
             calendar.add(calendarOccupancyDTO);
         }

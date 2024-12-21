@@ -1,6 +1,7 @@
 package org.example.eventy.solutions.controllers;
 
 import org.example.eventy.common.models.PagedResponse;
+import org.example.eventy.events.dtos.EventCardDTO;
 import org.example.eventy.solutions.dtos.PriceListDTO;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
 import org.example.eventy.solutions.models.Solution;
@@ -8,6 +9,7 @@ import org.example.eventy.solutions.services.ProductService;
 import org.example.eventy.solutions.services.ServiceService;
 import org.example.eventy.solutions.services.SolutionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,7 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -58,66 +60,74 @@ public class SolutionController {
     /* this returns SolutionCardDTOs, because there is NO CASE where:
        1) we need ALL solution
        2) they are NOT in card shapes (they always will be if we are getting all solution) */
-    // GET http://localhost:8080/api/solutions?search=cake&type=SERVICE&category=Wedding&eventTypes=Ceremony,Reception&company=ElegantEvents&minPrice=100&maxPrice=1000&startDate=2024-12-01&endDate=2024-12-31&isAvailable=true&page=0&size=10&sort=name,asc
+    // GET http://localhost:8080/api/solutions?search=party&type=Service&categories=Music,Decoration&eventTypes=Wedding,Birthday&company=EventCorp&minPrice=100&maxPrice=5000&startDate=2024-12-20T10:00:00&endDate=2024-12-20T20:00:00&isAvailable=true&page=0&size=10&sort=name,asc
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<SolutionCardDTO>> getSolutions(
-            @RequestParam(required = false) String search,
+    public ResponseEntity<PagedResponse<SolutionCardDTO>> getSolutions(
+            @RequestParam(required = false, defaultValue = "") String search,
             @RequestParam(required = false, defaultValue = "Any") String type,
-            @RequestParam(required = false) String category,
+            @RequestParam(required = false) ArrayList<String> categories,
             @RequestParam(required = false) ArrayList<String> eventTypes,
-            @RequestParam(required = false) String company,
+            @RequestParam(required = false, defaultValue = "") String company,
             @RequestParam(required = false, defaultValue = "0") Double minPrice,
             @RequestParam(required = false, defaultValue = "99999999") Double maxPrice,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
             @RequestParam(required = false, defaultValue = "true") Boolean isAvailable,
             Pageable pageable) {
         // Pageable - page, size, sort
         // sort by: "category", "name", "price,asc", "price,desc", "date,asc", "date,desc", "duration,asc", "duration,desc"
-        ArrayList<Solution> solutionModels = solutionService.getSolutions(
-                search, type, category, eventTypes, company, minPrice, maxPrice, startDate, endDate, isAvailable, pageable);
-
-        ArrayList<SolutionCardDTO> solutions = new ArrayList<>();
-        for (Solution solution : solutionModels) {
-            solutions.add(new SolutionCardDTO(solution));
+        if (startDate == null) {
+            startDate = LocalDateTime.of(1970, 1, 1, 0, 0); // Very small date
         }
-
-        return new ResponseEntity<Collection<SolutionCardDTO>>(solutions, HttpStatus.OK);
-    }
-
-    // GET "/api/solutions/featured"
-    @GetMapping(value = "/featured", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<SolutionCardDTO>> getFeaturedSolutions() {
-        ArrayList<Solution> featuredSolutionModels = solutionService.getFeaturedSolutions();
-
-        ArrayList<SolutionCardDTO> featuredSolutions = new ArrayList<>();
-        for (Solution solution : featuredSolutionModels) {
-            featuredSolutions.add(new SolutionCardDTO(solution));
+        if (endDate == null) {
+            endDate = LocalDateTime.of(2099, 12, 31, 23, 59); // Very large date
         }
+        Page<Solution> solutions = solutionService.getSolutions(
+            search, type, categories, eventTypes, company, minPrice, maxPrice, startDate, endDate, isAvailable, pageable);
 
-        return new ResponseEntity<Collection<SolutionCardDTO>>(featuredSolutions, HttpStatus.OK);
+        List<SolutionCardDTO> solutionCardsDTO = new ArrayList<>();
+        for (Solution solution : solutions) {
+            solutionCardsDTO.add(new SolutionCardDTO(solution));
+        }
+        long count = solutions.getTotalElements();
+
+        PagedResponse<SolutionCardDTO> response = new PagedResponse<>(solutionCardsDTO, (int) Math.ceil((double) count / pageable.getPageSize()), count);
+        return new ResponseEntity<PagedResponse<SolutionCardDTO>>(response, HttpStatus.OK);
     }
 
     // GET "/api/solutions/cards/5"
     @GetMapping(value = "/cards/{solutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SolutionCardDTO> getSolutionCard(@PathVariable Long solutionId) {
-        if (solutionId == 5) {
-            Solution solutionModel = solutionService.getSolution(solutionId);
-            SolutionCardDTO solutionCard = new SolutionCardDTO(solutionModel);
+        Solution solution = solutionService.getSolution(solutionId);
 
+        if (solution != null) {
+            SolutionCardDTO solutionCard = new SolutionCardDTO(solution);
             return new ResponseEntity<SolutionCardDTO>(solutionCard, HttpStatus.OK);
         }
 
         return new ResponseEntity<SolutionCardDTO>(HttpStatus.NOT_FOUND);
     }
 
+    // GET "/api/solutions/featured"
+    @GetMapping(value = "/featured", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<SolutionCardDTO>> getFeaturedSolutions() {
+        ArrayList<Solution> featuredSolutions = solutionService.getFeaturedSolutions();
+
+        ArrayList<SolutionCardDTO> featuredSolutionsDTO = new ArrayList<>();
+        for (Solution solution : featuredSolutions) {
+            featuredSolutionsDTO.add(new SolutionCardDTO(solution));
+        }
+
+        return new ResponseEntity<Collection<SolutionCardDTO>>(featuredSolutionsDTO, HttpStatus.OK);
+    }
+
     @GetMapping(value = "/pricelist/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<SolutionCardDTO>> getProviderPrices(@PathVariable Long userId) {
         if(userId == 5) {
             // prices are shown in cards like the cards on the homepage
-            List<Solution> solutionModels = solutionService.getSolutions(null, null, null, null, null, 0, 99999999, null, null, null, Pageable.unpaged());
+            Page<Solution> solutionModels = solutionService.getSolutions(null, null, null, null, null, 0, 99999999, null, null, null, Pageable.unpaged());
 
-            ArrayList<SolutionCardDTO> solutions = new ArrayList<>();
+            List<SolutionCardDTO> solutions = new ArrayList<>();
             for (Solution solution : solutionModels) {
                 solutions.add(new SolutionCardDTO(solution));
             }

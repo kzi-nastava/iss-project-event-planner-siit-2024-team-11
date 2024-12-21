@@ -3,6 +3,7 @@ package org.example.eventy.solutions.models;
 import jakarta.persistence.*;
 import org.example.eventy.events.models.Event;
 
+import java.time.LocalDateTime;
 import java.util.Calendar;
 
 @Entity
@@ -18,16 +19,14 @@ public class Reservation {
     @JoinColumn(name = "selected_service_id", referencedColumnName = "id")
     private Solution selectedService;
     @Column(nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Calendar reservationStartDateTime;
+    private LocalDateTime reservationStartDateTime;
     @Column(nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Calendar reservationEndDateTime;
+    private LocalDateTime reservationEndDateTime;
 
     public Reservation() {
     }
 
-    public Reservation(Long id, Event selectedEvent, Solution selectedService, Calendar reservationStartDateTime, Calendar reservationEndDateTime) {
+    public Reservation(Long id, Event selectedEvent, Solution selectedService, LocalDateTime reservationStartDateTime, LocalDateTime reservationEndDateTime) {
         this.id = id;
         this.selectedEvent = selectedEvent;
         this.selectedService = selectedService;
@@ -59,19 +58,19 @@ public class Reservation {
         this.selectedService = selectedService;
     }
 
-    public Calendar getReservationStartDateTime() {
+    public LocalDateTime getReservationStartDateTime() {
         return reservationStartDateTime;
     }
 
-    public void setReservationStartDateTime(Calendar reservationStartDateTime) {
+    public void setReservationStartDateTime(LocalDateTime reservationStartDateTime) {
         this.reservationStartDateTime = reservationStartDateTime;
     }
 
-    public Calendar getReservationEndDateTime() {
+    public LocalDateTime getReservationEndDateTime() {
         return reservationEndDateTime;
     }
 
-    public void setReservationEndDateTime(Calendar reservationEndDateTime) {
+    public void setReservationEndDateTime(LocalDateTime reservationEndDateTime) {
         this.reservationEndDateTime = reservationEndDateTime;
     }
 }
