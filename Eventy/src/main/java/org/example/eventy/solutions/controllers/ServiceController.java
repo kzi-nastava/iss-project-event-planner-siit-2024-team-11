@@ -1,17 +1,18 @@
 package org.example.eventy.solutions.controllers;
 
+import org.example.eventy.common.models.PagedResponse;
 import org.example.eventy.solutions.dtos.services.*;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.services.ServiceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
 import java.util.Optional;
 import java.util.ArrayList;
 
@@ -73,26 +74,28 @@ public class ServiceController {
        2) they are NOT in card shapes (they always will be if we are getting all services)
        also SolutionCardDTO == ProductCardDTO == ServiceCardDTO (only a few of fields will be null) */
     // GET "/api/services"
-    @GetMapping(value = "/cards", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<SolutionCardDTO>> getServiceCards(Pageable pageable) {
-        ArrayList<Solution> serviceModels = serviceService.getServices(pageable);
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PagedResponse<SolutionCardDTO>> getServices(Pageable pageable) {
+        Page<Solution> services = serviceService.getServices(pageable);
 
-        ArrayList<SolutionCardDTO> services = new ArrayList<>();
-        for (Solution solution : serviceModels) {
-            services.add(new SolutionCardDTO(solution));
+        ArrayList<SolutionCardDTO> servicesDTO = new ArrayList<>();
+        for (Solution service : services) {
+            servicesDTO.add(new SolutionCardDTO(service));
         }
+        long count = services.getTotalElements();
 
-        return new ResponseEntity<>(services, HttpStatus.OK);
+        PagedResponse<SolutionCardDTO> response = new PagedResponse<>(servicesDTO, (int) Math.ceil((double) count / pageable.getPageSize()), count);
+        return new ResponseEntity<PagedResponse<SolutionCardDTO>>(response, HttpStatus.OK);
     }
 
     // GET "/api/services/cards/5"
     @GetMapping(value = "/cards/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SolutionCardDTO> getServiceCard(@PathVariable Long serviceId) {
-        if (serviceId == 5) {
-            Solution serviceCardModel = serviceService.getService(serviceId);
-            SolutionCardDTO serviceCard = new SolutionCardDTO(serviceCardModel);
+        Solution service = serviceService.getService(serviceId);
 
-            return new ResponseEntity<SolutionCardDTO>(serviceCard, HttpStatus.OK);
+        if (service != null) {
+            SolutionCardDTO serviceCardDTO = new SolutionCardDTO(service);
+            return new ResponseEntity<SolutionCardDTO>(serviceCardDTO, HttpStatus.OK);
         }
 
         return new ResponseEntity<SolutionCardDTO>(HttpStatus.NOT_FOUND);

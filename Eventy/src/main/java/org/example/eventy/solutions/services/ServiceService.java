@@ -8,15 +8,18 @@ import org.example.eventy.solutions.dtos.services.*;
 import org.example.eventy.solutions.models.Category;
 import org.example.eventy.solutions.models.Service;
 import org.example.eventy.solutions.models.Solution;
+import org.example.eventy.solutions.repositories.SolutionRepository;
 import org.example.eventy.users.models.SolutionProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.*;
 
 @org.springframework.stereotype.Service
 public class ServiceService {
-    // @Autowired
-    // private ServiceRepository serviceRepository;
+    @Autowired
+    private SolutionRepository solutionRepository;
 
     private Collection<org.example.eventy.solutions.models.Service> allServices = new ArrayList<>();
 
@@ -138,72 +141,13 @@ public class ServiceService {
         allServices.removeIf(s -> s.getId() == id);
     }
 
-    public ArrayList<Solution> getServices(Pageable pageable) {
-        ArrayList<Solution> services = generateServiceExamples();
-        return services;
+    public Page<Solution> getServices(Pageable pageable) {
+        // FALI TYPE OVDEEE U REPOOO PO TOME CEMO NACI SAMO USLUGE
+        // type = "SolutionType.SERVICE"
+        return solutionRepository.findAll(null, null, null, null, null, null, null, null, null, null, pageable);
     }
 
     public Solution getService(Long serviceId) {
-        ArrayList<Solution> services = generateServiceExamples();
-        Solution service = services.get(0);
-        service.setId(serviceId);
-
-        return service;
-    }
-
-    public ArrayList<Solution> generateServiceExamples() {
-        Category category1 = new Category();
-        category1.setName("Catering");
-        ArrayList<EventType> eventTypes = new ArrayList<EventType>();
-        EventType eventType1 = new EventType();
-        eventType1.setName("Wedding");
-        EventType eventType2 = new EventType();
-        eventType2.setName("Birthday");
-        eventTypes.add(eventType1);
-        eventTypes.add(eventType2);
-        ArrayList<PicturePath> imageUrls = new ArrayList<PicturePath>();
-        imageUrls.add(new PicturePath(9L, "https://example.com/solution.png"));
-        SolutionProvider provider = new SolutionProvider();
-        provider.setName("TacTac");
-        provider.setEmail("cakes.luxury@gmail.com");
-        provider.setImageUrls(imageUrls);
-
-        Service service1 = new Service();
-        service1.setId(1L);
-        service1.setName("Catering Food");
-        service1.setCategory(category1);
-        service1.setMinReservationTime(1);
-        service1.setMaxReservationTime(3);
-        service1.setDescription(null);
-        service1.setEventTypes(eventTypes);
-        service1.setPrice(2220.00);
-        service1.setDiscount(15);
-        service1.setImageUrls(imageUrls);
-        service1.setAvailable(true);
-        service1.setProvider(provider);
-
-        Category category2 = new Category();
-        category2.setName("Entertainment");
-        provider.setEmail("exit.festival@gmail.com");
-
-        Service service2 = new org.example.eventy.solutions.models.Service();
-        service2.setId(2L);
-        service2.setName("DJ Services");
-        service2.setCategory(category2);
-        service2.setMinReservationTime(2);
-        service2.setMaxReservationTime(6);
-        service2.setDescription(null);
-        service2.setEventTypes(eventTypes);
-        service2.setPrice(150.00);
-        service2.setDiscount(10);
-        service2.setImageUrls(imageUrls);
-        service2.setAvailable(true);
-        service2.setProvider(provider);
-
-        ArrayList<Solution> services = new ArrayList<Solution>();
-        services.add(service1);
-        services.add(service2);
-
-        return services;
+        return solutionRepository.findById(serviceId).orElse(null);
     }
 }
