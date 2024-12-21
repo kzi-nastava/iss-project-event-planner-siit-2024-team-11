@@ -19,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -158,6 +157,7 @@ public class EventController {
             @RequestParam(required = false, defaultValue = "") String search,
             @RequestParam(required = false) ArrayList<String> eventTypes,
             @RequestParam(required = false, defaultValue = "") String location,
+            @RequestParam(required = false, defaultValue = "9999") Integer maxParticipants,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
             Pageable pageable) {
@@ -171,7 +171,7 @@ public class EventController {
         if (endDate == null) {
             endDate = LocalDateTime.of(2099, 12, 31, 23, 59); // Very large date
         }
-        Page<Event> events = eventService.getEvents(search, eventTypes, location, startDate, endDate, pageable);
+        Page<Event> events = eventService.getEvents(search, eventTypes, maxParticipants, location, startDate, endDate, pageable);
 
         List<EventCardDTO> eventsDTO = new ArrayList<>();
         for (Event event : events) {
@@ -186,11 +186,11 @@ public class EventController {
     // GET "/api/events/cards/5"
     @GetMapping(value = "/cards/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EventCardDTO> getEventCard(@PathVariable Long eventId) {
-        if (eventId == 5) {
-            Event eventModel = eventService.getEvent(eventId);
-            EventCardDTO eventCard = new EventCardDTO(eventModel);
+        Event event = eventService.getEvent(eventId);
 
-            return new ResponseEntity<EventCardDTO>(eventCard, HttpStatus.OK);
+        if (event != null) {
+            EventCardDTO eventCardDTO = new EventCardDTO(event);
+            return new ResponseEntity<EventCardDTO>(eventCardDTO, HttpStatus.OK);
         }
 
         return new ResponseEntity<EventCardDTO>(HttpStatus.NOT_FOUND);
@@ -202,14 +202,14 @@ public class EventController {
     // GET "/api/events/featured"
     @GetMapping(value = "/featured", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<EventCardDTO>> getFeaturedEvents() {
-        ArrayList<Event> featuredEventModels = eventService.getFeaturedEvents();
+        ArrayList<Event> featuredEvents = eventService.getFeaturedEvents();
 
-        ArrayList<EventCardDTO> featuredEvents = new ArrayList<>();
-        for (Event event : featuredEventModels) {
-            featuredEvents.add(new EventCardDTO(event));
+        ArrayList<EventCardDTO> featuredEventsDTO = new ArrayList<>();
+        for (Event event : featuredEvents) {
+            featuredEventsDTO.add(new EventCardDTO(event));
         }
 
-        return new ResponseEntity<Collection<EventCardDTO>>(featuredEvents, HttpStatus.OK);
+        return new ResponseEntity<Collection<EventCardDTO>>(featuredEventsDTO, HttpStatus.OK);
     }
 }
 
