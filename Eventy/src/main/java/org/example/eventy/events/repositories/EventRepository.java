@@ -53,8 +53,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                                                  @Param("endDate")LocalDate endDate);
 
     @Query("SELECT e FROM Event e " +
-            "WHERE (:search = '' OR LOWER(e.name) = LOWER(:search)) " +
-            "   OR (:search = '' OR LOWER(e.description) = LOWER(:search)) " +
+            "WHERE (:search = '' OR e.name ILIKE ('%' || :search || '%')) " +
+            "   OR (:search = '' OR e.description ILIKE ('%' || :search || '%')) " +
             "AND (:maxParticipants IS NULL OR e.maxNumberParticipants <= :maxParticipants) " +
             "AND (:location IS NULL OR e.location.name = :location) " +
             "AND (CAST(:startDate AS timestamp) IS NULL OR CAST(:endDate AS timestamp) IS NULL OR e.date BETWEEN CAST(:startDate AS timestamp) AND CAST(:endDate AS timestamp)) " +

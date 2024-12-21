@@ -59,7 +59,7 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
                FROM Reservation r
                WHERE r.selectedService.id = s.id
                  AND (:startDate <= r.reservationEndDateTime AND :startDate >= r.reservationStartDateTime)
-                 AND (:endDate >= r.reservationStartDateTime AND :endDate <= r.reservationEndDateTime))
+                 OR (:endDate >= r.reservationStartDateTime AND :endDate <= r.reservationEndDateTime))
           """)
     //AND (:type = 'Any' OR s.type = :type) -------------> // FALI TYPE OVDEEE
     Page<Solution> findAll(@Param("search") String search,
