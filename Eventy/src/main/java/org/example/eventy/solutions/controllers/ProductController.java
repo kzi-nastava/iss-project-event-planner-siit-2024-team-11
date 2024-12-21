@@ -1,5 +1,6 @@
 package org.example.eventy.solutions.controllers;
 
+import org.example.eventy.common.models.PagedResponse;
 import org.example.eventy.events.dtos.EventTypeDTO;
 import org.example.eventy.solutions.dtos.CreateProductDTO;
 import org.example.eventy.solutions.dtos.ProductDTO;
@@ -8,6 +9,7 @@ import org.example.eventy.solutions.dtos.SolutionCardDTO;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,26 +33,28 @@ public class ProductController {
        also SolutionCardDTO == ProductCardDTO == ServiceCardDTO (only a few of fields will be null) */
     // GET "/api/products"
     // ***NOTE: this should be named getProducts PROBABLY, but we already have one method below named like that
-    @GetMapping(value = "/cards", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<SolutionCardDTO>> getProductCards(Pageable pageable) {
-        ArrayList<Solution> productModels = productService.getProducts(pageable);
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PagedResponse<SolutionCardDTO>> getProducts(Pageable pageable) {
+        Page<Solution> products = productService.getProducts(pageable);
 
-        ArrayList<SolutionCardDTO> products = new ArrayList<>();
-        for (Solution solution : productModels) {
-            products.add(new SolutionCardDTO(solution));
+        ArrayList<SolutionCardDTO> productsDTO = new ArrayList<>();
+        for (Solution product : products) {
+            productsDTO.add(new SolutionCardDTO(product));
         }
+        long count = products.getTotalElements();
 
-        return new ResponseEntity<>(products, HttpStatus.OK);
+        PagedResponse<SolutionCardDTO> response = new PagedResponse<>(productsDTO, (int) Math.ceil((double) count / pageable.getPageSize()), count);
+        return new ResponseEntity<PagedResponse<SolutionCardDTO>>(response, HttpStatus.OK);
     }
 
     // GET "/api/products/cards/5"
     @GetMapping(value = "/cards/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SolutionCardDTO> getProductCard(@PathVariable Long productId) {
-        if (productId == 5) {
-            Solution productCardModel = productService.getProduct(productId);
-            SolutionCardDTO productCard = new SolutionCardDTO(productCardModel);
+        Solution product = productService.getProduct(productId);
 
-            return new ResponseEntity<SolutionCardDTO>(productCard, HttpStatus.OK);
+        if (product != null) {
+            SolutionCardDTO productCardDTO = new SolutionCardDTO(product);
+            return new ResponseEntity<SolutionCardDTO>(productCardDTO, HttpStatus.OK);
         }
 
         return new ResponseEntity<SolutionCardDTO>(HttpStatus.NOT_FOUND);
@@ -78,6 +82,7 @@ public class ProductController {
         return new ResponseEntity<ProductDTO>(productDTO, HttpStatus.BAD_REQUEST);
     }
 
+    /*
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<ProductDTO>> getProducts() {
         List<ProductDTO> products = new ArrayList<>();
@@ -87,7 +92,7 @@ public class ProductController {
 
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
-
+*/
     @GetMapping(value = "/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ProductDTO> getProduct(@PathVariable Long productId) {
         ProductDTO productDTO = new ProductDTO();
