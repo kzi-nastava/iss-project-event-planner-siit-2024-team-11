@@ -26,7 +26,7 @@ public class EventTypeController {
     private SolutionCategoryService solutionCategoryService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PagedResponse<EventTypeCardDTO>> getTypes(@RequestParam(required = false) String search, Pageable pageable) {
+    public ResponseEntity<PagedResponse<EventTypeCardDTO>> getTypes(@RequestParam(required = false, defaultValue = "") String search, Pageable pageable) {
         List<EventType> eventTypes = eventTypeService.getTypes(search, pageable);
         List<EventTypeCardDTO> eventTypeDTOs = new ArrayList<EventTypeCardDTO>();
 
@@ -34,7 +34,7 @@ public class EventTypeController {
             eventTypeDTOs.add(new EventTypeCardDTO(eventType));
         }
 
-        long count = eventTypeService.getCount();
+        long count = eventTypeService.getCount(search);
 
         PagedResponse<EventTypeCardDTO> pagedResponse = new PagedResponse<>(eventTypeDTOs, (int) Math.ceil((double) count / pageable.getPageSize()), count);
 
@@ -42,6 +42,7 @@ public class EventTypeController {
     }
 
     @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Organizer')")
     public ResponseEntity<Collection<EventTypeCardDTO>> getActiveTypes() {
         List<EventType> eventTypes = eventTypeService.getActiveTypes();
         List<EventTypeCardDTO> eventTypeDTOs = new ArrayList<EventTypeCardDTO>();
@@ -114,10 +115,10 @@ public class EventTypeController {
     }
 
     @PutMapping(value = "/{eventTypeId}/activation", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EventTypeDTO> toggleActivate(@PathVariable Long eventTypeId) {
+    public ResponseEntity<EventTypeWithActivityDTO> toggleActivate(@PathVariable Long eventTypeId) {
         EventType eventType = eventTypeService.toggleActivation(eventTypeId);
         if(eventType != null) {
-            return new ResponseEntity<>(new EventTypeDTO(eventType), HttpStatus.OK);
+            return new ResponseEntity<>(new EventTypeWithActivityDTO(eventType), HttpStatus.OK);
         }
 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
