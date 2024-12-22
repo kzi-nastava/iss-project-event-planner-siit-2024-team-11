@@ -49,7 +49,7 @@ public class EventTypeService {
         return eventType;
     }
 
-    public long getCount() {
-        return eventTypeRepository.count();
+    public long getCount(String search) {
+        return eventTypeRepository.findCountSearch(search);
     }
 }

@@ -1,5 +1,6 @@
 package org.example.eventy.events.dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.example.eventy.events.models.EventType;
 import org.example.eventy.solutions.dtos.categories.CategoryWithIDDTO;
 import org.example.eventy.solutions.models.Category;
@@ -12,6 +13,7 @@ public class EventTypeWithActivityDTO {
     private String name;
     private String description;
     private List<CategoryWithIDDTO> recommendedSolutionCategories;
+    @JsonProperty("isActive")
     private boolean isActive;
 
     public EventTypeWithActivityDTO() {
@@ -72,7 +74,7 @@ public class EventTypeWithActivityDTO {
         this.recommendedSolutionCategories = recommendedSolutionCategories;
     }
 
-    public boolean isActive() {
+    public boolean getIsActive() {
         return isActive;
     }
 
