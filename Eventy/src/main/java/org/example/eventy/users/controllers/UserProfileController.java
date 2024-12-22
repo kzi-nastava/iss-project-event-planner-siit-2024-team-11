@@ -50,7 +50,7 @@ public class UserProfileController {
             return new ResponseEntity<UserDTO>(HttpStatus.NOT_FOUND);
         }
 
-        if(!user.getPassword().equals(passwordEncoder.encode(updateUserProfileDTO.getOldPassword()))) {
+        if(!passwordEncoder.matches(updateUserProfileDTO.getOldPassword(), user.getPassword())) {
             return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
         }
 
@@ -89,6 +89,7 @@ public class UserProfileController {
         User user = userService.get(userId);
         if(user != null) {
             user.setActive(false);
+            user.setDeactivated(true);
             userService.save(user, false);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
