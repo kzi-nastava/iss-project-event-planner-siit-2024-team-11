@@ -24,12 +24,12 @@ public class ReviewService {
 
     public Page<Review> getPendingReviews(Pageable pageable) {
         //Pageable pageable = PageRequest.of(page, size, Sort.by("criteria").descending());
-        return reviewRepository.findAll(pageable, "PENDING");
+        return reviewRepository.findAllByStatusOrderByIdDesc(pageable, Status.PENDING);
     }
 
     public Page<Review> getAcceptedReviews(Pageable pageable) {
         //Pageable pageable = PageRequest.of(page, size, Sort.by("criteria").descending());
-        return reviewRepository.findAll(pageable, "ACCEPTED");
+        return reviewRepository.findAllByStatusOrderByIdDesc(pageable, Status.ACCEPTED);
     }
 
     public Review getReview(Long reviewId) {
