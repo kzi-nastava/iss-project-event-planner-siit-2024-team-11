@@ -3,6 +3,7 @@ package org.example.eventy.reviews.dtos;
 import org.example.eventy.common.models.Status;
 
 public class UpdateReviewDTO {
+    private Long id;
     private String comment;
     private Integer grade;
     private Status status;
@@ -10,10 +11,19 @@ public class UpdateReviewDTO {
     public UpdateReviewDTO() {
     }
 
-    public UpdateReviewDTO(String comment, Integer grade, Status status) {
+    public UpdateReviewDTO(Long id, String comment, Integer grade, Status status) {
+        this.id = id;
         this.comment = comment;
         this.grade = grade;
         this.status = status;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getComment() {
