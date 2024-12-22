@@ -108,9 +108,10 @@ public class ServiceService {
         return getServiceDTOs;
     }*/
 
+    /*
     public Optional<GetServiceDTO> getService(long id) {
         return Optional.of(new GetServiceDTO(allServices.stream().filter(s -> s.getId() == id).findFirst().get()));
-    }
+    }*/
 
     public Optional<UpdatedServiceDTO> updateService(UpdateServiceDTO updateServiceDTO) {
         Optional<org.example.eventy.solutions.models.Service> oldService = allServices.stream().filter(s -> s.getId() == updateServiceDTO.getId()).findFirst();

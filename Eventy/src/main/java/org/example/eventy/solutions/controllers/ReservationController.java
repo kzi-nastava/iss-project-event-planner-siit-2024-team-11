@@ -1,5 +1,6 @@
 package org.example.eventy.solutions.controllers;
 
+import jakarta.validation.Valid;
 import org.example.eventy.solutions.dtos.ReservationDTO;
 import org.example.eventy.solutions.models.Reservation;
 import org.example.eventy.solutions.services.ReservationService;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -19,36 +21,14 @@ public class ReservationController {
     @Autowired
     private ReservationService reservationService;
 
-    /*
-    {
-        "id": 5,
-        "selectedEventId": 3,
-        "selectedServiceId": 12,
-        "reservationStartDateTime": "2024-12-01T14:00:00",
-        "reservationEndDateTime": "2024-12-01T16:00:00"
-    }
-    */
-    // POST "/api/reservations"
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ReservationDTO> createReservation(@RequestBody ReservationDTO reservation) {
-        if (reservation.getId() == 5) {
-            Reservation newReservationModel = reservationService.createReservation(reservation);
-            ReservationDTO newReservation = new ReservationDTO(newReservationModel);
-
-            return new ResponseEntity<>(newReservation, HttpStatus.CREATED);
-        }
-
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
-
     // GET "/api/reservations/5"
     @GetMapping(value = "/{reservationId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ReservationDTO> getReservation(@PathVariable Long reservationId) {
-        if (reservationId == 5) {
-            Reservation reservationModel = reservationService.getReservation(reservationId);
-            ReservationDTO reservation = new ReservationDTO(reservationModel);
+        Reservation reservation= reservationService.getReservation(reservationId);
 
-            return new ResponseEntity<ReservationDTO>(reservation, HttpStatus.OK);
+        if (reservation != null) {
+            ReservationDTO reservationDTO = new ReservationDTO(reservation);
+            return new ResponseEntity<ReservationDTO>(reservationDTO, HttpStatus.OK);
         }
 
         return new ResponseEntity<ReservationDTO>(HttpStatus.NOT_FOUND);
@@ -57,15 +37,15 @@ public class ReservationController {
     // GET "/api/reservations/service/5"
     @GetMapping(value = "/service/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<ReservationDTO>> getReservationsByServiceId(@PathVariable Long serviceId) {
-        if (serviceId == 5) {
-            ArrayList<Reservation> reservationModels = reservationService.getReservationsByServiceId(serviceId);
+        ArrayList<Reservation> reservations = reservationService.getReservationsByServiceId(serviceId);
 
-            ArrayList<ReservationDTO> reservations = new ArrayList<>();
-            for (Reservation reservation : reservationModels) {
-                reservations.add(new ReservationDTO(reservation));
+        if (reservations != null) {
+            ArrayList<ReservationDTO> reservationsDTO = new ArrayList<>();
+            for (Reservation reservation : reservations) {
+                reservationsDTO.add(new ReservationDTO(reservation));
             }
 
-            return new ResponseEntity<Collection<ReservationDTO>>(reservations, HttpStatus.OK);
+            return new ResponseEntity<Collection<ReservationDTO>>(reservationsDTO, HttpStatus.OK);
         }
 
         return new ResponseEntity<Collection<ReservationDTO>>(HttpStatus.NOT_FOUND);
@@ -74,17 +54,42 @@ public class ReservationController {
     // GET "/api/reservations/event/5"
     @GetMapping(value = "/event/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<ReservationDTO>> getReservationsByEventId(@PathVariable Long eventId) {
-        if (eventId == 5) {
-            ArrayList<Reservation> reservationModels = reservationService.getReservationsByEventId(eventId);
+        ArrayList<Reservation> reservations = reservationService.getReservationsByEventId(eventId);
 
-            ArrayList<ReservationDTO> reservations = new ArrayList<>();
-            for (Reservation reservation : reservationModels) {
-                reservations.add(new ReservationDTO(reservation));
+        if (reservations != null) {
+            ArrayList<ReservationDTO> reservationsDTO = new ArrayList<>();
+            for (Reservation reservation : reservations) {
+                reservationsDTO.add(new ReservationDTO(reservation));
             }
 
-            return new ResponseEntity<Collection<ReservationDTO>>(reservations, HttpStatus.OK);
+            return new ResponseEntity<Collection<ReservationDTO>>(reservationsDTO, HttpStatus.OK);
         }
 
         return new ResponseEntity<Collection<ReservationDTO>>(HttpStatus.NOT_FOUND);
+    }
+
+    /*
+    {
+        "selectedEventId": 3,
+        "selectedServiceId": 12,
+        "reservationStartDateTime": "2024-12-01T14:00:00",
+        "reservationEndDateTime": "2024-12-01T16:00:00"
+    }
+    */
+    // POST "/api/reservations"
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ReservationDTO> createReservation(@Valid @RequestBody ReservationDTO reservationDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // if there are validation errors, we return a 400 Bad Request response
+            return new ResponseEntity<ReservationDTO>(HttpStatus.BAD_REQUEST);
+        }
+
+        Reservation reservation = reservationService.createReservation(reservationDTO);
+
+        if(reservation != null) {
+            return new ResponseEntity<ReservationDTO>(new ReservationDTO(reservation), HttpStatus.CREATED);
+        }
+
+        return new ResponseEntity<ReservationDTO>(HttpStatus.BAD_REQUEST);
     }
 }

@@ -61,8 +61,7 @@ public class ReviewController {
         Review review = reviewService.getReview(reviewId);
 
         if (review != null) {
-            ReviewDTO reviewDTO = new ReviewDTO(review);
-            return new ResponseEntity<ReviewDTO>(reviewDTO, HttpStatus.OK);
+            return new ResponseEntity<ReviewDTO>(new ReviewDTO(review), HttpStatus.OK);
         }
 
         return new ResponseEntity<ReviewDTO>(HttpStatus.NOT_FOUND);
@@ -85,8 +84,6 @@ public class ReviewController {
         }
 
         review = reviewService.updateReview(review, updateReviewDTO);
-
-        review = reviewService.saveReview(review);
         if(review == null) {
             return new ResponseEntity<ReviewDTO>(HttpStatus.BAD_REQUEST);
         }
@@ -103,8 +100,6 @@ public class ReviewController {
         }
 
         review = reviewService.deleteReview(review);
-
-        review = reviewService.saveReview(review);
         if(review == null) {
             return new ResponseEntity<ReviewDTO>(HttpStatus.BAD_REQUEST);
         }
