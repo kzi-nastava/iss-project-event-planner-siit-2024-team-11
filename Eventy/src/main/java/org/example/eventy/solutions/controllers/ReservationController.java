@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/reservations")
@@ -81,7 +83,10 @@ public class ReservationController {
     public ResponseEntity<ReservationDTO> createReservation(@Valid @RequestBody ReservationDTO reservationDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             // if there are validation errors, we return a 400 Bad Request response
-            return new ResponseEntity<ReservationDTO>(HttpStatus.BAD_REQUEST);
+            List<String> errorMessages = bindingResult.getFieldErrors().stream()
+                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                    .collect(Collectors.toList());
+            return new ResponseEntity(errorMessages, HttpStatus.BAD_REQUEST);
         }
 
         Reservation reservation = reservationService.createReservation(reservationDTO);

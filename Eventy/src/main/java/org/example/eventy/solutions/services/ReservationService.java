@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -50,6 +51,14 @@ public class ReservationService {
         return saveReservation(newReservation);
     }
 
+    public List<Reservation> findOverlappingReservations(ReservationDTO newReservation) {
+        LocalDateTime start = newReservation.getReservationStartDateTime();
+        LocalDateTime end = newReservation.getReservationEndDateTime();
+
+        return reservationRepository.findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfter(
+                end, start);
+    }
+
     public Reservation saveReservation(Reservation reservation) {
         try {
             return reservationRepository.save(reservation);
@@ -66,4 +75,6 @@ public class ReservationService {
         endDateTimeDate.setTime(Date.from(endDateTime.atStartOfDay(ZoneId.systemDefault()).toInstant()));
         return reservationRepository.findReservationsByProvider(providerId, startDateTimeDate, endDateTimeDate);
     }
+
+
 }
