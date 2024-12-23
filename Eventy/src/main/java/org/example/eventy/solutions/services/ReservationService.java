@@ -2,10 +2,11 @@ package org.example.eventy.solutions.services;
 
 import org.example.eventy.events.models.Event;
 import org.example.eventy.events.services.EventService;
-import org.example.eventy.reviews.models.Review;
 import org.example.eventy.solutions.dtos.ReservationDTO;
 import org.example.eventy.solutions.models.Reservation;
 import org.example.eventy.solutions.models.Solution;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.example.eventy.solutions.repositories.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,10 @@ public class ReservationService {
     public ArrayList<Reservation> getReservationsByEventId(Long eventId) {
         Event event = eventService.getEvent(eventId);
         return reservationRepository.findAllBySelectedEvent(event);
+    }
+
+    public Page<Reservation> getReservationsByUserId(Long userId, Pageable pageable) {
+        return reservationRepository.findAllByUserId(userId, pageable);
     }
 
     public Reservation createReservation(ReservationDTO reservation) {
@@ -75,6 +80,4 @@ public class ReservationService {
         endDateTimeDate.setTime(Date.from(endDateTime.atStartOfDay(ZoneId.systemDefault()).toInstant()));
         return reservationRepository.findReservationsByProvider(providerId, startDateTimeDate, endDateTimeDate);
     }
-
-
 }
