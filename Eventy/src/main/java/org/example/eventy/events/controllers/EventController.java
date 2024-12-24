@@ -1,5 +1,6 @@
 package org.example.eventy.events.controllers;
 
+import jakarta.validation.Valid;
 import org.example.eventy.common.models.PagedResponse;
 import org.example.eventy.events.dtos.*;
 import org.example.eventy.events.models.*;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -56,7 +58,15 @@ public class EventController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('Organizer')")
-    public ResponseEntity<EventDTO> organizeEvent(@RequestBody OrganizeEventDTO organizeEventDTO) {
+    public ResponseEntity<EventDTO> organizeEvent(@Valid @RequestBody OrganizeEventDTO organizeEventDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // if there are validation errors, we return a 400 Bad Request response
+            List<String> errorMessages = bindingResult.getFieldErrors().stream()
+                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                    .collect(Collectors.toList());
+            return new ResponseEntity(errorMessages, HttpStatus.BAD_REQUEST);
+        }
+
         Event event = new Event();
         event.setName(organizeEventDTO.getName());
         event.setDescription(organizeEventDTO.getDescription());

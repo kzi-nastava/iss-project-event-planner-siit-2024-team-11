@@ -1,19 +1,46 @@
 package org.example.eventy.events.dtos;
 
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
+import org.example.eventy.events.validation.annotation.ValidOrganizedEvent;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
+@ValidOrganizedEvent // trigger the custom validation
 public class OrganizeEventDTO {
+    @NotNull(message = "Name cannot be null")
     private String name;
+
+    @NotNull(message = "Description cannot be null")
     private String description;
+
+    @NotNull(message = "Number of participants cannot be null")
     private int maxNumberParticipants;
+
+    @NotNull(message = "Type cannot be null")
     private boolean isPublic;
+
+    @NotNull(message = "Event type cannot be null")
     private Long eventTypeId;
+
+    @NotNull(message = "Location cannot be null")
     private CreateLocationDTO location;
+
+    @NotNull(message = "Date cannot be null")
+    @Future(message = "Date must be in the future")
     private LocalDateTime date;
+
+    @NotNull(message = "Agenda cannot be null")
     private List<CreateActivityDTO> agenda;
+
+    @NotNull(message = "Invited emails cannot be null")
     private List<String> emails;
+
+    @NotNull(message = "Organizer cannot be null")
     private Long organizerId;
+
+    ///////////////////////////////
 
     public OrganizeEventDTO() {
 
