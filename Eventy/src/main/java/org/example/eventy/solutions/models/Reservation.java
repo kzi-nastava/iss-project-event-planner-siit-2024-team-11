@@ -1,26 +1,40 @@
 package org.example.eventy.solutions.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
 import org.example.eventy.events.models.Event;
+import org.example.eventy.solutions.validation.annotation.ValidReservation;
 
 import java.time.LocalDateTime;
 import java.util.Calendar;
 
 @Entity
 @Table(name = "Reservations")
+@ValidReservation // trigger the custom validation
 public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "selected_event_id", referencedColumnName = "id")
+    @NotNull(message = "Event must not be null")
     private Event selectedEvent;
+
     @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "selected_service_id", referencedColumnName = "id")
+    @NotNull(message = "Service must not be null")
     private Solution selectedService;
+
     @Column(nullable = false)
+    @NotNull(message = "Reservation start time cannot be null")
+    @Future(message = "Reservation start time must be in the future")
     private LocalDateTime reservationStartDateTime;
+
     @Column(nullable = false)
+    @NotNull(message = "Reservation end time cannot be null")
+    @Future(message = "Reservation end time must be in the future")
     private LocalDateTime reservationEndDateTime;
 
     public Reservation() {

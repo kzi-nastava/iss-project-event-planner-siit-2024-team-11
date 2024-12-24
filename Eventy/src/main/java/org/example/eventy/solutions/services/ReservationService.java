@@ -1,13 +1,18 @@
 package org.example.eventy.solutions.services;
 
+import org.example.eventy.events.models.Event;
 import org.example.eventy.events.services.EventService;
 import org.example.eventy.solutions.dtos.ReservationDTO;
 import org.example.eventy.solutions.models.Reservation;
+import org.example.eventy.solutions.models.Solution;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.example.eventy.solutions.repositories.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -23,9 +28,26 @@ public class ReservationService {
     @Autowired
     private ServiceService serviceService;
 
+    public Reservation getReservation(Long reservationId) {
+        return reservationRepository.findById(reservationId).orElse(null);
+    }
+
+    public ArrayList<Reservation> getReservationsByServiceId(Long serviceId) {
+        Solution service = serviceService.getService(serviceId);
+        return reservationRepository.findAllBySelectedService(service);
+    }
+
+    public ArrayList<Reservation> getReservationsByEventId(Long eventId) {
+        Event event = eventService.getEvent(eventId);
+        return reservationRepository.findAllBySelectedEvent(event);
+    }
+
+    public Page<Reservation> getReservationsByUserId(Long userId, Pageable pageable) {
+        return reservationRepository.findAllByUserId(userId, pageable);
+    }
+
     public Reservation createReservation(ReservationDTO reservation) {
         Reservation newReservation = new Reservation();
-        newReservation.setId(reservation.getId());
         newReservation.setSelectedEvent(eventService.getEvent(reservation.getSelectedEventId()));
         newReservation.setSelectedService(serviceService.getService(reservation.getSelectedServiceId()));
         newReservation.setReservationStartDateTime(reservation.getReservationStartDateTime());
@@ -34,20 +56,21 @@ public class ReservationService {
         return saveReservation(newReservation);
     }
 
-    public Reservation getReservation(Long reservationId) {
-        return null;
-    }
+    public List<Reservation> findOverlappingReservations(ReservationDTO newReservation) {
+        LocalDateTime start = newReservation.getReservationStartDateTime();
+        LocalDateTime end = newReservation.getReservationEndDateTime();
 
-    public ArrayList<Reservation> getReservationsByServiceId(Long serviceId) {
-        return null;
-    }
-
-    public ArrayList<Reservation> getReservationsByEventId(Long eventId) {
-        return null;
+        return reservationRepository.findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfter(
+                end, start);
     }
 
     public Reservation saveReservation(Reservation reservation) {
-        return reservation;
+        try {
+            return reservationRepository.save(reservation);
+        }
+        catch (Exception e) {
+            return null;
+        }
     }
 
     public List<Reservation> getReservationByProviderBetween(Long providerId, LocalDate startDateTime, LocalDate endDateTime) {

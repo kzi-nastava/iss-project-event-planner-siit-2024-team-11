@@ -41,14 +41,14 @@ public class ReviewService {
         review.setGrade(updateReviewDTO.getGrade());
         review.setStatus(updateReviewDTO.getStatus());
 
-        return review;
+        return saveReview(review);
     }
 
     public Review deleteReview(Review review) {
         review.setStatus(Status.DENIED);
         review.setDeleted(true);
 
-        return review;
+        return saveReview(review);
     }
 
     public Review saveReview(Review review) {
