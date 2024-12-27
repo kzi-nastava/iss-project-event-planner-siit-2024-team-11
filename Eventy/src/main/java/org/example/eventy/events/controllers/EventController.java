@@ -69,7 +69,7 @@ public class EventController {
         event.setName(organizeEventDTO.getName());
         event.setDescription(organizeEventDTO.getDescription());
         event.setMaxNumberParticipants(organizeEventDTO.getMaxNumberParticipants());
-        event.setPrivacy(organizeEventDTO.isPublic() ? PrivacyType.PUBLIC : PrivacyType.PRIVATE);
+        event.setPrivacy(organizeEventDTO.getIsPublic() ? PrivacyType.PUBLIC : PrivacyType.PRIVATE);
         event.setDate(organizeEventDTO.getDate());
         event.setType(eventTypeService.get(organizeEventDTO.getEventTypeId()));
         event.setOrganiser((EventOrganizer) userService.get(organizeEventDTO.getOrganizerId()));

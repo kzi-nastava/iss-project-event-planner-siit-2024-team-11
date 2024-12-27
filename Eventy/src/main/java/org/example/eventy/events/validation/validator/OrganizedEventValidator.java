@@ -75,7 +75,7 @@ public class OrganizedEventValidator implements ConstraintValidator<ValidOrganiz
         // 8. Check if "agenda" is okay - @NotNull is already checked in OrganizeEventDTO
 
         // 9. Check if "emails" is okay - if EventPrivacy == PRIVATE
-        if (!organizeEventDTO.isPublic()) {
+        if (!organizeEventDTO.getIsPublic()) {
             List<String> invitedEmails = organizeEventDTO.getEmails();
             if (invitedEmails.isEmpty()) {
                 context.buildConstraintViolationWithTemplate("Invited emails cannot be empty")

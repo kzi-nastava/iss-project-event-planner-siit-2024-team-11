@@ -18,7 +18,7 @@ public class OrganizeEventDTO {
     @NotNull(message = "Number of participants cannot be null")
     private int maxNumberParticipants;
 
-    @NotNull(message = "Type cannot be null")
+    @NotNull(message = "Privacy type cannot be null")
     private boolean isPublic;
 
     @NotNull(message = "Event type cannot be null")
@@ -82,11 +82,11 @@ public class OrganizeEventDTO {
         this.maxNumberParticipants = maxNumberParticipants;
     }
 
-    public boolean isPublic() {
+    public boolean getIsPublic() {
         return isPublic;
     }
 
-    public void setPublic(boolean aPublic) {
+    public void setIsPublic(boolean aPublic) {
         isPublic = aPublic;
     }
 
