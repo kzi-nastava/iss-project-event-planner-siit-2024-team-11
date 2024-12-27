@@ -39,7 +39,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("SELECT e FROM Event e " +
             "WHERE e.organiser.id = :userId " +
-            "AND e.date BETWEEN :startDate AND :endDate")
+            "AND DATE(e.date) BETWEEN :startDate AND :endDate")
     List<Event> findOrganizedEventsByUserBetween(
             @Param("userId") Long userId,
             @Param("startDate") LocalDate startDate,
@@ -47,7 +47,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     );
 
     @Query("SELECT e FROM User u JOIN u.acceptedEvents e " +
-            "WHERE u.id = :userId AND e.date BETWEEN :startDate AND :endDate")
+            "WHERE u.id = :userId AND DATE(e.date) BETWEEN :startDate AND :endDate")
     List<Event> findAttendingEventsByUserBetween(@Param("userId") Long userId,
                                                  @Param("startDate") LocalDate startDate,
                                                  @Param("endDate")LocalDate endDate);

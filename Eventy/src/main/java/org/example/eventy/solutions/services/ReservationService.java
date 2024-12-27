@@ -51,10 +51,6 @@ public class ReservationService {
     }
 
     public List<Reservation> getReservationByProviderBetween(Long providerId, LocalDate startDateTime, LocalDate endDateTime) {
-        Calendar startDateTimeDate = Calendar.getInstance();
-        Calendar endDateTimeDate = Calendar.getInstance();
-        startDateTimeDate.setTime(Date.from(startDateTime.atStartOfDay(ZoneId.systemDefault()).toInstant()));
-        endDateTimeDate.setTime(Date.from(endDateTime.atStartOfDay(ZoneId.systemDefault()).toInstant()));
-        return reservationRepository.findReservationsByProvider(providerId, startDateTimeDate, endDateTimeDate);
+        return reservationRepository.findReservationsByProvider(providerId, startDateTime.atStartOfDay(), endDateTime.atStartOfDay());
     }
 }

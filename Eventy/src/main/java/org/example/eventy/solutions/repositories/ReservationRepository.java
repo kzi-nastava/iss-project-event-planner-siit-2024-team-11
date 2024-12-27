@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.List;
 
@@ -18,6 +19,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "AND r.reservationEndDateTime <= :endDate")
     List<Reservation> findReservationsByProvider(
             @Param("providerId") Long providerId,
-            @Param("startDate") Calendar startDate,
-            @Param("endDate") Calendar endDate);
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
 }
