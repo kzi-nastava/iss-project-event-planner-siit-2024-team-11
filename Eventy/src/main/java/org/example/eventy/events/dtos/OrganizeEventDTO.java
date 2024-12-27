@@ -34,7 +34,6 @@ public class OrganizeEventDTO {
     @NotNull(message = "Agenda cannot be null")
     private List<CreateActivityDTO> agenda;
 
-    @NotNull(message = "Invited emails cannot be null")
     private List<String> emails;
 
     @NotNull(message = "Organizer cannot be null")
