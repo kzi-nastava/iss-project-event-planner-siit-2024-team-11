@@ -98,12 +98,13 @@ public class EventController {
         //event = eventService.save(event);
 
         if(event != null) {
-            // SEND EMAIL INVITATIONS HERE, example:
-            emailService.sendInvitations(organizeEventDTO);
+            if (event.getPrivacy() == PrivacyType.PRIVATE) {
+                // SEND EMAIL INVITATIONS HERE, example:
+                emailService.sendInvitations(organizeEventDTO);
+            }
             EventDTO eventDTO = new EventDTO();
-                // needs to be this:
-            // EventDTO eventDTO = new EventDTO(event);
-                // but there are right now errors while converting to DTO..
+            // needs to be this ---> // EventDTO eventDTO = new EventDTO(event);
+            // but there are right now errors while converting to DTO (getOrganizer().getId()... <=> null.getId()...)
             return new ResponseEntity<EventDTO>(eventDTO, HttpStatus.CREATED);
         }
 
