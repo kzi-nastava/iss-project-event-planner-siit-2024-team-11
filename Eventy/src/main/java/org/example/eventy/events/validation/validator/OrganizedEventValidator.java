@@ -74,23 +74,25 @@ public class OrganizedEventValidator implements ConstraintValidator<ValidOrganiz
 
         // 8. Check if "agenda" is okay - @NotNull is already checked in OrganizeEventDTO
 
-        // 9. Check if "emails" is okay - @NotNull is already checked in OrganizeEventDTO
-        List<String> invitedEmails = organizeEventDTO.getEmails();
-        if (invitedEmails.isEmpty()) {
-            context.buildConstraintViolationWithTemplate("Invited emails cannot be empty")
-               .addPropertyNode("emails")
-               .addConstraintViolation();
-            return false;
-        }
-
-        String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
-        Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
-        for (String email : invitedEmails) {
-            if (email == null || email.isEmpty() || !EMAIL_PATTERN.matcher(email).matches()) {
-                context.buildConstraintViolationWithTemplate("Invited emails are not valid")
-                   .addPropertyNode("emails")
-                   .addConstraintViolation();
+        // 9. Check if "emails" is okay - if EventPrivacy == PRIVATE
+        if (!organizeEventDTO.isPublic()) {
+            List<String> invitedEmails = organizeEventDTO.getEmails();
+            if (invitedEmails.isEmpty()) {
+                context.buildConstraintViolationWithTemplate("Invited emails cannot be empty")
+                        .addPropertyNode("emails")
+                        .addConstraintViolation();
                 return false;
+            }
+
+            String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+            Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
+            for (String email : invitedEmails) {
+                if (email == null || email.isEmpty() || !EMAIL_PATTERN.matcher(email).matches()) {
+                    context.buildConstraintViolationWithTemplate("Invited emails are not valid")
+                            .addPropertyNode("emails")
+                            .addConstraintViolation();
+                    return false;
+                }
             }
         }
 
