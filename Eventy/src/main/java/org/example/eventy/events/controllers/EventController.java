@@ -2,6 +2,7 @@ package org.example.eventy.events.controllers;
 
 import jakarta.validation.Valid;
 import org.example.eventy.common.models.PagedResponse;
+import org.example.eventy.common.services.EmailService;
 import org.example.eventy.events.dtos.*;
 import org.example.eventy.events.models.*;
 import org.example.eventy.events.services.ActivityService;
@@ -31,21 +32,18 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/events")
 public class EventController {
-
     @Autowired
     private EventService eventService;
-
     @Autowired
     private EventTypeService eventTypeService;
-
     @Autowired
     private LocationService locationService;
-
     @Autowired
     private ActivityService activityService;
-
     @Autowired
     UserService userService;
+    @Autowired
+    EmailService emailService;
 
     @GetMapping(value = "/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EventDTO> getEvent(@PathVariable Long eventId) {
@@ -57,7 +55,7 @@ public class EventController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('Organizer')")
+    //@PreAuthorize("hasRole('Organizer')")
     public ResponseEntity<EventDTO> organizeEvent(@Valid @RequestBody OrganizeEventDTO organizeEventDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             // if there are validation errors, we return a 400 Bad Request response
@@ -74,13 +72,16 @@ public class EventController {
         event.setPrivacy(organizeEventDTO.isPublic() ? PrivacyType.PUBLIC : PrivacyType.PRIVATE);
         event.setDate(organizeEventDTO.getDate());
         event.setType(eventTypeService.get(organizeEventDTO.getEventTypeId()));
+        event.setOrganiser((EventOrganizer) userService.get(organizeEventDTO.getOrganizerId()));
+
         Location location = new Location();
         location.setName(organizeEventDTO.getLocation().getName());
         location.setAddress(organizeEventDTO.getLocation().getAddress());
         location.setLatitude(organizeEventDTO.getLocation().getLatitude());
         location.setLongitude(organizeEventDTO.getLocation().getLongitude());
-        locationService.save(location); // is this even necessary with CascadeType.ALL
+        //locationService.save(location); // is this even necessary with CascadeType.ALL
         event.setLocation(location);
+
         List<Activity> agenda = new ArrayList<>();
         for(CreateActivityDTO activityDTO : organizeEventDTO.getAgenda()) {
             Activity activity = new Activity();
@@ -89,18 +90,20 @@ public class EventController {
             activity.setLocation(activityDTO.getLocation());
             activity.setStartTime(activityDTO.getStartTime());
             activity.setEndTime(activityDTO.getEndTime());
-            activityService.save(activity);
+            //activityService.save(activity);
             agenda.add(activity);
         }
         event.setAgenda(agenda);
-        event.setOrganiser((EventOrganizer) userService.get(organizeEventDTO.getOrganizerId()));
 
-        event = eventService.save(event);
+        //event = eventService.save(event);
 
         if(event != null) {
-            // SEND EMAIL INVITATIONS HERE, example: emailService.sendInviations(organizeEventDTO.getEmails())
-            // ofc, it doesn't have to be this example or anything similar, everything can be adjusted
-            EventDTO eventDTO = new EventDTO(event);
+            // SEND EMAIL INVITATIONS HERE, example:
+            emailService.sendInvitations(organizeEventDTO);
+            EventDTO eventDTO = new EventDTO();
+                // needs to be this:
+            // EventDTO eventDTO = new EventDTO(event);
+                // but there are right now errors while converting to DTO..
             return new ResponseEntity<EventDTO>(eventDTO, HttpStatus.CREATED);
         }
 
