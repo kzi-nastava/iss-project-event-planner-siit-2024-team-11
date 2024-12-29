@@ -3,6 +3,7 @@ package org.example.eventy.users.controllers;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.common.services.EmailService;
+import org.example.eventy.common.services.PictureService;
 import org.example.eventy.users.dtos.*;
 import org.example.eventy.users.models.EventOrganizer;
 import org.example.eventy.users.models.RegistrationRequest;
@@ -46,6 +47,9 @@ public class AuthenticationController {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private PictureService pictureService;
+
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserTokenState> login(@RequestBody LoginDTO authenticationRequest, HttpServletResponse response) {
         // Ukoliko kredencijali nisu ispravni, logovanje nece biti uspesno, desice se
@@ -86,14 +90,7 @@ public class AuthenticationController {
             newOrganizer.setDeactivated(false);
             newOrganizer.setHasSilencedNotifications(false);
             newOrganizer.setRole(roleRepository.findByName("ROLE_Organizer"));
-            List<PicturePath> profilePictures = new ArrayList<>();
-            for(String path : registrationDTO.getProfilePictures()) {
-                PicturePath picturePath = new PicturePath();
-                picturePath.setPath(path);
-                profilePictures.add(picturePath);
-                // no need for PictureService right?
-            }
-            newOrganizer.setImageUrls(profilePictures);
+            newOrganizer.setImageUrls(this.pictureService.save(registrationDTO.getProfilePictures()));
 
             if(registrationDTO.getFirstName() == null || registrationDTO.getLastName() == null) {
                 return new ResponseEntity<String>("Organizer validation failed!", HttpStatus.BAD_REQUEST);

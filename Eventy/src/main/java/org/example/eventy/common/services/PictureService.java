@@ -17,7 +17,7 @@ public class PictureService {
         List<PicturePath> picturePaths = new ArrayList<>();
 
         for(String path : paths) {
-            PicturePath picturePath = pictureRepository.findByPath(path);
+            PicturePath picturePath = pictureRepository.findFirstByPath(path);
 
             if(picturePath == null) {
                 picturePath = new PicturePath();
