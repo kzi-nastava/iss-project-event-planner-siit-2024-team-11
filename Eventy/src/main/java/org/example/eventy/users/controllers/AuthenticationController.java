@@ -1,14 +1,13 @@
 package org.example.eventy.users.controllers;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.common.services.EmailService;
 import org.example.eventy.common.services.PictureService;
+import org.example.eventy.common.util.EncryptionUtil;
 import org.example.eventy.users.dtos.*;
-import org.example.eventy.users.models.EventOrganizer;
-import org.example.eventy.users.models.RegistrationRequest;
-import org.example.eventy.users.models.SolutionProvider;
-import org.example.eventy.users.models.User;
+import org.example.eventy.users.models.*;
 import org.example.eventy.users.repositories.RoleRepository;
 import org.example.eventy.users.services.RegistrationRequestService;
 import org.example.eventy.users.services.UserService;
@@ -198,5 +197,54 @@ public class AuthenticationController {
         int expiresIn = tokenUtils.getExpiredIn();
 
         return new ResponseEntity<UserTokenState>(new UserTokenState(jwt, expiresIn, user.getId()), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/fast-registration", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<String> fastRegister(@Valid @RequestBody FastRegistrationDTO fastRegistrationDTO) {
+        try {
+            String email = EncryptionUtil.decrypt(fastRegistrationDTO.getEncryptedEmail());
+
+            User user;
+            AuthenticatedUser newAuthenticatedUser = new AuthenticatedUser();
+            newAuthenticatedUser.setPassword(fastRegistrationDTO.getPassword());
+            newAuthenticatedUser.setEmail(email);
+            newAuthenticatedUser.setAddress(fastRegistrationDTO.getAddress());
+            newAuthenticatedUser.setPhoneNumber(fastRegistrationDTO.getPhoneNumber());
+            newAuthenticatedUser.setActive(true);
+            newAuthenticatedUser.setDeactivated(false);
+            newAuthenticatedUser.setHasSilencedNotifications(false);
+            newAuthenticatedUser.setRole(roleRepository.findByName("ROLE_AuthenticatedUser"));
+            newAuthenticatedUser.setImageUrls(null);
+
+            newAuthenticatedUser = (AuthenticatedUser) userService.save(newAuthenticatedUser, true);
+            if(newAuthenticatedUser == null) {
+                return new ResponseEntity<String>("Fast Registration failed!", HttpStatus.BAD_REQUEST);
+            }
+            /*user = newAuthenticatedUser;
+
+
+            RegistrationRequest registrationRequest = registrationRequestService.create(user);
+            if(registrationRequest == null) {
+                return new ResponseEntity<String>("Creating user request failed!", HttpStatus.BAD_REQUEST);
+            }
+
+            try {
+                emailService.sendEmail(
+                        user.getEmail(),
+                        "Confirm registration",
+                        "Click on this link to confirm registration (the link is valid in the next 24h): " +
+                                "<a href=\"http://localhost:4200/confirm-registration/" + registrationRequest.getId() + "\">Activate account</a>"
+                );
+            }
+            catch (Exception e) {
+                return new ResponseEntity<String>("Sending email failed!", HttpStatus.BAD_REQUEST);
+            }*/
+
+            return new ResponseEntity<String>("Fast registration successful!", HttpStatus.CREATED);
+
+        } catch (Exception e) {
+            return new ResponseEntity<String>("Invalid or expired link", HttpStatus.BAD_REQUEST);
+        }
+
     }
 }
