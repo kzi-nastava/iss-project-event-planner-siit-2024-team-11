@@ -1,6 +1,8 @@
 package org.example.eventy.events.controllers;
 
+import jakarta.validation.Valid;
 import org.example.eventy.common.models.PagedResponse;
+import org.example.eventy.common.services.EmailService;
 import org.example.eventy.events.dtos.*;
 import org.example.eventy.events.models.*;
 import org.example.eventy.events.services.ActivityService;
@@ -17,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -29,21 +32,18 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/events")
 public class EventController {
-
     @Autowired
     private EventService eventService;
-
     @Autowired
     private EventTypeService eventTypeService;
-
     @Autowired
     private LocationService locationService;
-
     @Autowired
     private ActivityService activityService;
-
     @Autowired
     UserService userService;
+    @Autowired
+    EmailService emailService;
 
     @GetMapping(value = "/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EventDTO> getEvent(@PathVariable Long eventId) {
@@ -55,22 +55,33 @@ public class EventController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('Organizer')")
-    public ResponseEntity<EventDTO> organizeEvent(@RequestBody OrganizeEventDTO organizeEventDTO) {
+    //@PreAuthorize("hasRole('Organizer')")
+    public ResponseEntity<EventDTO> organizeEvent(@Valid @RequestBody OrganizeEventDTO organizeEventDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // if there are validation errors, we return a 400 Bad Request response
+            List<String> errorMessages = bindingResult.getFieldErrors().stream()
+                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                    .collect(Collectors.toList());
+            return new ResponseEntity(errorMessages, HttpStatus.BAD_REQUEST);
+        }
+
         Event event = new Event();
         event.setName(organizeEventDTO.getName());
         event.setDescription(organizeEventDTO.getDescription());
         event.setMaxNumberParticipants(organizeEventDTO.getMaxNumberParticipants());
-        event.setPrivacy(organizeEventDTO.isPublic() ? PrivacyType.PUBLIC : PrivacyType.PRIVATE);
+        event.setPrivacy(organizeEventDTO.getIsPublic() ? PrivacyType.PUBLIC : PrivacyType.PRIVATE);
         event.setDate(organizeEventDTO.getDate());
         event.setType(eventTypeService.get(organizeEventDTO.getEventTypeId()));
+        event.setOrganiser((EventOrganizer) userService.get(organizeEventDTO.getOrganizerId()));
+
         Location location = new Location();
         location.setName(organizeEventDTO.getLocation().getName());
         location.setAddress(organizeEventDTO.getLocation().getAddress());
         location.setLatitude(organizeEventDTO.getLocation().getLatitude());
         location.setLongitude(organizeEventDTO.getLocation().getLongitude());
-        locationService.save(location); // is this even necessary with CascadeType.ALL
+        //locationService.save(location); // is this even necessary with CascadeType.ALL
         event.setLocation(location);
+
         List<Activity> agenda = new ArrayList<>();
         for(CreateActivityDTO activityDTO : organizeEventDTO.getAgenda()) {
             Activity activity = new Activity();
@@ -79,18 +90,21 @@ public class EventController {
             activity.setLocation(activityDTO.getLocation());
             activity.setStartTime(activityDTO.getStartTime());
             activity.setEndTime(activityDTO.getEndTime());
-            activityService.save(activity);
+            //activityService.save(activity);
             agenda.add(activity);
         }
         event.setAgenda(agenda);
-        event.setOrganiser((EventOrganizer) userService.get(organizeEventDTO.getOrganizerId()));
 
-        event = eventService.save(event);
+        //event = eventService.save(event);
 
         if(event != null) {
-            // SEND EMAIL INVITATIONS HERE, example: emailService.sendInviations(organizeEventDTO.getEmails())
-            // ofc, it doesn't have to be this example or anything similar, everything can be adjusted
-            EventDTO eventDTO = new EventDTO(event);
+            if (event.getPrivacy() == PrivacyType.PRIVATE) {
+                // SEND EMAIL INVITATIONS HERE, example:
+                emailService.sendInvitations(organizeEventDTO);
+            }
+            EventDTO eventDTO = new EventDTO();
+            // needs to be this ---> // EventDTO eventDTO = new EventDTO(event);
+            // but there are right now errors while converting to DTO (getOrganizer().getId()... <=> null.getId()...)
             return new ResponseEntity<EventDTO>(eventDTO, HttpStatus.CREATED);
         }
 
