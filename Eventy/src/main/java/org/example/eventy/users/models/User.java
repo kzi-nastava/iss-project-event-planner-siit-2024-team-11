@@ -54,16 +54,18 @@ public abstract class User implements UserDetails {
     @JoinTable(name = "BlockedUsers", joinColumns = @JoinColumn(name = "blocker_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "blocked_id", referencedColumnName = "id"))
     private List<User> blocked;
 
-
     @ManyToMany(cascade = CascadeType.REFRESH)
     @JoinTable(name = "UsersAttendingEvents", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id"))
     private List<Event> acceptedEvents;
+
     @ManyToMany(cascade = CascadeType.REFRESH)
     @JoinTable(name = "UsersFavoriteEvents", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id"))
     private List<Event> favoriteEvents;
+
     @ManyToMany(cascade = CascadeType.REFRESH)
     @JoinTable(name = "UsersFavoriteSolutions", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "solution_id", referencedColumnName = "id"))
     private List<Solution> favoriteSolutions;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;
