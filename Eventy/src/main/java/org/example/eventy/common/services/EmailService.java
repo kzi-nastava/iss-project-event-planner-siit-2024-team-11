@@ -2,6 +2,7 @@ package org.example.eventy.common.services;
 
 import jakarta.activation.FileDataSource;
 import jakarta.mail.internet.InternetAddress;
+import org.example.eventy.common.util.EncryptionUtil;
 import org.example.eventy.events.dtos.CreateLocationDTO;
 import org.example.eventy.events.dtos.OrganizeEventDTO;
 import org.example.eventy.users.models.User;
@@ -58,7 +59,12 @@ public class EmailService {
                 // create HTML content
                 String htmlContent;
                 String homepageLink = "http://localhost:4200/";
-                String registrationLink = "http://localhost:4200/fast-registration";
+
+                // encrypted email in link with expiration date (1 day)
+                long expirationTime = System.currentTimeMillis() + (24 * 60 * 60 * 1000);
+                String encryptedEmail = EncryptionUtil.encrypt(email, expirationTime);
+                String registrationLink = "http://localhost:4200/fast-registration?value=" + encryptedEmail;
+
                 String organizerEmailLink = "mailto:" + organizerEmail + "?subject=Event%20Invitation&body=Hello%2C%0D%0A%0D%0AI%20would%20like%20to%20know%20more%20about%20the%20event%20'" + eventName + "'.%0D%0A%0D%0ABest%20regards%2C%0D%0A";
                 String eventyLogoSrc = "src/main/resources/static/logo-nav.png";
                 String eventDetailsLink = "http://localhost:4200/events/5";
@@ -82,6 +88,9 @@ public class EmailService {
                 e.printStackTrace();
 
             } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
