@@ -94,6 +94,8 @@ public class EmailService {
                 invitation.setEvent(event);
                 invitation.setStatus(Status.PENDING);
                 invitationService.save(invitation);
+                // NOTE: need to add if the user is logged in currently
+                // immediately update his accepted events!!
 
             } catch (MessagingException e) {
                 e.printStackTrace();
