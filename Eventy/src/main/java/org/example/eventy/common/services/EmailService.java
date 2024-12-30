@@ -2,9 +2,14 @@ package org.example.eventy.common.services;
 
 import jakarta.activation.FileDataSource;
 import jakarta.mail.internet.InternetAddress;
+import org.example.eventy.common.models.Status;
 import org.example.eventy.common.util.EncryptionUtil;
 import org.example.eventy.events.dtos.CreateLocationDTO;
 import org.example.eventy.events.dtos.OrganizeEventDTO;
+import org.example.eventy.events.models.Event;
+import org.example.eventy.events.models.Invitation;
+import org.example.eventy.events.models.Location;
+import org.example.eventy.events.services.InvitationService;
 import org.example.eventy.users.models.User;
 import org.example.eventy.users.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +32,8 @@ public class EmailService {
     private JavaMailSender mailSender;
     @Autowired
     private UserService userService;
+    @Autowired
+    InvitationService invitationService;
 
     public void sendEmail(String to, String subject, String text) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
@@ -39,13 +46,12 @@ public class EmailService {
         mailSender.send(message);
     }
 
-    public void sendInvitations(OrganizeEventDTO organizeEventDTO) {
-        List<String> emails = organizeEventDTO.getEmails();
-        String organizerEmail = userService.get(organizeEventDTO.getOrganizerId()).getEmail();
-        String eventName = organizeEventDTO.getName();
+    public void sendInvitations(Event event, List<String> emails) {
+        String organizerEmail = event.getOrganiser().getEmail();
+        String eventName = event.getName();
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy 'at' h:mm a");
-        String eventDate = organizeEventDTO.getDate().format(dateTimeFormatter);
-        CreateLocationDTO eventLocation = organizeEventDTO.getLocation();
+        String eventDate = event.getDate().format(dateTimeFormatter);
+        Location eventLocation = event.getLocation();
 
         for (String email : emails) {
             try {
@@ -83,12 +89,14 @@ public class EmailService {
                 helper.addInline("logoImage", new FileDataSource(logoFile)); // `cid:logoImage` matches HTML
 
                 mailSender.send(message);
+                Invitation invitation = new Invitation();
+                invitation.setGuestEmail(email);
+                invitation.setEvent(event);
+                invitation.setStatus(Status.PENDING);
+                invitationService.save(invitation);
 
             } catch (MessagingException e) {
                 e.printStackTrace();
-
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
 
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -97,7 +105,7 @@ public class EmailService {
     }
 
     private String buildEmailContent(String type, String recipientEmail, String organizerEmail, String eventName, String eventDate,
-                                     CreateLocationDTO location, String homepageLink, String registrationLink, String organizerEmailLink, String eventyLogoSrc, String eventLink) {
+                                     Location location, String homepageLink, String registrationLink, String organizerEmailLink, String eventyLogoSrc, String eventLink) {
         String googleMapsLink = "https://www.google.com/maps?q=" + location.getLatitude() + "," + location.getLongitude();
 
         if (type.equals("normal_invite")) {
