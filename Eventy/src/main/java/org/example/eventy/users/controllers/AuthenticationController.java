@@ -74,10 +74,22 @@ public class AuthenticationController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        String jwt = tokenUtils.generateToken(user);
-        int expiresIn = tokenUtils.getExpiredIn();
+        // go through all event invitations and add them to new user's accepted events
+        List<Event> acceptedEvents = user.getAcceptedEvents();
+        List<Invitation> invitations = invitationService.getInvitationsByGuestEmail(user.getEmail());
+        for (Invitation invitation : invitations) {
+            invitation.setStatus(Status.ACCEPTED);
+            invitationService.save(invitation);
+            acceptedEvents.add(invitation.getEvent());
+        }
+        if (!invitations.isEmpty()) {
+            user.setAcceptedEvents(acceptedEvents);
+            userService.save(user, false);
+        }
 
         // Vrati token kao odgovor na uspesnu autentifikaciju
+        String jwt = tokenUtils.generateToken(user);
+        int expiresIn = tokenUtils.getExpiredIn();
         return ResponseEntity.ok(new UserTokenState(jwt, expiresIn, user.getId()));
     }
 
@@ -236,8 +248,10 @@ public class AuthenticationController {
                 invitationService.save(invitation);
                 acceptedEvents.add(invitation.getEvent());
             }
-            newAuthenticatedUser.setAcceptedEvents(acceptedEvents);
-            userService.save(newAuthenticatedUser, false);
+            if (!invitations.isEmpty()) {
+                newAuthenticatedUser.setAcceptedEvents(acceptedEvents);
+                userService.save(newAuthenticatedUser, false);
+            }
 
             String jwt = tokenUtils.generateToken(newAuthenticatedUser);
             int expiresIn = tokenUtils.getExpiredIn();
