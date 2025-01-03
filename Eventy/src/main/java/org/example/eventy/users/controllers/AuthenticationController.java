@@ -2,6 +2,7 @@ package org.example.eventy.users.controllers;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.apache.tomcat.util.http.parser.Upgrade;
 import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.common.models.Status;
 import org.example.eventy.common.services.EmailService;
@@ -268,6 +269,43 @@ public class AuthenticationController {
         if (!invitations.isEmpty()) {
             user.setAcceptedEvents(acceptedEvents);
             userService.save(user, false);
+        }
+    }
+
+    @PostMapping(value = "/upgrade-profile", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<UserTokenState> upgradeProfile(@Valid @RequestBody UpgradeProfileDTO upgradeProfileDTO) {
+        try {
+            String email = EncryptionUtil.decrypt(upgradeProfileDTO.getEncryptedEmail());
+
+            /*
+            AuthenticatedUser newAuthenticatedUser = new AuthenticatedUser();
+            newAuthenticatedUser.setEmail(email);
+            newAuthenticatedUser.setPassword(fastRegistrationDTO.getPassword());
+            newAuthenticatedUser.setAddress(fastRegistrationDTO.getAddress());
+            newAuthenticatedUser.setPhoneNumber(fastRegistrationDTO.getPhoneNumber());
+            newAuthenticatedUser.setActive(true);
+            newAuthenticatedUser.setDeactivated(false);
+            newAuthenticatedUser.setEnabled(true);
+            newAuthenticatedUser.setHasSilencedNotifications(false);
+            newAuthenticatedUser.setRole(roleRepository.findByName("ROLE_AuthenticatedUser"));
+            newAuthenticatedUser.setImageUrls(null);
+
+            newAuthenticatedUser = (AuthenticatedUser) userService.save(newAuthenticatedUser, true);
+            if(newAuthenticatedUser == null) {
+                return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
+            }
+
+            // go through all event invitations and add them to new user's accepted events
+            acceptPendingInvitations(newAuthenticatedUser);
+            */
+            //String jwt = tokenUtils.generateToken(newAuthenticatedUser);
+            User user = new EventOrganizer(); // popuniti ovo podacima
+            String jwt = tokenUtils.generateToken(user);
+            int expiresIn = tokenUtils.getExpiredIn();
+            return new ResponseEntity<UserTokenState>(new UserTokenState(jwt, expiresIn, user.getId()), HttpStatus.CREATED);
+
+        } catch (Exception e) {
+            return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
         }
     }
 }
