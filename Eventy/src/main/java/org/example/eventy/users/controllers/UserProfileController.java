@@ -71,8 +71,10 @@ public class UserProfileController {
             ((Admin) user).setFirstName(updateUserProfileDTO.getFirstName());
             ((Admin) user).setLastName(updateUserProfileDTO.getLastName());
         } else {
-            ((AuthenticatedUser) user).setFirstName(updateUserProfileDTO.getFirstName());
-            ((AuthenticatedUser) user).setLastName(updateUserProfileDTO.getLastName());
+            //((AuthenticatedUser) user).setFirstName(updateUserProfileDTO.getFirstName());
+            //((AuthenticatedUser) user).setLastName(updateUserProfileDTO.getLastName());
+            // <> <> <> NOTE: AuthenticatedUser does not have first nor last name - Tamara
+
         }
 
         user = userService.save(user, true);
