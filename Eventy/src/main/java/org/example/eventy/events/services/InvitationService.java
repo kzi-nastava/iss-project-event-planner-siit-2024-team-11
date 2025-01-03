@@ -1,5 +1,6 @@
 package org.example.eventy.events.services;
 
+import org.example.eventy.common.models.Status;
 import org.example.eventy.events.models.Invitation;
 import org.example.eventy.events.repositories.InvitationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,8 @@ public class InvitationService {
         return invitationRepository.findAll();
     }
 
-    public List<Invitation> getInvitationsByGuestEmail(String guestEmail) {
-        return invitationRepository.findByGuestEmail(guestEmail);
+    public List<Invitation> getPendingInvitationsByGuestEmail(String guestEmail) {
+        return invitationRepository.findByGuestEmailAndStatusEquals(guestEmail, Status.PENDING);
     }
 
     public Invitation save(Invitation invitation) {
