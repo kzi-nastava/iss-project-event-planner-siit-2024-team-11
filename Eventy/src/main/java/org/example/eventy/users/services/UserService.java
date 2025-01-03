@@ -41,18 +41,19 @@ public class UserService {
         }
     }
 
-    public boolean suspendUser(String userEmail, int daysDuration) {
-        UserDTO user = getUserByEmail(userEmail);
-        user.setName("SUSPENDED!");
-
-        return true;
-    }
-
-    public UserDTO getUserByEmail(String userEmail) {
-        UserDTO user = new UserDTO();
-        user.setEmail(userEmail);
+    public User suspendUser(String userEmail, int daysDuration) {
+        User user = getUserByEmail(userEmail);
+        //user.setSuspensionDeadline();
 
         return user;
+    }
+
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public User getUserByPhoneNumber(String phoneNumber) throws UsernameNotFoundException {
+        return userRepository.findByPhoneNumber(phoneNumber);
     }
 
     public UserType getUserType(User user) {

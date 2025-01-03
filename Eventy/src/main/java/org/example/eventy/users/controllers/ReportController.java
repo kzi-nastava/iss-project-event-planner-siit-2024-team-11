@@ -1,6 +1,7 @@
 package org.example.eventy.users.controllers;
 
 import org.example.eventy.users.dtos.ReportDTO;
+import org.example.eventy.users.models.User;
 import org.example.eventy.users.services.ReportService;
 import org.example.eventy.users.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +55,8 @@ public class ReportController {
         if (reportId == 5) {
             ReportDTO report = reportService.getReport(reportId);
 
-            boolean isSuspended = userService.suspendUser(report.getReportedUserEmail(), 3); // Assumes userService exists
+            User user = userService.suspendUser(report.getReportedUserEmail(), 3); // Assumes userService exists
+            boolean isSuspended = user.getSuspensionDeadline() != null; // neka logika ovde
             if (!isSuspended) {
                 return new ResponseEntity<>("Failed to suspend offender", HttpStatus.INTERNAL_SERVER_ERROR);
             }
