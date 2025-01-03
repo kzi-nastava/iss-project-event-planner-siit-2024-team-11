@@ -6,6 +6,7 @@ import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.common.models.Status;
 import org.example.eventy.common.services.EmailService;
 import org.example.eventy.common.services.PictureService;
+import org.example.eventy.common.util.ActiveUserManager;
 import org.example.eventy.common.util.EncryptionUtil;
 import org.example.eventy.events.models.Event;
 import org.example.eventy.events.models.Invitation;
@@ -34,27 +35,22 @@ import java.util.List;
 public class AuthenticationController {
     @Autowired
     private TokenUtils tokenUtils;
-
     @Autowired
     private AuthenticationManager authenticationManager;
-
     @Autowired
     private UserService userService;
-
     @Autowired
     private RegistrationRequestService registrationRequestService;
-
     @Autowired
     private EmailService emailService;
-
     @Autowired
     private RoleRepository roleRepository;
-
     @Autowired
     private PictureService pictureService;
-
     @Autowired
     private InvitationService invitationService;
+    @Autowired
+    private ActiveUserManager activeUserManager;
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserTokenState> login(@RequestBody LoginDTO authenticationRequest, HttpServletResponse response) {
@@ -74,23 +70,32 @@ public class AuthenticationController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        // go through all event invitations and add them to new user's accepted events
-        List<Event> acceptedEvents = user.getAcceptedEvents();
-        List<Invitation> invitations = invitationService.getInvitationsByGuestEmail(user.getEmail());
-        for (Invitation invitation : invitations) {
-            invitation.setStatus(Status.ACCEPTED);
-            invitationService.save(invitation);
-            acceptedEvents.add(invitation.getEvent());
-        }
-        if (!invitations.isEmpty()) {
-            user.setAcceptedEvents(acceptedEvents);
-            userService.save(user, false);
-        }
+        // add active user so we can track them
+        activeUserManager.addUser(user);
+
+        // go through all event invitations and add them to user's accepted events
+        acceptPendingInvitations(user);
 
         // Vrati token kao odgovor na uspesnu autentifikaciju
         String jwt = tokenUtils.generateToken(user);
         int expiresIn = tokenUtils.getExpiredIn();
         return ResponseEntity.ok(new UserTokenState(jwt, expiresIn, user.getId()));
+    }
+
+    @PostMapping(value = "/logout")
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+
+        String email = tokenUtils.getUsernameFromToken(token);
+
+        if (email != null && activeUserManager.isUserActive(email)) {
+            activeUserManager.removeUser(email);
+            return ResponseEntity.ok("User removed successfully");
+        } else {
+            return ResponseEntity.badRequest().body("Invalid or inactive user.");
+        }
     }
 
     @PostMapping(value = "/registration", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
@@ -241,17 +246,7 @@ public class AuthenticationController {
             }
 
             // go through all event invitations and add them to new user's accepted events
-            List<Event> acceptedEvents = newAuthenticatedUser.getAcceptedEvents();
-            List<Invitation> invitations = invitationService.getInvitationsByGuestEmail(email);
-            for (Invitation invitation : invitations) {
-                invitation.setStatus(Status.ACCEPTED);
-                invitationService.save(invitation);
-                acceptedEvents.add(invitation.getEvent());
-            }
-            if (!invitations.isEmpty()) {
-                newAuthenticatedUser.setAcceptedEvents(acceptedEvents);
-                userService.save(newAuthenticatedUser, false);
-            }
+            acceptPendingInvitations(newAuthenticatedUser);
 
             String jwt = tokenUtils.generateToken(newAuthenticatedUser);
             int expiresIn = tokenUtils.getExpiredIn();
@@ -260,6 +255,19 @@ public class AuthenticationController {
         } catch (Exception e) {
             return new ResponseEntity<UserTokenState>( HttpStatus.BAD_REQUEST);
         }
+    }
 
+    private void acceptPendingInvitations(User user) {
+        List<Event> acceptedEvents = user.getAcceptedEvents();
+        List<Invitation> invitations = invitationService.getPendingInvitationsByGuestEmail(user.getEmail());
+        for (Invitation invitation : invitations) {
+            invitation.setStatus(Status.ACCEPTED);
+            invitationService.save(invitation);
+            acceptedEvents.add(invitation.getEvent());
+        }
+        if (!invitations.isEmpty()) {
+            user.setAcceptedEvents(acceptedEvents);
+            userService.save(user, false);
+        }
     }
 }

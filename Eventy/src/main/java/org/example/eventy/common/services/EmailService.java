@@ -3,6 +3,7 @@ package org.example.eventy.common.services;
 import jakarta.activation.FileDataSource;
 import jakarta.mail.internet.InternetAddress;
 import org.example.eventy.common.models.Status;
+import org.example.eventy.common.util.ActiveUserManager;
 import org.example.eventy.common.util.EncryptionUtil;
 import org.example.eventy.events.dtos.CreateLocationDTO;
 import org.example.eventy.events.dtos.OrganizeEventDTO;
@@ -34,6 +35,8 @@ public class EmailService {
     private UserService userService;
     @Autowired
     InvitationService invitationService;
+    @Autowired
+    private ActiveUserManager activeUserManager;
 
     public void sendEmail(String to, String subject, String text) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
@@ -76,9 +79,9 @@ public class EmailService {
                 String eventDetailsLink = "http://localhost:4200/events/5";
 
                 User user = userService.findByEmail(email);
+                // depending on the user, send the right email
                 String type = (user != null) ? "normal_invite" : "fast_registration";
                 htmlContent = buildEmailContent(type, email, organizerEmail, eventName, eventDate, eventLocation, homepageLink, registrationLink, organizerEmailLink, eventyLogoSrc, eventDetailsLink);
-
                 helper.setText(htmlContent, true);
 
                 // add Eventy Logo image --> <img src="cid:logoImage" alt="Eventy Logo"/>
@@ -89,13 +92,23 @@ public class EmailService {
                 helper.addInline("logoImage", new FileDataSource(logoFile)); // `cid:logoImage` matches HTML
 
                 mailSender.send(message);
+
                 Invitation invitation = new Invitation();
                 invitation.setGuestEmail(email);
                 invitation.setEvent(event);
-                invitation.setStatus(Status.PENDING);
+
+                // NOTE: need to add if the user is logged in currently --> immediately update his accepted events!!
+                if (user != null && activeUserManager.isUserActive(email)) {
+                    List<Event> acceptedEvents = user.getAcceptedEvents();
+                    acceptedEvents.add(event);
+                    user.setAcceptedEvents(acceptedEvents);
+                    userService.save(user, false);
+                    invitation.setStatus(Status.ACCEPTED);
+                } else {
+                    invitation.setStatus(Status.PENDING);
+                }
+
                 invitationService.save(invitation);
-                // NOTE: need to add if the user is logged in currently
-                // immediately update his accepted events!!
 
             } catch (MessagingException e) {
                 e.printStackTrace();
