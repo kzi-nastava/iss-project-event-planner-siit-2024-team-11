@@ -70,10 +70,10 @@ public class AuthenticationController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        // add active user so we can track them
+        // add the currently logged-in user, so we can track them (for accepted events - Tamara)
         activeUserManager.addUser(user);
 
-        // go through all event invitations and add them to user's accepted events
+        // go through all event invitations and add them to user's accepted events - Tamara
         acceptPendingInvitations(user);
 
         // Vrati token kao odgovor na uspesnu autentifikaciju
@@ -229,8 +229,8 @@ public class AuthenticationController {
             String email = EncryptionUtil.decrypt(fastRegistrationDTO.getEncryptedEmail());
 
             AuthenticatedUser newAuthenticatedUser = new AuthenticatedUser();
-            newAuthenticatedUser.setPassword(fastRegistrationDTO.getPassword());
             newAuthenticatedUser.setEmail(email);
+            newAuthenticatedUser.setPassword(fastRegistrationDTO.getPassword());
             newAuthenticatedUser.setAddress(fastRegistrationDTO.getAddress());
             newAuthenticatedUser.setPhoneNumber(fastRegistrationDTO.getPhoneNumber());
             newAuthenticatedUser.setActive(true);
@@ -253,7 +253,7 @@ public class AuthenticationController {
             return new ResponseEntity<UserTokenState>(new UserTokenState(jwt, expiresIn, newAuthenticatedUser.getId()), HttpStatus.CREATED);
 
         } catch (Exception e) {
-            return new ResponseEntity<UserTokenState>( HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
         }
     }
 

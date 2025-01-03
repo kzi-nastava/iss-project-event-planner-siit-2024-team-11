@@ -1,11 +1,26 @@
 package org.example.eventy.users.dtos;
 
+import jakarta.validation.constraints.NotNull;
+import org.example.eventy.users.validation.annotation.ValidFastRegistration;
+
+@ValidFastRegistration // trigger the custom validation
 public class FastRegistrationDTO {
+    @NotNull(message = "Email cannot be null")
     private String encryptedEmail;
+
+    @NotNull(message = "Password cannot be null")
     private String password;
+
+    @NotNull(message = "Confirmed password cannot be null")
     private String confirmedPassword;
+
+    @NotNull(message = "Address cannot be null")
     private String address;
+
+    @NotNull(message = "Phone number cannot be null")
     private String phoneNumber;
+
+    ///////////////////////////////
 
     public FastRegistrationDTO() {
     }

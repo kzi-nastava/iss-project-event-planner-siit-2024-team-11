@@ -2,115 +2,94 @@ package org.example.eventy.users.validation.validator;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import org.example.eventy.events.models.Event;
-import org.example.eventy.events.services.EventService;
-import org.example.eventy.solutions.dtos.ReservationDTO;
-import org.example.eventy.solutions.models.Reservation;
-import org.example.eventy.solutions.models.Service;
-import org.example.eventy.solutions.services.ReservationService;
-import org.example.eventy.solutions.services.ServiceService;
-import org.example.eventy.solutions.validation.annotation.ValidReservation;
+import org.example.eventy.common.util.EncryptionUtil;
 import org.example.eventy.users.dtos.FastRegistrationDTO;
+import org.example.eventy.users.services.UserService;
 import org.example.eventy.users.validation.annotation.ValidFastRegistration;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.List;
+import java.util.regex.Pattern;
 
 public class FastRegistrationValidator implements ConstraintValidator<ValidFastRegistration, FastRegistrationDTO> {
     @Autowired
-    private EventService eventService;
-    @Autowired
-    private ServiceService serviceService;
-    @Autowired
-    private ReservationService reservationService;
+    private UserService userService;
 
     public FastRegistrationValidator() {
     }
 
     @Override
     public boolean isValid(FastRegistrationDTO fastRegistrationDTO, ConstraintValidatorContext context) {
-        /*// 1. Check if the selected event exists
-        if (eventService.getEvent(reservationDTO.getSelectedEventId()) == null) {
-            context.buildConstraintViolationWithTemplate("Selected event does not exist")
-                    .addPropertyNode("selectedEventId")
+        // 1. Check if email valid
+        String email;
+        try {
+            email = EncryptionUtil.decrypt(fastRegistrationDTO.getEncryptedEmail());
+        } catch (Exception e) {
+            throw new RuntimeException("Email processing error", e);
+        }
+
+            // not good format
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        if (!pattern.matcher(email).matches()) {
+            context.buildConstraintViolationWithTemplate("Wrong email format")
                     .addConstraintViolation();
             return false;
         }
 
-        // 2. Check if the selected service exists
-        if (serviceService.getService(reservationDTO.getSelectedServiceId()) == null) {
-            context.buildConstraintViolationWithTemplate("Selected service does not exist")
-                    .addPropertyNode("selectedServiceId")
+            // email already in use
+        if (userService.getUserByEmail(email) != null) {
+            context.buildConstraintViolationWithTemplate("Email is already in use")
                     .addConstraintViolation();
             return false;
         }
 
-        // 3. Check if the selected service is available
-        if (!serviceService.getService(reservationDTO.getSelectedServiceId()).isAvailable()) {
-            context.buildConstraintViolationWithTemplate("Selected service is not available")
-                    .addPropertyNode("selectedServiceId")
+        // 2. Check if password is good
+        if (fastRegistrationDTO.getPassword().length() < 8) {
+            context.buildConstraintViolationWithTemplate("Password must be at least 8 characters")
+                    .addPropertyNode("password")
                     .addConstraintViolation();
             return false;
         }
 
-        Service selectedService = (Service) serviceService.getService(reservationDTO.getSelectedServiceId());
-
-        // 4. Check if the reservation start time is in the future
-        if (reservationDTO.getReservationStartDateTime().isBefore(LocalDateTime.now().plusDays(selectedService.getReservationDeadline()))) {
-            context.buildConstraintViolationWithTemplate("It's too late to make a reservation")
-                    .addPropertyNode("reservationStartDateTime")
+            // password > 20 ?
+        if (fastRegistrationDTO.getPassword().length() > 20) {
+            context.buildConstraintViolationWithTemplate("Password must be 20 characters or shorter")
+                    .addPropertyNode("password")
                     .addConstraintViolation();
             return false;
         }
 
-        // 5. Check if the reservation end time is after the start time
-        if (reservationDTO.getReservationEndDateTime().isBefore(reservationDTO.getReservationStartDateTime())) {
-            context.buildConstraintViolationWithTemplate("Reservation end time must be after start time")
-                    .addPropertyNode("reservationEndDateTime")
+            // passwords match ?
+        if (!fastRegistrationDTO.getPassword().equals(fastRegistrationDTO.getConfirmedPassword())) {
+            context.buildConstraintViolationWithTemplate("Passwords must match!")
+                    .addPropertyNode("confirmedPassword")
                     .addConstraintViolation();
             return false;
         }
 
-        // 6. Check if the duration is invalid
-        Duration duration = Duration.between(reservationDTO.getReservationStartDateTime(), reservationDTO.getReservationEndDateTime());
-        if (duration.toMinutes() < selectedService.getMinReservationTime() || duration.toMinutes() > selectedService.getMaxReservationTime()) {
-            String message = "Reservation duration must be between " + selectedService.getMinReservationTime() + " and " + selectedService.getMaxReservationTime() + " minutes";
-            context.buildConstraintViolationWithTemplate(message)
+        // 3. Check if address is good
+        if (fastRegistrationDTO.getAddress().length() > 20) {
+            context.buildConstraintViolationWithTemplate("Address must be 20 characters or shorter")
+                    .addPropertyNode("address")
                     .addConstraintViolation();
             return false;
         }
 
-        // 7. Check if the reservation falls within the Event's date range
-        Event selectedEvent = eventService.getEvent(reservationDTO.getSelectedEventId());
-        if (reservationDTO.getReservationStartDateTime().toLocalDate().isEqual(selectedEvent.getDate().toLocalDate()) ||
-                reservationDTO.getReservationEndDateTime().toLocalDate().isEqual(selectedEvent.getDate().toLocalDate())) {
-            context.buildConstraintViolationWithTemplate("Reservation time must be within the event's date range")
-                    .addPropertyNode("reservationStartDateTime")
+        // 4. Check if phone number is good
+        if (!fastRegistrationDTO.getPhoneNumber().matches("\\d+")) {
+            context.buildConstraintViolationWithTemplate("Phone number must contain only digits.")
+                    .addPropertyNode("phoneNumber")
                     .addConstraintViolation();
             return false;
         }
 
-        // 8. Check if the reservation overlaps with any existing reservations
-        List<Reservation> overlappingReservations = reservationService.findOverlappingReservations(reservationDTO);
-        if (!overlappingReservations.isEmpty()) {
-            context.buildConstraintViolationWithTemplate("The selected time overlaps with an existing reservation")
-                    .addPropertyNode("reservationStartDateTime")
+            // phone already in use
+        if (userService.getUserByPhoneNumber(fastRegistrationDTO.getPhoneNumber()) != null) {
+            context.buildConstraintViolationWithTemplate("Phone number is already taken.")
+                    .addPropertyNode("phoneNumber")
                     .addConstraintViolation();
             return false;
         }
-
-        // 9. Check for consistency between "From" and "To" fields if the service duration is fixed
-        if (selectedService.getMinReservationTime().intValue() == selectedService.getMaxReservationTime().intValue()) {
-            LocalDateTime calculatedEndTime = reservationDTO.getReservationStartDateTime().plusMinutes(selectedService.getMaxReservationTime());
-            if (!reservationDTO.getReservationEndDateTime().equals(calculatedEndTime)) {
-                context.buildConstraintViolationWithTemplate("End time does not match the calculated duration of the service")
-                        .addPropertyNode("reservationEndDateTime")
-                        .addConstraintViolation();
-                return false;
-            }
-        }*/
 
         return true;
     }
