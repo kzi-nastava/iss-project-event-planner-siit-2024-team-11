@@ -280,7 +280,7 @@ public class AuthenticationController {
                 EventOrganizer newEventOrganizer = new EventOrganizer();
                 newEventOrganizer.setId(currentUser.getId());
                 List<PicturePath> images = pictureService.save(upgradeProfileDTO.getProfilePictures());
-                if(images == null) {
+                if (images == null) {
                     return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
                 }
                 newEventOrganizer.setImageUrls(images);
@@ -302,7 +302,7 @@ public class AuthenticationController {
                 }
 
                 newEventOrganizer = (EventOrganizer) userService.save(newEventOrganizer, true);
-                if(newEventOrganizer == null) {
+                if (newEventOrganizer == null) {
                     // restore the deleted user
                     userService.save(currentUser, true);
                     return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
@@ -316,7 +316,7 @@ public class AuthenticationController {
                 SolutionProvider newSolutionProvider = new SolutionProvider();
                 newSolutionProvider.setId(currentUser.getId());
                 List<PicturePath> images = pictureService.save(upgradeProfileDTO.getProfilePictures());
-                if(images == null) {
+                if (images == null) {
                     return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
                 }
                 newSolutionProvider.setImageUrls(images);
@@ -338,7 +338,7 @@ public class AuthenticationController {
                 }
 
                 newSolutionProvider = (SolutionProvider) userService.save(newSolutionProvider, true);
-                if(newSolutionProvider == null) {
+                if (newSolutionProvider == null) {
                     // restore the deleted user
                     userService.save(currentUser, true);
                     return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
