@@ -2,13 +2,10 @@ package org.example.eventy.users.validation.validator;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import org.example.eventy.common.util.EncryptionUtil;
 import org.example.eventy.users.dtos.UpgradeProfileDTO;
 import org.example.eventy.users.services.UserService;
 import org.example.eventy.users.validation.annotation.ValidUpgradeProfile;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.regex.Pattern;
 
 public class UpgradeProfileValidator implements ConstraintValidator<ValidUpgradeProfile, UpgradeProfileDTO> {
     @Autowired
@@ -19,26 +16,9 @@ public class UpgradeProfileValidator implements ConstraintValidator<ValidUpgrade
 
     @Override
     public boolean isValid(UpgradeProfileDTO upgradeProfileDTO, ConstraintValidatorContext context) {
-        // 1. Check if email valid
-        String email;
-        try {
-            email = EncryptionUtil.decrypt(upgradeProfileDTO.getEncryptedEmail());
-        } catch (Exception e) {
-            throw new RuntimeException("Email processing error", e);
-        }
-
-        // not good format
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
-        Pattern pattern = Pattern.compile(emailRegex);
-        if (!pattern.matcher(email).matches()) {
-            context.buildConstraintViolationWithTemplate("Wrong email format")
-                    .addConstraintViolation();
-            return false;
-        }
-
-        // email already in use
-        if (userService.getUserByEmail(email) != null) {
-            context.buildConstraintViolationWithTemplate("Email is already in use")
+        // 1. Check email
+        if (userService.getUserByEmail(upgradeProfileDTO.getEmail()) == null) {
+            context.buildConstraintViolationWithTemplate("An user with this email doesn't exists")
                     .addConstraintViolation();
             return false;
         }
@@ -126,24 +106,6 @@ public class UpgradeProfileValidator implements ConstraintValidator<ValidUpgrade
             return false;
         }
 
-        /*
-            // check every picture if it exists in file
-        for (String picture : upgradeProfileDTO.getProfilePictures()) {
-            if (!isValidFile(picture)) {
-                context.buildConstraintViolationWithTemplate("Invalid profile picture: " + picture)
-                        .addPropertyNode("profilePictures")
-                        .addConstraintViolation();
-                return false;
-            }
-        }*/
-
         return true;
     }
-
-    /*
-    // idk if this will be checked like this..
-    private boolean isValidFile(String filePath) {
-        File file = new File(filePath);
-        return file.exists() && file.isFile();
-    }*/
 }

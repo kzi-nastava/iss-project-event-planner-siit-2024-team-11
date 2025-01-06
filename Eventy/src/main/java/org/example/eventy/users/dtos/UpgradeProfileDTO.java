@@ -8,7 +8,7 @@ import java.util.List;
 @ValidUpgradeProfile // trigger the custom validation
 public class UpgradeProfileDTO {
     @NotNull(message = "Email cannot be null")
-    private String encryptedEmail;
+    private String email;
 
     @NotNull(message = "Account type cannot be null")
     private String accountType;
@@ -19,7 +19,7 @@ public class UpgradeProfileDTO {
     private String companyName;
     private String description;
 
-    // if null, set basic pic depending on the accountType
+    @NotNull(message = "Picture cannot be null")
     private List<String> profilePictures;
 
     /////////////////////////////////////
@@ -27,8 +27,8 @@ public class UpgradeProfileDTO {
     public UpgradeProfileDTO() {
     }
 
-    public UpgradeProfileDTO(String encryptedEmail, String accountType, String firstName, String lastName, String companyName, String description, List<String> profilePictures) {
-        this.encryptedEmail = encryptedEmail;
+    public UpgradeProfileDTO(String email, String accountType, String firstName, String lastName, String companyName, String description, List<String> profilePictures) {
+        this.email = email;
         this.accountType = accountType;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -37,12 +37,12 @@ public class UpgradeProfileDTO {
         this.profilePictures = profilePictures;
     }
 
-    public String getEncryptedEmail() {
-        return encryptedEmail;
+    public String getEmail() {
+        return email;
     }
 
-    public void setEncryptedEmail(String encryptedEmail) {
-        this.encryptedEmail = encryptedEmail;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getAccountType() {
