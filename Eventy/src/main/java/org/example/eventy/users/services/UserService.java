@@ -41,6 +41,10 @@ public class UserService {
         }
     }
 
+    public void deletePhysicallyById(long userId) {
+        userRepository.deleteById(userId);
+    }
+
     public User suspendUser(String userEmail, int daysDuration) {
         User user = getUserByEmail(userEmail);
         //user.setSuspensionDeadline();

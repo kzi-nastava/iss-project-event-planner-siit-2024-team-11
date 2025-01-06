@@ -2,7 +2,6 @@ package org.example.eventy.users.controllers;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.apache.tomcat.util.http.parser.Upgrade;
 import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.common.models.Status;
 import org.example.eventy.common.services.EmailService;
@@ -275,34 +274,80 @@ public class AuthenticationController {
     @PostMapping(value = "/upgrade-profile", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<UserTokenState> upgradeProfile(@Valid @RequestBody UpgradeProfileDTO upgradeProfileDTO) {
         try {
-            String email = EncryptionUtil.decrypt(upgradeProfileDTO.getEncryptedEmail());
+            User currentUser = userService.getUserByEmail(upgradeProfileDTO.getEmail());
 
-            /*
-            AuthenticatedUser newAuthenticatedUser = new AuthenticatedUser();
-            newAuthenticatedUser.setEmail(email);
-            newAuthenticatedUser.setPassword(fastRegistrationDTO.getPassword());
-            newAuthenticatedUser.setAddress(fastRegistrationDTO.getAddress());
-            newAuthenticatedUser.setPhoneNumber(fastRegistrationDTO.getPhoneNumber());
-            newAuthenticatedUser.setActive(true);
-            newAuthenticatedUser.setDeactivated(false);
-            newAuthenticatedUser.setEnabled(true);
-            newAuthenticatedUser.setHasSilencedNotifications(false);
-            newAuthenticatedUser.setRole(roleRepository.findByName("ROLE_AuthenticatedUser"));
-            newAuthenticatedUser.setImageUrls(null);
+            if (upgradeProfileDTO.getAccountType().equals("EVENT ORGANIZER")) {
+                EventOrganizer newEventOrganizer = new EventOrganizer();
+                newEventOrganizer.setId(currentUser.getId());
+                List<PicturePath> images = pictureService.save(upgradeProfileDTO.getProfilePictures());
+                if(images == null) {
+                    return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
+                }
+                newEventOrganizer.setImageUrls(images);
+                newEventOrganizer.setEmail(upgradeProfileDTO.getEmail());
+                newEventOrganizer.setPassword(currentUser.getPassword());
+                newEventOrganizer.setAddress(currentUser.getAddress());
+                newEventOrganizer.setPhoneNumber(currentUser.getPhoneNumber());
+                newEventOrganizer.setActive(true);
+                newEventOrganizer.setDeactivated(false);
+                newEventOrganizer.setEnabled(true);
+                newEventOrganizer.setHasSilencedNotifications(currentUser.isHasSilencedNotifications());
+                newEventOrganizer.setRole(roleRepository.findByName("ROLE_Organizer"));
+                newEventOrganizer.setFirstName(upgradeProfileDTO.getFirstName());
+                newEventOrganizer.setLastName(upgradeProfileDTO.getLastName());
 
-            newAuthenticatedUser = (AuthenticatedUser) userService.save(newAuthenticatedUser, true);
-            if(newAuthenticatedUser == null) {
-                return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
+                userService.deletePhysicallyById(currentUser.getId());
+                if (userService.get(currentUser.getId()) != null) {
+                    return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
+                }
+
+                newEventOrganizer = (EventOrganizer) userService.save(newEventOrganizer, true);
+                if(newEventOrganizer == null) {
+                    // restore the deleted user
+                    userService.save(currentUser, true);
+                    return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
+                }
+
+                String jwt = tokenUtils.generateToken(newEventOrganizer);
+                int expiresIn = tokenUtils.getExpiredIn();
+                return new ResponseEntity<UserTokenState>(new UserTokenState(jwt, expiresIn, newEventOrganizer.getId()), HttpStatus.CREATED);
+
+            } else {
+                SolutionProvider newSolutionProvider = new SolutionProvider();
+                newSolutionProvider.setId(currentUser.getId());
+                List<PicturePath> images = pictureService.save(upgradeProfileDTO.getProfilePictures());
+                if(images == null) {
+                    return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
+                }
+                newSolutionProvider.setImageUrls(images);
+                newSolutionProvider.setEmail(upgradeProfileDTO.getEmail());
+                newSolutionProvider.setPassword(currentUser.getPassword());
+                newSolutionProvider.setAddress(currentUser.getAddress());
+                newSolutionProvider.setPhoneNumber(currentUser.getPhoneNumber());
+                newSolutionProvider.setActive(true);
+                newSolutionProvider.setDeactivated(false);
+                newSolutionProvider.setEnabled(true);
+                newSolutionProvider.setHasSilencedNotifications(currentUser.isHasSilencedNotifications());
+                newSolutionProvider.setRole(roleRepository.findByName("ROLE_Provider"));
+                newSolutionProvider.setDescription(upgradeProfileDTO.getDescription());
+                newSolutionProvider.setName(upgradeProfileDTO.getCompanyName());
+
+                userService.deletePhysicallyById(currentUser.getId());
+                if (userService.get(currentUser.getId()) != null) {
+                    return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
+                }
+
+                newSolutionProvider = (SolutionProvider) userService.save(newSolutionProvider, true);
+                if(newSolutionProvider == null) {
+                    // restore the deleted user
+                    userService.save(currentUser, true);
+                    return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
+                }
+
+                String jwt = tokenUtils.generateToken(newSolutionProvider);
+                int expiresIn = tokenUtils.getExpiredIn();
+                return new ResponseEntity<UserTokenState>(new UserTokenState(jwt, expiresIn, newSolutionProvider.getId()), HttpStatus.CREATED);
             }
-
-            // go through all event invitations and add them to new user's accepted events
-            acceptPendingInvitations(newAuthenticatedUser);
-            */
-            //String jwt = tokenUtils.generateToken(newAuthenticatedUser);
-            User user = new EventOrganizer(); // popuniti ovo podacima
-            String jwt = tokenUtils.generateToken(user);
-            int expiresIn = tokenUtils.getExpiredIn();
-            return new ResponseEntity<UserTokenState>(new UserTokenState(jwt, expiresIn, user.getId()), HttpStatus.CREATED);
 
         } catch (Exception e) {
             return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
