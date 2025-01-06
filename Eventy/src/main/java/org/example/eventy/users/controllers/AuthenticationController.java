@@ -14,6 +14,8 @@ import org.example.eventy.users.services.RegistrationRequestService;
 import org.example.eventy.users.services.UserService;
 import org.example.eventy.util.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import java.net.URI;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -146,7 +148,7 @@ public class AuthenticationController {
                     user.getEmail(),
                     "Confirm registration",
                     "Click on this link to confirm registration (the link is valid in the next 24h): " +
-                            "<a href=\"http://localhost:4200/confirm-registration/" + registrationRequest.getId() + "\">Activate account</a>"
+                            "<a href=\"http://localhost:8080/api/authentication/confirm-registration-routing/" + registrationRequest.getId() + "\">Activate account</a>"
             );
         }
         catch (Exception e) {
@@ -157,7 +159,7 @@ public class AuthenticationController {
     }
 
     @PutMapping(value="/registration-confirmation/{requestId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserTokenState> confirmRegistration(@PathVariable Long requestId) {
+    public ResponseEntity<UserTokenState> confirmRegistration(@PathVariable Long requestId, @RequestHeader("User-Agent") String userAgent) {
         RequestUpdateStatus status = registrationRequestService.update(requestId);
 
         if(status == RequestUpdateStatus.NOT_FOUND) {
@@ -198,5 +200,21 @@ public class AuthenticationController {
         int expiresIn = tokenUtils.getExpiredIn();
 
         return new ResponseEntity<UserTokenState>(new UserTokenState(jwt, expiresIn, user.getId()), HttpStatus.OK);
+    }
+
+    @GetMapping("/confirm-registration-routing/{requestId}")
+    public ResponseEntity<Void> confirmRegistrationRouting(@PathVariable Long requestId, @RequestHeader("User-Agent") String userAgent) {
+        // if the device is mobile
+        if (userAgent.toLowerCase().contains("android")) {
+            String deepLink = "eventy://confirm-registration?id=" + requestId;
+            HttpHeaders headers = new HttpHeaders();
+            headers.setLocation(URI.create(deepLink));
+            return new ResponseEntity<>(headers, HttpStatus.FOUND);
+        }
+
+        String webLink = "http://localhost:4200/confirm-registration/" + requestId;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(webLink));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 }
