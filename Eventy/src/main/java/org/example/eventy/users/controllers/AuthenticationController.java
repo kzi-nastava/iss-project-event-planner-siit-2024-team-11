@@ -304,7 +304,7 @@ public class AuthenticationController {
                 newEventOrganizer = (EventOrganizer) userService.save(newEventOrganizer, true);
                 if (newEventOrganizer == null) {
                     // restore the deleted user
-                    userService.save(currentUser, true);
+                    userService.save(currentUser, false);
                     return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
                 }
 
@@ -340,7 +340,7 @@ public class AuthenticationController {
                 newSolutionProvider = (SolutionProvider) userService.save(newSolutionProvider, true);
                 if (newSolutionProvider == null) {
                     // restore the deleted user
-                    userService.save(currentUser, true);
+                    userService.save(currentUser, false);
                     return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
                 }
 
