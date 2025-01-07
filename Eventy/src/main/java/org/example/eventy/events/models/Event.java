@@ -1,5 +1,6 @@
 package org.example.eventy.events.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.example.eventy.users.models.EventOrganizer;
 
@@ -12,34 +13,48 @@ public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false)
     private String name;
+
     @Column(nullable = false)
     private String description;
+
     @Column(nullable = false)
     private int maxNumberParticipants;
+
     @Column(nullable = false)
     private PrivacyType privacy;
+
     @Column(nullable = false)
     private LocalDateTime date;
+
     @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "event_type_id", referencedColumnName = "id")
     private EventType type;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "location_id", referencedColumnName = "id")
     private Location location;
+
     @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "event_id", referencedColumnName = "id")
     private List<Activity> agenda;
+
     @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "organizer_id", referencedColumnName = "id")
     private EventOrganizer organiser;
+
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonManagedReference // prevents infinite loop
+    private List<Invitation> invitations;
+
 
     public Event() {
 
     }
 
-    public Event(Long id, String name, String description, int maxNumberParticipants, PrivacyType privacy, LocalDateTime date, EventType type, Location location, List<Activity> agenda, EventOrganizer organiser) {
+    public Event(Long id, String name, String description, int maxNumberParticipants, PrivacyType privacy, LocalDateTime date, EventType type, Location location, List<Activity> agenda, EventOrganizer organiser, List<Invitation> invitations) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -50,6 +65,7 @@ public class Event {
         this.location = location;
         this.agenda = agenda;
         this.organiser = organiser;
+        this.invitations = invitations;
     }
 
     public Long getId() {
@@ -130,5 +146,13 @@ public class Event {
 
     public void setOrganiser(EventOrganizer organiser) {
         this.organiser = organiser;
+    }
+
+    public List<Invitation> getInvitations() {
+        return invitations;
+    }
+
+    public void setInvitations(List<Invitation> invitations) {
+        this.invitations = invitations;
     }
 }
