@@ -5,10 +5,7 @@ import org.example.eventy.common.models.PagedResponse;
 import org.example.eventy.common.services.EmailService;
 import org.example.eventy.events.dtos.*;
 import org.example.eventy.events.models.*;
-import org.example.eventy.events.services.ActivityService;
-import org.example.eventy.events.services.EventService;
-import org.example.eventy.events.services.EventTypeService;
-import org.example.eventy.events.services.LocationService;
+import org.example.eventy.events.services.*;
 import org.example.eventy.users.models.EventOrganizer;
 import org.example.eventy.users.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,12 +92,12 @@ public class EventController {
         }
         event.setAgenda(agenda);
 
-        //event = eventService.save(event);
+        event = eventService.save(event);
 
         if(event != null) {
             if (event.getPrivacy() == PrivacyType.PRIVATE) {
                 // SEND EMAIL INVITATIONS HERE, example:
-                emailService.sendInvitations(organizeEventDTO);
+                emailService.sendInvitations(event, organizeEventDTO.getEmails());
             }
             EventDTO eventDTO = new EventDTO();
             // needs to be this ---> // EventDTO eventDTO = new EventDTO(event);

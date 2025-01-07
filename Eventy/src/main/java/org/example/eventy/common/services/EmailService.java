@@ -2,8 +2,15 @@ package org.example.eventy.common.services;
 
 import jakarta.activation.FileDataSource;
 import jakarta.mail.internet.InternetAddress;
+import org.example.eventy.common.models.Status;
+import org.example.eventy.common.util.ActiveUserManager;
+import org.example.eventy.common.util.EncryptionUtil;
 import org.example.eventy.events.dtos.CreateLocationDTO;
 import org.example.eventy.events.dtos.OrganizeEventDTO;
+import org.example.eventy.events.models.Event;
+import org.example.eventy.events.models.Invitation;
+import org.example.eventy.events.models.Location;
+import org.example.eventy.events.services.InvitationService;
 import org.example.eventy.users.models.User;
 import org.example.eventy.users.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +33,10 @@ public class EmailService {
     private JavaMailSender mailSender;
     @Autowired
     private UserService userService;
+    @Autowired
+    InvitationService invitationService;
+    @Autowired
+    private ActiveUserManager activeUserManager;
 
     public void sendEmail(String to, String subject, String text) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
@@ -38,13 +49,12 @@ public class EmailService {
         mailSender.send(message);
     }
 
-    public void sendInvitations(OrganizeEventDTO organizeEventDTO) {
-        List<String> emails = organizeEventDTO.getEmails();
-        String organizerEmail = userService.get(organizeEventDTO.getOrganizerId()).getEmail();
-        String eventName = organizeEventDTO.getName();
+    public void sendInvitations(Event event, List<String> emails) {
+        String organizerEmail = event.getOrganiser().getEmail();
+        String eventName = event.getName();
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy 'at' h:mm a");
-        String eventDate = organizeEventDTO.getDate().format(dateTimeFormatter);
-        CreateLocationDTO eventLocation = organizeEventDTO.getLocation();
+        String eventDate = event.getDate().format(dateTimeFormatter);
+        Location eventLocation = event.getLocation();
 
         for (String email : emails) {
             try {
@@ -58,15 +68,20 @@ public class EmailService {
                 // create HTML content
                 String htmlContent;
                 String homepageLink = "http://localhost:4200/";
-                String registrationLink = "http://localhost:4200/fast-registration";
+
+                // encrypted email in link with expiration date (1 day)
+                long expirationTime = System.currentTimeMillis() + (24 * 60 * 60 * 1000);
+                String encryptedEmail = EncryptionUtil.encrypt(email, expirationTime);
+                String registrationLink = "http://localhost:4200/fast-registration?value=" + encryptedEmail;
+
                 String organizerEmailLink = "mailto:" + organizerEmail + "?subject=Event%20Invitation&body=Hello%2C%0D%0A%0D%0AI%20would%20like%20to%20know%20more%20about%20the%20event%20'" + eventName + "'.%0D%0A%0D%0ABest%20regards%2C%0D%0A";
                 String eventyLogoSrc = "src/main/resources/static/logo-nav.png";
                 String eventDetailsLink = "http://localhost:4200/events/5";
 
                 User user = userService.findByEmail(email);
+                // depending on the user, send the right email
                 String type = (user != null) ? "normal_invite" : "fast_registration";
                 htmlContent = buildEmailContent(type, email, organizerEmail, eventName, eventDate, eventLocation, homepageLink, registrationLink, organizerEmailLink, eventyLogoSrc, eventDetailsLink);
-
                 helper.setText(htmlContent, true);
 
                 // add Eventy Logo image --> <img src="cid:logoImage" alt="Eventy Logo"/>
@@ -78,17 +93,34 @@ public class EmailService {
 
                 mailSender.send(message);
 
+                Invitation invitation = new Invitation();
+                invitation.setGuestEmail(email);
+                invitation.setEvent(event);
+
+                // NOTE: need to add if the user is logged in currently --> immediately update his accepted events!!
+                if (user != null && activeUserManager.isUserActive(email)) {
+                    List<Event> acceptedEvents = user.getAcceptedEvents();
+                    acceptedEvents.add(event);
+                    user.setAcceptedEvents(acceptedEvents);
+                    userService.save(user, false);
+                    invitation.setStatus(Status.ACCEPTED);
+                } else {
+                    invitation.setStatus(Status.PENDING);
+                }
+
+                invitationService.save(invitation);
+
             } catch (MessagingException e) {
                 e.printStackTrace();
 
-            } catch (UnsupportedEncodingException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
     }
 
     private String buildEmailContent(String type, String recipientEmail, String organizerEmail, String eventName, String eventDate,
-                                     CreateLocationDTO location, String homepageLink, String registrationLink, String organizerEmailLink, String eventyLogoSrc, String eventLink) {
+                                     Location location, String homepageLink, String registrationLink, String organizerEmailLink, String eventyLogoSrc, String eventLink) {
         String googleMapsLink = "https://www.google.com/maps?q=" + location.getLatitude() + "," + location.getLongitude();
 
         if (type.equals("normal_invite")) {
