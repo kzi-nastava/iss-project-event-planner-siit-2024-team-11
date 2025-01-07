@@ -12,6 +12,7 @@ import org.example.eventy.users.models.User;
 import org.example.eventy.users.repositories.RoleRepository;
 import org.example.eventy.users.services.RegistrationRequestService;
 import org.example.eventy.users.services.UserService;
+import org.example.eventy.util.NetworkUtils;
 import org.example.eventy.util.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -144,11 +145,12 @@ public class AuthenticationController {
         }
 
         try {
+            String url = "http://" + NetworkUtils.getLocalIpAddress() +":8080/api/authentication/confirm-registration-routing/";
             emailService.sendEmail(
                     user.getEmail(),
                     "Confirm registration",
                     "Click on this link to confirm registration (the link is valid in the next 24h): " +
-                            "<a href=\"http://localhost:8080/api/authentication/confirm-registration-routing/" + registrationRequest.getId() + "\">Activate account</a>"
+                            "<a href=\"" + url + registrationRequest.getId() + "\">Activate account</a>"
             );
         }
         catch (Exception e) {
@@ -174,12 +176,14 @@ public class AuthenticationController {
             }
 
             try {
+                String url = "http://" + NetworkUtils.getLocalIpAddress() +":8080/api/authentication/confirm-registration-routing/";
                 emailService.sendEmail(
                         user.getEmail(),
                         "Confirm registration",
                         "Click on this link to confirm registration (the link is valid in the next 24h): " +
-                                "<a href=\"http://localhost:4200/confirm-registration/" + registrationRequest.getId() + "\">Activate account</a>"
-                );            }
+                                "<a href=\"" + url + registrationRequest.getId() + "\">Activate account</a>"
+                );
+            }
             catch (Exception e) {
                 return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
             }
