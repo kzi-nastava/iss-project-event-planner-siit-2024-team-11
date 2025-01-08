@@ -219,6 +219,9 @@ public class AuthenticationController {
             return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
         }
 
+        // go through all event invitations and add them to new user's accepted events
+        acceptPendingInvitations(user);
+
         user.setActive(true);
         user.setEnabled(true);
         userService.save(user, false);
@@ -246,7 +249,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/fast-registration", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<UserTokenState> fastRegister(@Valid @RequestBody FastRegistrationDTO fastRegistrationDTO) {
+    public ResponseEntity<String> fastRegister(@Valid @RequestBody FastRegistrationDTO fastRegistrationDTO) {
         try {
             String email = EncryptionUtil.decrypt(fastRegistrationDTO.getEncryptedEmail());
 
@@ -255,27 +258,39 @@ public class AuthenticationController {
             newAuthenticatedUser.setPassword(fastRegistrationDTO.getPassword());
             newAuthenticatedUser.setAddress(fastRegistrationDTO.getAddress());
             newAuthenticatedUser.setPhoneNumber(fastRegistrationDTO.getPhoneNumber());
-            newAuthenticatedUser.setActive(true);
+            newAuthenticatedUser.setActive(false);
             newAuthenticatedUser.setDeactivated(false);
-            newAuthenticatedUser.setEnabled(true);
+            newAuthenticatedUser.setEnabled(false);
             newAuthenticatedUser.setHasSilencedNotifications(false);
             newAuthenticatedUser.setRole(roleRepository.findByName("ROLE_AuthenticatedUser"));
             newAuthenticatedUser.setImageUrls(null);
 
             newAuthenticatedUser = (AuthenticatedUser) userService.save(newAuthenticatedUser, true);
             if(newAuthenticatedUser == null) {
-                return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
             }
 
-            // go through all event invitations and add them to new user's accepted events
-            acceptPendingInvitations(newAuthenticatedUser);
+            RegistrationRequest registrationRequest = registrationRequestService.create(newAuthenticatedUser);
+            if(registrationRequest == null) {
+                return new ResponseEntity<String>("Creating request failed!", HttpStatus.BAD_REQUEST);
+            }
 
-            String jwt = tokenUtils.generateToken(newAuthenticatedUser);
-            int expiresIn = tokenUtils.getExpiredIn();
-            return new ResponseEntity<UserTokenState>(new UserTokenState(jwt, expiresIn, newAuthenticatedUser.getId()), HttpStatus.CREATED);
+            try {
+                String url = "http://" + NetworkUtils.getLocalIpAddress() +":8080/api/authentication/confirm-registration-routing/";
+                emailService.sendEmail(
+                        newAuthenticatedUser.getEmail(),
+                        "Confirm registration",
+                        "Click on this link to confirm registration (the link is valid in the next 24h): " +
+                                "<a href=\"" + url + registrationRequest.getId() + "\">Activate account</a>"
+                );
+            }
+            catch (Exception e) {
+                return new ResponseEntity<String>("Sending email failed!", HttpStatus.BAD_REQUEST);
+            }
 
+            return new ResponseEntity<String>("Confirmation email sent to the email address!", HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
         }
     }
 

@@ -16,11 +16,11 @@ public class EventyApplication {
         SpringApplication.run(EventyApplication.class, args);
     }
 
-//    @PostConstruct
-//    public void seedRoles() {
-//        roleRepository.save(new Role("ROLE_Admin"));
-//        roleRepository.save(new Role("ROLE_AuthenticatedUser"));
-//        roleRepository.save(new Role("ROLE_Organizer"));
-//        roleRepository.save(new Role("ROLE_Provider"));
-//    }
+    @PostConstruct
+    public void seedRoles() {
+        roleRepository.save(new Role("ROLE_Admin"));
+        roleRepository.save(new Role("ROLE_AuthenticatedUser"));
+        roleRepository.save(new Role("ROLE_Organizer"));
+        roleRepository.save(new Role("ROLE_Provider"));
+    }
 }
