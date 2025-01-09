@@ -173,7 +173,7 @@ public class EventController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
             Pageable pageable) {
         // Pageable - page, size, sort
-        // sort by: "eventType", "name", "maxParticipants,asc", "maxParticipants,desc", "location", "date,asc", "date,desc"
+        // sort by: "type", "name", "maxNumberParticipants,asc", "maxNumberParticipants,desc", "location", "date,asc", "date,desc"
 
         // Set default values for startDate and endDate
         if (startDate == null) {

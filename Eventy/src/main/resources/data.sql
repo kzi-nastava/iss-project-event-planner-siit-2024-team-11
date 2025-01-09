@@ -35,6 +35,6 @@ INSERT INTO events(
     max_number_participants, privacy, date,event_type_id, id, location_id, organizer_id, description, name
 )
 VALUES
-    (100, 0, '2024-12-25 15:00:00', 1, DEFAULT, 1, 1, 'Sample Event Description for Event Type 1', 'Sample Event Name for Event Type 1'),
+    (50, 0, '2024-12-25 15:00:00', 1, DEFAULT, 1, 1, 'Sample Event Description for Event Type 1', 'Sample Event Name for Event Type 1'),
     (100, 0, '2024-12-26 15:00:00', 2, DEFAULT, 2, 1, 'Sample Event Description for Event Type 2', 'Sample Event Name for Event Type 2'),
-    (100, 0, '2024-12-27 15:00:00', 3, DEFAULT, 3, 1, 'Sample Event Description for Event Type 3', 'Sample Event Name for Event Type 3');
+    (150, 0, '2024-12-27 15:00:00', 3, DEFAULT, 3, 1, 'Sample Event Description for Event Type 3', 'Sample Event Name for Event Type 3');
