@@ -16,8 +16,11 @@ import org.example.eventy.users.models.*;
 import org.example.eventy.users.repositories.RoleRepository;
 import org.example.eventy.users.services.RegistrationRequestService;
 import org.example.eventy.users.services.UserService;
+import org.example.eventy.util.NetworkUtils;
 import org.example.eventy.util.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import java.net.URI;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -165,11 +168,12 @@ public class AuthenticationController {
         }
 
         try {
+            String url = "http://" + NetworkUtils.getLocalIpAddress() +":8080/api/authentication/confirm-registration-routing/";
             emailService.sendEmail(
                     user.getEmail(),
                     "Confirm registration",
                     "Click on this link to confirm registration (the link is valid in the next 24h): " +
-                            "<a href=\"http://localhost:4200/confirm-registration/" + registrationRequest.getId() + "\">Activate account</a>"
+                            "<a href=\"" + url + registrationRequest.getId() + "\">Activate account</a>"
             );
         }
         catch (Exception e) {
@@ -180,7 +184,7 @@ public class AuthenticationController {
     }
 
     @PutMapping(value="/registration-confirmation/{requestId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserTokenState> confirmRegistration(@PathVariable Long requestId) {
+    public ResponseEntity<UserTokenState> confirmRegistration(@PathVariable Long requestId, @RequestHeader("User-Agent") String userAgent) {
         RequestUpdateStatus status = registrationRequestService.update(requestId);
 
         if(status == RequestUpdateStatus.NOT_FOUND) {
@@ -195,12 +199,14 @@ public class AuthenticationController {
             }
 
             try {
+                String url = "http://" + NetworkUtils.getLocalIpAddress() +":8080/api/authentication/confirm-registration-routing/";
                 emailService.sendEmail(
                         user.getEmail(),
                         "Confirm registration",
                         "Click on this link to confirm registration (the link is valid in the next 24h): " +
-                                "<a href=\"http://localhost:4200/confirm-registration/" + registrationRequest.getId() + "\">Activate account</a>"
-                );            }
+                                "<a href=\"" + url + registrationRequest.getId() + "\">Activate account</a>"
+                );
+            }
             catch (Exception e) {
                 return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
             }
@@ -213,6 +219,9 @@ public class AuthenticationController {
             return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
         }
 
+        // go through all event invitations and add them to new user's accepted events
+        acceptPendingInvitations(user);
+
         user.setActive(true);
         user.setEnabled(true);
         userService.save(user, false);
@@ -223,8 +232,24 @@ public class AuthenticationController {
         return new ResponseEntity<UserTokenState>(new UserTokenState(jwt, expiresIn, user.getId()), HttpStatus.OK);
     }
 
+    @GetMapping("/confirm-registration-routing/{requestId}")
+    public ResponseEntity<Void> confirmRegistrationRouting(@PathVariable Long requestId, @RequestHeader("User-Agent") String userAgent) {
+        // if the device is mobile
+        if (userAgent.toLowerCase().contains("android")) {
+            String deepLink = "eventy://confirm-registration?id=" + requestId;
+            HttpHeaders headers = new HttpHeaders();
+            headers.setLocation(URI.create(deepLink));
+            return new ResponseEntity<>(headers, HttpStatus.FOUND);
+        }
+
+        String webLink = "http://localhost:4200/confirm-registration/" + requestId;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(webLink));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
+    }
+
     @PostMapping(value = "/fast-registration", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<UserTokenState> fastRegister(@Valid @RequestBody FastRegistrationDTO fastRegistrationDTO) {
+    public ResponseEntity<String> fastRegister(@Valid @RequestBody FastRegistrationDTO fastRegistrationDTO) {
         try {
             String email = EncryptionUtil.decrypt(fastRegistrationDTO.getEncryptedEmail());
 
@@ -233,27 +258,39 @@ public class AuthenticationController {
             newAuthenticatedUser.setPassword(fastRegistrationDTO.getPassword());
             newAuthenticatedUser.setAddress(fastRegistrationDTO.getAddress());
             newAuthenticatedUser.setPhoneNumber(fastRegistrationDTO.getPhoneNumber());
-            newAuthenticatedUser.setActive(true);
+            newAuthenticatedUser.setActive(false);
             newAuthenticatedUser.setDeactivated(false);
-            newAuthenticatedUser.setEnabled(true);
+            newAuthenticatedUser.setEnabled(false);
             newAuthenticatedUser.setHasSilencedNotifications(false);
             newAuthenticatedUser.setRole(roleRepository.findByName("ROLE_AuthenticatedUser"));
             newAuthenticatedUser.setImageUrls(null);
 
             newAuthenticatedUser = (AuthenticatedUser) userService.save(newAuthenticatedUser, true);
             if(newAuthenticatedUser == null) {
-                return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
             }
 
-            // go through all event invitations and add them to new user's accepted events
-            acceptPendingInvitations(newAuthenticatedUser);
+            RegistrationRequest registrationRequest = registrationRequestService.create(newAuthenticatedUser);
+            if(registrationRequest == null) {
+                return new ResponseEntity<String>("Creating request failed!", HttpStatus.BAD_REQUEST);
+            }
 
-            String jwt = tokenUtils.generateToken(newAuthenticatedUser);
-            int expiresIn = tokenUtils.getExpiredIn();
-            return new ResponseEntity<UserTokenState>(new UserTokenState(jwt, expiresIn, newAuthenticatedUser.getId()), HttpStatus.CREATED);
+            try {
+                String url = "http://" + NetworkUtils.getLocalIpAddress() +":8080/api/authentication/confirm-registration-routing/";
+                emailService.sendEmail(
+                        newAuthenticatedUser.getEmail(),
+                        "Confirm registration",
+                        "Click on this link to confirm registration (the link is valid in the next 24h): " +
+                                "<a href=\"" + url + registrationRequest.getId() + "\">Activate account</a>"
+                );
+            }
+            catch (Exception e) {
+                return new ResponseEntity<String>("Sending email failed!", HttpStatus.BAD_REQUEST);
+            }
 
+            return new ResponseEntity<String>("Confirmation email sent to the email address!", HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -272,25 +309,26 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/upgrade-profile", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<UserTokenState> upgradeProfile(@Valid @RequestBody UpgradeProfileDTO upgradeProfileDTO) {
+    public ResponseEntity<String> upgradeProfile(@Valid @RequestBody UpgradeProfileDTO upgradeProfileDTO) {
         try {
             User currentUser = userService.getUserByEmail(upgradeProfileDTO.getEmail());
+            User newUser;
 
             if (upgradeProfileDTO.getAccountType().equals("EVENT ORGANIZER")) {
                 EventOrganizer newEventOrganizer = new EventOrganizer();
                 newEventOrganizer.setId(currentUser.getId());
                 List<PicturePath> images = pictureService.save(upgradeProfileDTO.getProfilePictures());
                 if (images == null) {
-                    return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
                 }
                 newEventOrganizer.setImageUrls(images);
                 newEventOrganizer.setEmail(upgradeProfileDTO.getEmail());
                 newEventOrganizer.setPassword(currentUser.getPassword());
                 newEventOrganizer.setAddress(currentUser.getAddress());
                 newEventOrganizer.setPhoneNumber(currentUser.getPhoneNumber());
-                newEventOrganizer.setActive(true);
+                newEventOrganizer.setActive(false);
                 newEventOrganizer.setDeactivated(false);
-                newEventOrganizer.setEnabled(true);
+                newEventOrganizer.setEnabled(false);
                 newEventOrganizer.setHasSilencedNotifications(currentUser.isHasSilencedNotifications());
                 newEventOrganizer.setRole(roleRepository.findByName("ROLE_Organizer"));
                 newEventOrganizer.setFirstName(upgradeProfileDTO.getFirstName());
@@ -298,35 +336,32 @@ public class AuthenticationController {
 
                 userService.deletePhysicallyById(currentUser.getId());
                 if (userService.get(currentUser.getId()) != null) {
-                    return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
                 }
 
                 newEventOrganizer = (EventOrganizer) userService.save(newEventOrganizer, true);
                 if (newEventOrganizer == null) {
                     // restore the deleted user
                     userService.save(currentUser, false);
-                    return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
                 }
 
-                String jwt = tokenUtils.generateToken(newEventOrganizer);
-                int expiresIn = tokenUtils.getExpiredIn();
-                return new ResponseEntity<UserTokenState>(new UserTokenState(jwt, expiresIn, newEventOrganizer.getId()), HttpStatus.CREATED);
-
+                newUser = (User) newEventOrganizer;
             } else {
                 SolutionProvider newSolutionProvider = new SolutionProvider();
                 newSolutionProvider.setId(currentUser.getId());
                 List<PicturePath> images = pictureService.save(upgradeProfileDTO.getProfilePictures());
                 if (images == null) {
-                    return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
                 }
                 newSolutionProvider.setImageUrls(images);
                 newSolutionProvider.setEmail(upgradeProfileDTO.getEmail());
                 newSolutionProvider.setPassword(currentUser.getPassword());
                 newSolutionProvider.setAddress(currentUser.getAddress());
                 newSolutionProvider.setPhoneNumber(currentUser.getPhoneNumber());
-                newSolutionProvider.setActive(true);
+                newSolutionProvider.setActive(false);
                 newSolutionProvider.setDeactivated(false);
-                newSolutionProvider.setEnabled(true);
+                newSolutionProvider.setEnabled(false);
                 newSolutionProvider.setHasSilencedNotifications(currentUser.isHasSilencedNotifications());
                 newSolutionProvider.setRole(roleRepository.findByName("ROLE_Provider"));
                 newSolutionProvider.setDescription(upgradeProfileDTO.getDescription());
@@ -334,23 +369,41 @@ public class AuthenticationController {
 
                 userService.deletePhysicallyById(currentUser.getId());
                 if (userService.get(currentUser.getId()) != null) {
-                    return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
                 }
 
                 newSolutionProvider = (SolutionProvider) userService.save(newSolutionProvider, true);
                 if (newSolutionProvider == null) {
                     // restore the deleted user
                     userService.save(currentUser, false);
-                    return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
                 }
 
-                String jwt = tokenUtils.generateToken(newSolutionProvider);
-                int expiresIn = tokenUtils.getExpiredIn();
-                return new ResponseEntity<UserTokenState>(new UserTokenState(jwt, expiresIn, newSolutionProvider.getId()), HttpStatus.CREATED);
+                newUser = (User) newSolutionProvider;
             }
 
+            RegistrationRequest registrationRequest = registrationRequestService.create(newUser);
+            if(registrationRequest == null) {
+                return new ResponseEntity<String>("Creating request failed!", HttpStatus.BAD_REQUEST);
+            }
+
+            try {
+                String url = "http://" + NetworkUtils.getLocalIpAddress() +":8080/api/authentication/confirm-registration-routing/";
+                emailService.sendEmail(
+                        newUser.getEmail(),
+                        "Confirm upgrade",
+                        "Click on this link to confirm upgrade (the link is valid in the next 24h): " +
+                                "<a href=\"" + url + registrationRequest.getId() + "\">Activate account</a>"
+                );
+            }
+            catch (Exception e) {
+                return new ResponseEntity<String>("Sending email failed!", HttpStatus.BAD_REQUEST);
+            }
+
+            return new ResponseEntity<String>("Confirmation email sent to the email address!", HttpStatus.CREATED);
+
         } catch (Exception e) {
-            return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
         }
     }
 }
