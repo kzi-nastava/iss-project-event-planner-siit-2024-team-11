@@ -1,7 +1,9 @@
 package org.example.eventy.solutions.dtos;
 
+import org.example.eventy.common.models.ReservationConfirmationType;
 import org.example.eventy.common.models.SolutionType;
 import org.example.eventy.events.models.EventType;
+import org.example.eventy.solutions.models.Product;
 import org.example.eventy.solutions.models.Service;
 import org.example.eventy.solutions.models.Solution;
 
@@ -13,8 +15,12 @@ public class SolutionCardDTO {
     private String name;
     private String categoryName;
     private String description; // only for products
+    private String specifics; // only for services
     private Integer minReservationTime; // only for services
     private Integer maxReservationTime; // only for services
+    private Integer reservationDeadline; // only for services
+    private Integer cancellationDeadline; // only for services
+    private ReservationConfirmationType reservationType; // only for services
     private ArrayList<String> eventTypeNames;
     private Double price;
     private Integer discount;
@@ -28,14 +34,18 @@ public class SolutionCardDTO {
 
     }
 
-    public SolutionCardDTO(Long solutionId, SolutionType type, String name, String categoryName, String description, Integer minReservationTime, Integer maxReservationTime, ArrayList<String> eventTypeNames, double price, int discount, String firstImageUrl, boolean isAvailable, Long providerId, String providerName, String providerImageUrl) {
+    public SolutionCardDTO(Long solutionId, SolutionType type, String name, String categoryName, String description, String specifics, Integer minReservationTime, Integer maxReservationTime, Integer reservationDeadline, Integer cancellationDeadline, ReservationConfirmationType reservationType, ArrayList<String> eventTypeNames, Double price, Integer discount, String firstImageUrl, Boolean isAvailable, Long providerId, String providerName, String providerImageUrl) {
         this.solutionId = solutionId;
         this.type = type;
         this.name = name;
         this.categoryName = categoryName;
         this.description = description;
+        this.specifics = specifics;
         this.minReservationTime = minReservationTime;
         this.maxReservationTime = maxReservationTime;
+        this.reservationDeadline = reservationDeadline;
+        this.cancellationDeadline = cancellationDeadline;
+        this.reservationType = reservationType;
         this.eventTypeNames = eventTypeNames;
         this.price = price;
         this.discount = discount;
@@ -51,13 +61,22 @@ public class SolutionCardDTO {
         this.type = solution.getDescription() != null ? SolutionType.PRODUCT : SolutionType.SERVICE;
         this.name = solution.getName();
         this.categoryName = solution.getCategory().getName();
-        this.description = solution.getDescription();
         if (solution instanceof Service) {
+            this.specifics = ((Service) solution).getSpecifics();
             this.minReservationTime = ((Service) solution).getMinReservationTime();
             this.maxReservationTime = ((Service) solution).getMaxReservationTime();
+            this.reservationDeadline = ((Service) solution).getReservationDeadline();
+            this.cancellationDeadline = ((Service) solution).getCancellationDeadline();
+            this.reservationType = ((Service) solution).getReservationType();
+            this.description = null;
         } else {
+            this.specifics = null;
             this.minReservationTime = null;
             this.maxReservationTime = null;
+            this.reservationDeadline = null;
+            this.cancellationDeadline = null;
+            this.reservationType = null;
+            this.description = ((Product) solution).getDescription();
         }
         this.eventTypeNames = new ArrayList<String>();
         for (EventType eventType : solution.getEventTypes()) {
@@ -112,6 +131,14 @@ public class SolutionCardDTO {
         this.description = description;
     }
 
+    public String getSpecifics() {
+        return specifics;
+    }
+
+    public void setSpecifics(String specifics) {
+        this.specifics = specifics;
+    }
+
     public Integer getMinReservationTime() {
         return minReservationTime;
     }
@@ -126,6 +153,30 @@ public class SolutionCardDTO {
 
     public void setMaxReservationTime(Integer maxReservationTime) {
         this.maxReservationTime = maxReservationTime;
+    }
+
+    public Integer getReservationDeadline() {
+        return reservationDeadline;
+    }
+
+    public void setReservationDeadline(Integer reservationDeadline) {
+        this.reservationDeadline = reservationDeadline;
+    }
+
+    public Integer getCancellationDeadline() {
+        return cancellationDeadline;
+    }
+
+    public void setCancellationDeadline(Integer cancellationDeadline) {
+        this.cancellationDeadline = cancellationDeadline;
+    }
+
+    public ReservationConfirmationType getReservationType() {
+        return reservationType;
+    }
+
+    public void setReservationType(ReservationConfirmationType reservationType) {
+        this.reservationType = reservationType;
     }
 
     public ArrayList<String> getEventTypeNames() {
@@ -160,7 +211,7 @@ public class SolutionCardDTO {
         this.firstImageUrl = firstImageUrl;
     }
 
-    public Boolean isAvailable() {
+    public Boolean getAvailable() {
         return isAvailable;
     }
 
