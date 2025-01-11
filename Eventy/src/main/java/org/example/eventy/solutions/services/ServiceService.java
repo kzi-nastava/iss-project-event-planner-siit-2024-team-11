@@ -143,9 +143,7 @@ public class ServiceService {
     }
 
     public Page<Solution> getServices(Pageable pageable) {
-        // FALI TYPE OVDEEE U REPOOO PO TOME CEMO NACI SAMO USLUGE
-        // type = "SolutionType.SERVICE"
-        return solutionRepository.findAll(null, null, null, null, null, null, null, null, null, null, pageable);
+        return solutionRepository.findAll(null, null, null, null, null, null, null, null, null, null, null, pageable);
     }
 
     public Solution getService(Long serviceId) {

@@ -1,21 +1,43 @@
 package org.example.eventy.solutions.models;
 
+import jakarta.persistence.*;
 import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.common.models.ReservationConfirmationType;
 import org.example.eventy.events.models.EventType;
 import org.example.eventy.users.models.SolutionProvider;
 
-import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@DiscriminatorValue("Service")
 public class Service extends Solution {
+
+    // NOTE: we cannot put @Column(nullable = FALSE) because of SingeTable,
+    //       so these will all be NULL if it's Product
+
+    @Column
     private String specifics;
+
+    @Column
     private Integer minReservationTime;
+
+    @Column
     private Integer maxReservationTime;
+
+    @Column
     private Integer reservationDeadline;
+
+    @Column
     private Integer cancellationDeadline;
+
+    @Column
     private ReservationConfirmationType reservationType;
+
+    @OneToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "service_history_id", referencedColumnName = "id")
     private ServiceHistory currentService;
+
+    ////////////////////////////////////////////
 
     public Service() {
 

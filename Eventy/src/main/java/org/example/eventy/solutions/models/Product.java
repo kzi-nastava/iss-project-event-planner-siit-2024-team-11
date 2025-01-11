@@ -1,7 +1,16 @@
 package org.example.eventy.solutions.models;
 
+
+import jakarta.persistence.*;
+
+@Entity
+@DiscriminatorValue("Product")
 public class Product extends Solution {
-    private ProductHistory currentProduct;
+    @OneToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "product_history_id", referencedColumnName = "id")
+    private ProductHistory currentProduct; // we keep this if any edits are made to the current product
+
+    ///////////////////////////////////
 
     public Product() {
 

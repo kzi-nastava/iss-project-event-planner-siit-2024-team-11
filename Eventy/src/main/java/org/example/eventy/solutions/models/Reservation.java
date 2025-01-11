@@ -7,7 +7,6 @@ import org.example.eventy.events.models.Event;
 import org.example.eventy.solutions.validation.annotation.ValidReservation;
 
 import java.time.LocalDateTime;
-import java.util.Calendar;
 
 @Entity
 @Table(name = "Reservations")
