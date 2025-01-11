@@ -14,7 +14,7 @@ public class SolutionCardDTO {
     private SolutionType type; // "SERVICE" or "PRODUCT"
     private String name;
     private String categoryName;
-    private String description; // only for products
+    private String description;
     private String specifics; // only for services
     private Integer minReservationTime; // only for services
     private Integer maxReservationTime; // only for services
@@ -58,26 +58,26 @@ public class SolutionCardDTO {
 
     public SolutionCardDTO(Solution solution) {
         this.solutionId = solution.getId();
-        this.type = solution.getDescription() != null ? SolutionType.PRODUCT : SolutionType.SERVICE;
         this.name = solution.getName();
         this.categoryName = solution.getCategory().getName();
         if (solution instanceof Service) {
+            this.type = SolutionType.SERVICE;
             this.specifics = ((Service) solution).getSpecifics();
             this.minReservationTime = ((Service) solution).getMinReservationTime();
             this.maxReservationTime = ((Service) solution).getMaxReservationTime();
             this.reservationDeadline = ((Service) solution).getReservationDeadline();
             this.cancellationDeadline = ((Service) solution).getCancellationDeadline();
             this.reservationType = ((Service) solution).getReservationType();
-            this.description = null;
         } else {
+            this.type = SolutionType.PRODUCT;
             this.specifics = null;
             this.minReservationTime = null;
             this.maxReservationTime = null;
             this.reservationDeadline = null;
             this.cancellationDeadline = null;
             this.reservationType = null;
-            this.description = ((Product) solution).getDescription();
         }
+        this.description = solution.getDescription();
         this.eventTypeNames = new ArrayList<String>();
         for (EventType eventType : solution.getEventTypes()) {
             this.eventTypeNames.add(eventType.getName());

@@ -36,12 +36,12 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
            """)
     long countUsersFavoriteSolutions(@Param("userId") Long userId);
 
-    // FALI TYPE OVDEEE
     @Query("""
            SELECT s
            FROM Solution s
            LEFT JOIN s.eventTypes et
            WHERE (:search = '' OR s.name ILIKE ('%' || :search || '%'))
+             AND (:type = 'Any' OR ((:type = 'Product' AND TYPE(s) = Product) OR ( :type = 'Service' AND TYPE(s) = Service)))
              AND (:categories IS NULL OR s.category.name IN :categories)
              AND (:eventTypes IS NULL OR EXISTS (
                SELECT 1
@@ -49,20 +49,21 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
                WHERE et.name IN :eventTypes
                AND SIZE(s.eventTypes) = :eventTypesSize
              ))
-             AND (:company = '' OR s.provider.name = :company)
-             AND (:minPrice IS NULL OR :maxPrice IS NULL OR (s.price BETWEEN :minPrice AND :maxPrice))
+             AND (:company IS NULL OR :company = '' OR LOWER(s.provider.name) = LOWER(:company))
+             AND (:minPrice IS NULL OR :maxPrice IS NULL OR ((s.price - (s.price * s.discount / 100)) BETWEEN :minPrice AND :maxPrice))
              AND (s.isAvailable = :isAvailable)
              AND (s.isVisible = TRUE)
              AND (s.isDeleted = FALSE)
-             AND NOT EXISTS (
-               SELECT r
-               FROM Reservation r
-               WHERE r.selectedService.id = s.id
-                 AND (:startDate <= r.reservationEndDateTime AND :startDate >= r.reservationStartDateTime)
-                 OR (:endDate >= r.reservationStartDateTime AND :endDate <= r.reservationEndDateTime))
-          """)
-    //AND (:type = 'Any' OR s.type = :type) -------------> // FALI TYPE OVDEEE
+             AND (CAST(:startDate AS timestamp) IS NULL OR CAST(:endDate AS timestamp) IS NULL
+                OR NOT EXISTS (
+                   SELECT r
+                   FROM Reservation r
+                   WHERE r.selectedService.id = s.id
+                      AND (CAST(:startDate AS timestamp) <= r.reservationEndDateTime AND CAST(:startDate AS timestamp) >= r.reservationStartDateTime)
+                      OR (CAST(:endDate AS timestamp) >= r.reservationStartDateTime AND CAST(:endDate AS timestamp) <= r.reservationEndDateTime)))
+           """)
     Page<Solution> findAll(@Param("search") String search,
+                           @Param("type") String type,
                            @Param("categories") List<String> categories,
                            @Param("eventTypes") List<String> eventTypes,
                            @Param("eventTypesSize") Integer eventTypesSize,

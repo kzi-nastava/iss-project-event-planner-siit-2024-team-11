@@ -19,9 +19,7 @@ public class ProductService {
     private SolutionRepository solutionRepository;
 
     public Page<Solution> getProducts(Pageable pageable) {
-        // FALI TYPE OVDEEE U REPOOO PO TOME CEMO NACI SAMO PROIZOVDE
-        // type = "SolutionType.PRODUCT"
-        return solutionRepository.findAll(null, null, null, null, null, null, null, null, null, null, pageable);
+        return solutionRepository.findAll(null, null, null, null, null, null, null, null, null, null, null, pageable);
     }
 
     public Solution getProduct(Long productId) {

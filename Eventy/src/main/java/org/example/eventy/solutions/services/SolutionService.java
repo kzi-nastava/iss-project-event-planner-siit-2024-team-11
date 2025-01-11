@@ -16,7 +16,7 @@ public class SolutionService {
     private SolutionRepository solutionRepository;
 
     public Page<Solution> getSolutions(String search, String type, ArrayList<String> categories, ArrayList<String> eventTypes, String company, double minPrice, double maxPrice, LocalDateTime startDate, LocalDateTime endDate, Boolean isAvailable, Pageable pageable) {
-        return solutionRepository.findAll(search, categories, eventTypes, eventTypes == null ? 0 : eventTypes.size(), company, minPrice, maxPrice, startDate, endDate, isAvailable, pageable);
+        return solutionRepository.findAll(search, type, categories, eventTypes, eventTypes == null ? 0 : eventTypes.size(), company, minPrice, maxPrice, startDate, endDate, isAvailable, pageable);
     }
 
     public Solution getSolution(Long solutionId) {
