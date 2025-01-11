@@ -1,23 +1,11 @@
--- Pictures
-INSERT INTO pictures
-    (id, solution_id, path)
-VALUES
-    (DEFAULT, NULL, 'event_organiser_profile_picture.png'),
-    (DEFAULT, NULL, 'solution_provider_profile_picture.png');
-
 -- Users
 INSERT INTO users (
     id, user_type, email, password, address, phone_number, is_active, is_deactivated, enabled, has_silenced_notifications, suspension_deadline, role_id, last_password_reset_date, description, first_name, last_name, name
 )
 VALUES
     (DEFAULT, 'Organizer', 'tac@gmail.com', 'tac', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 3, NOW(), 'Description', 'First Name', 'Last Name', 'Admin User'),
-    (DEFAULT, 'Provider', 'provider@gmail.com', 'tac', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), 'Description', 'Provider', 'Provideric', 'Admin User');
-
--- Users Profile Pictures
-INSERT INTO public.users_profile_pictures(
-    picture_id, user_id)
-VALUES (1, 1);
-VALUES (2, 2);
+    (DEFAULT, 'Provider', 'provider@gmail.com', 'tac', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), 'Description', 'Provider', 'Provideric', 'VIT DOO'),
+    (DEFAULT, 'Provider', 'provider2@gmail.com', 'tac', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), 'Description', 'Provider', 'Provideric', 'APPLE');
 
 -- Locations
 INSERT INTO locations(latitude, longitude, id, address, name)
@@ -49,17 +37,40 @@ VALUES
     (DEFAULT, 'Photography & Videography', 'Services for capturing memories of events.', 0, false),
     (DEFAULT, 'Catering', 'Food and drink services for events.', 0, false);
 
--- Products
+-- Solutions
 INSERT INTO public.solutions(
-    discount, is_available, is_deleted, is_visible, price, category_id, id, provider_id, type, description, name)
+    cancellation_deadline, discount, is_available, is_deleted, is_visible, max_reservation_time, min_reservation_time, price,
+    reservation_deadline, reservation_type, category_id, id, product_history_id, provider_id, service_history_id, type, description, name, specifics)
 VALUES
-    (0, true, false, true, 50.00, 1, DEFAULT, 2, 'PRODUCT', 'A set of decorative string lights perfect for wedding venues.', 'Decorative String Lights'),
-    (15, true, false, true, 30.00, 1, DEFAULT, 2, 'PRODUCT', 'Elegant and comfortable chairs for high-end events.', 'Luxury Event Chairs');
+    -- Products
+    (NULL, 10, TRUE, FALSE, TRUE, NULL, NULL, 19.99, NULL, NULL, 1, DEFAULT, NULL, 2, NULL, 'Product', 'High-quality gym dumbbell', 'Dumbbell', NULL),
+    (NULL, 5, FALSE, FALSE, TRUE, NULL, NULL, 49.99, NULL, NULL, 2, DEFAULT, NULL, 3, NULL, 'Product', 'Ergonomic office chair', 'Office Chair', NULL),
+    (NULL, 15, TRUE, FALSE, TRUE, NULL, NULL, 29.99, NULL, NULL, 3, DEFAULT, NULL, 2, NULL, 'Product', 'Stylish table lamp', 'Table Lamp', NULL),
+    (NULL, 20, TRUE, FALSE, TRUE, NULL, NULL, 99.99, NULL, NULL, 1, DEFAULT, NULL, 3, NULL, 'Product', 'Gaming keyboard with RGB', 'Gaming Keyboard', NULL),
 
--- Services
-INSERT INTO public.solutions(
-    discount, is_available, is_deleted, is_visible, price, category_id, id, provider_id, type, description, name)
+    -- Services
+    (72, 15, FALSE, FALSE, TRUE, 240, 60, 99.99, 48, 0, 2, DEFAULT, NULL, 3, NULL, 'Service', 'Wedding photography package', 'Photography', 'Includes editing and delivery in 2 weeks'),
+    (48, 20, TRUE, FALSE, TRUE, 180, 30, 149.99, 24, 1, 3, DEFAULT, NULL, 3, NULL, 'Service', 'Personal training session', 'Training', 'One-on-one session with certified trainer'),
+    (72, 10, TRUE, FALSE, TRUE, 300, 90, 199.99, 36, 1, 2, DEFAULT, NULL, 3, NULL, 'Service', 'Event planning service', 'Event Planning', 'Full-service planning and coordination'),
+    (24, 25, TRUE, FALSE, TRUE, 120, 30, 79.99, 12, 0, 1, DEFAULT, NULL, 2, NULL, 'Service', 'House cleaning service', 'Cleaning', 'Deep cleaning for apartments and houses');
+
+-- Pictures
+INSERT INTO pictures
+(id, solution_id, path)
 VALUES
-    (0, true, false, true, 500.00, 2, DEFAULT, 2, 'SERVICE', 'Professional photography for weddings, birthdays, and corporate events.', 'Event Photography'),
-    (20, true, false, true, 1500.00, 3, DEFAULT, 2, 'SERVICE', 'Full-service catering for events with customizable menus.', 'Catering Service'),
-    (10, true, false, true, 800.00, 2, DEFAULT, 2, 'SERVICE', 'Experienced DJ with a wide range of music genres for your event.', 'DJ Service');
+    (DEFAULT, NULL, 'event_organiser_profile_picture.png'),
+    (DEFAULT, NULL, 'solution_provider_profile_picture.png'),
+    (DEFAULT, 1, 'dumbbell.jpg'),
+    (DEFAULT, 2, 'office_chair.webp'),
+    (DEFAULT, 3, 'table_lamp.webp'),
+    (DEFAULT, 4, 'keyboard.webp'),
+    (DEFAULT, 5, 'photography.webp'),
+    (DEFAULT, 6, 'training.webp'),
+    (DEFAULT, 7, 'event_planning.webp'),
+    (DEFAULT, 8, 'cleaning.webp');
+
+-- Users Profile Pictures
+INSERT INTO public.users_profile_pictures(
+    picture_id, user_id)
+VALUES (1, 1);
+VALUES (2, 2);
