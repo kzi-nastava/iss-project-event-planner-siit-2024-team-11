@@ -20,8 +20,7 @@ public class BudgetItem {
     private Category category;
 
     @ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
-    @JoinTable(name = "Solutions", joinColumns = @JoinColumn(name = "solution_id", referencedColumnName = "id"))
-
+    @JoinTable(name = "ReservedItems", joinColumns = @JoinColumn(name = "budget_item_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "solution_id", referencedColumnName = "id"))
     private List<Solution> reservedItems;
 
     @Column(nullable = false)

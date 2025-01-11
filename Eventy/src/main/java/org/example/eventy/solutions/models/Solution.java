@@ -16,25 +16,37 @@ public abstract class Solution {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
+
     @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
     private Category category;
+
     private String description;
+
     private double price;
     private int discount;
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "solution_id", referencedColumnName = "id")
     private List<PicturePath> imageUrls;
+
     private boolean isVisible;
+
     private boolean isAvailable;
+
     private boolean isDeleted;
+
     @ManyToMany()
     @JoinTable(name = "SuggestedEventTypes", joinColumns = @JoinColumn(name = "solution_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "event_type_id", referencedColumnName = "id"))
     private List<EventType> eventTypes;
+
     @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "provider_id", referencedColumnName = "id", nullable = false)
     private SolutionProvider provider;
+
+    /////////////////////////////////////////////////
 
     public Solution() {
 
