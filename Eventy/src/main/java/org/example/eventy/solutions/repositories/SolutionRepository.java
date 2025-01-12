@@ -40,7 +40,8 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
            SELECT s
            FROM Solution s
            LEFT JOIN s.eventTypes et
-           WHERE (:search = '' OR s.name ILIKE ('%' || :search || '%'))
+           WHERE ((:search = '' OR s.name ILIKE ('%' || :search || '%')) OR 
+                  (:search IS NULL OR :search = '' OR s.description ILIKE ('%' || :search || '%')))
              AND (:type = 'Any' OR ((:type = 'Product' AND TYPE(s) = Product) OR ( :type = 'Service' AND TYPE(s) = Service)))
              AND (:categories IS NULL OR s.category.name IN :categories)
              AND (:eventTypes IS NULL OR EXISTS (
