@@ -1,11 +1,19 @@
+INSERT INTO role(id, name)
+VALUES
+    (1,'ROLE_Admin'),
+    (2, 'ROLE_AuthenticatedUser'),
+    (3, 'ROLE_Organizer'),
+    (4, 'ROLE_Provider');
+
 -- Users
 INSERT INTO users (
     id, user_type, email, password, address, phone_number, is_active, is_deactivated, enabled, has_silenced_notifications, suspension_deadline, role_id, last_password_reset_date, description, first_name, last_name, name
 )
 VALUES
-    (DEFAULT, 'Organizer', 'tac@gmail.com', 'tac', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 3, NOW(), 'Description', 'First Name', 'Last Name', 'Admin User'),
-    (DEFAULT, 'Provider', 'provider@gmail.com', 'tac', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), 'Description', 'Provider', 'Provideric', 'VIT DOO'),
-    (DEFAULT, 'Provider', 'provider2@gmail.com', 'tac', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), 'Description', 'Provider', 'Provideric', 'APPLE');
+    (DEFAULT, 'Organizer', 'tac@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 3, NOW(), NULL, 'Tac Tac', 'Jezickovic', NULL),
+    (DEFAULT, 'Provider', 'provider@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), 'Description', NULL, NULL, 'VIT DOO'),
+    (DEFAULT, 'Provider', 'provider2@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), 'Description', NULL, NULL, 'APPLE'),
+    (DEFAULT, 'Admin', 'veselin.roganovic.rogan003@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', 'Cara Dusana 72, Novi Sad', '+381 65 31 43 240', TRUE, FALSE, TRUE, FALSE, NULL, 1, NOW(), NULL, 'Veselin', 'Roganovic', NULL);
 
 -- Locations
 INSERT INTO locations(latitude, longitude, id, address, name)
@@ -72,5 +80,7 @@ VALUES
 -- Users Profile Pictures
 INSERT INTO public.users_profile_pictures(
     picture_id, user_id)
-VALUES (1, 1);
-VALUES (2, 2);
+VALUES (1, 1),
+       (2, 2),
+       (1, 3),
+       (1, 4);

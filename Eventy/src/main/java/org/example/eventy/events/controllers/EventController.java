@@ -99,7 +99,7 @@ public class EventController {
                 // SEND EMAIL INVITATIONS HERE, example:
                 emailService.sendInvitations(event, organizeEventDTO.getEmails());
             }
-            EventDTO eventDTO = new EventDTO();
+            EventDTO eventDTO = new EventDTO(event);
             // needs to be this ---> // EventDTO eventDTO = new EventDTO(event);
             // but there are right now errors while converting to DTO (getOrganizer().getId()... <=> null.getId()...)
             return new ResponseEntity<EventDTO>(eventDTO, HttpStatus.CREATED);
