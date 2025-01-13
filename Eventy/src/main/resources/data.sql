@@ -12,7 +12,7 @@ INSERT INTO users (
 VALUES
     (DEFAULT, 'Organizer', 'tac@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 3, NOW(), NULL, 'Tac Tac', 'Jezickovic', NULL),
     (DEFAULT, 'Provider', 'provider@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), 'Description', NULL, NULL, 'VIT DOO'),
-    (DEFAULT, 'Provider', 'provider2@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), 'Description', NULL, NULL, 'APPLE'),
+    (DEFAULT, 'Provider', 'provider2@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), 'Description', NULL, NULL, 'Lidl'),
     (DEFAULT, 'Admin', 'veselin.roganovic.rogan003@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', 'Cara Dusana 72, Novi Sad', '+381 65 31 43 240', TRUE, FALSE, TRUE, FALSE, NULL, 1, NOW(), NULL, 'Veselin', 'Roganovic', NULL);
 
 -- Locations
@@ -57,10 +57,10 @@ VALUES
     (NULL, 20, TRUE, FALSE, TRUE, NULL, NULL, 99.99, NULL, NULL, 1, DEFAULT, NULL, 3, NULL, 'Product', 'Gaming keyboard with RGB', 'Gaming Keyboard', NULL),
 
     -- Services
-    (72, 15, FALSE, FALSE, TRUE, 240, 60, 99.99, 48, 0, 2, DEFAULT, NULL, 3, NULL, 'Service', 'Wedding photography package', 'Photography', 'Includes editing and delivery in 2 weeks'),
-    (48, 20, TRUE, FALSE, TRUE, 180, 30, 149.99, 24, 1, 3, DEFAULT, NULL, 3, NULL, 'Service', 'Personal training session', 'Training', 'One-on-one session with certified trainer'),
-    (72, 10, TRUE, FALSE, TRUE, 300, 90, 199.99, 36, 1, 2, DEFAULT, NULL, 3, NULL, 'Service', 'Event planning service', 'Event Planning', 'Full-service planning and coordination'),
-    (24, 25, TRUE, FALSE, TRUE, 120, 30, 79.99, 12, 0, 1, DEFAULT, NULL, 2, NULL, 'Service', 'House cleaning service', 'Cleaning', 'Deep cleaning for apartments and houses');
+    (15, 15, FALSE, FALSE, TRUE, 240, 60, 99.99, 7, 0, 2, DEFAULT, NULL, 3, NULL, 'Service', 'Wedding photography package', 'Photography', 'Includes editing and delivery in 2 weeks'),
+    (12, 20, TRUE, FALSE, TRUE, 180, 30, 149.99, 7, 1, 3, DEFAULT, NULL, 3, NULL, 'Service', 'Personal training session', 'Training', 'One-on-one session with certified trainer'),
+    (7, 10, TRUE, FALSE, TRUE, 300, 90, 199.99, 14, 1, 2, DEFAULT, NULL, 3, NULL, 'Service', 'Event planning service', 'Event Planning', 'Full-service planning and coordination'),
+    (17, 25, TRUE, FALSE, TRUE, 120, 30, 79.99, 14, 0, 1, DEFAULT, NULL, 2, NULL, 'Service', 'House cleaning service', 'Cleaning', 'Deep cleaning for apartments and houses');
 
 -- Pictures
 INSERT INTO pictures
@@ -68,6 +68,8 @@ INSERT INTO pictures
 VALUES
     (DEFAULT, NULL, 'event_organiser_profile_picture.png'),
     (DEFAULT, NULL, 'solution_provider_profile_picture.png'),
+    (DEFAULT, NULL, 'admin.png'),
+    (DEFAULT, NULL, 'lidl.png'),
     (DEFAULT, 1, 'dumbbell.jpg'),
     (DEFAULT, 2, 'office_chair.webp'),
     (DEFAULT, 3, 'table_lamp.webp'),
@@ -82,5 +84,5 @@ INSERT INTO public.users_profile_pictures(
     picture_id, user_id)
 VALUES (1, 1),
        (2, 2),
-       (1, 3),
-       (1, 4);
+       (4, 3),
+       (3, 4);

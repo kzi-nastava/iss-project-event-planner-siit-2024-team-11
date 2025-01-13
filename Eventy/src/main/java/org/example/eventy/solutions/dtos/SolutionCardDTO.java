@@ -88,7 +88,7 @@ public class SolutionCardDTO {
         this.isAvailable = solution.isAvailable();
         this.providerId = solution.getProvider().getId();
         this.providerName = solution.getProvider().getName();
-        this.providerImageUrl = solution.getImageUrls().get(0).getPath();
+        this.providerImageUrl = solution.getProvider().getImageUrls().get(0).getPath();
     }
 
     public Long getSolutionId() {
