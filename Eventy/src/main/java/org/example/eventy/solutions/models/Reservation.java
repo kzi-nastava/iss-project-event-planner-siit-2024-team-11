@@ -4,13 +4,11 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import org.example.eventy.events.models.Event;
-import org.example.eventy.solutions.validation.annotation.ValidReservation;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Reservations")
-@ValidReservation // trigger the custom validation
 public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
