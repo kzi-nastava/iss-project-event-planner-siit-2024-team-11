@@ -45,15 +45,15 @@ public class ReservationValidator implements ConstraintValidator<ValidReservatio
             return false;
         }
 
+        Service selectedService = (Service) serviceService.getService(reservationDTO.getSelectedServiceId());
+
         // 3. Check if the selected service is available
-        if (!serviceService.getService(reservationDTO.getSelectedServiceId()).isAvailable()) {
+        if (!selectedService.isAvailable()) {
             context.buildConstraintViolationWithTemplate("Selected service is not available")
                     .addPropertyNode("selectedServiceId")
                     .addConstraintViolation();
             return false;
         }
-
-        Service selectedService = (Service) serviceService.getService(reservationDTO.getSelectedServiceId());
 
         // 4. Check if the reservation start time is in the future
         if (reservationDTO.getReservationStartDateTime().isBefore(LocalDateTime.now().plusDays(selectedService.getReservationDeadline()))) {

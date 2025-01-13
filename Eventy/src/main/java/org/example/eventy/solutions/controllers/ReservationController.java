@@ -29,7 +29,7 @@ public class ReservationController {
     // GET "/api/reservations/5"
     @GetMapping(value = "/{reservationId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ReservationDTO> getReservation(@PathVariable Long reservationId) {
-        Reservation reservation= reservationService.getReservation(reservationId);
+        Reservation reservation = reservationService.getReservation(reservationId);
 
         if (reservation != null) {
             ReservationDTO reservationDTO = new ReservationDTO(reservation);
