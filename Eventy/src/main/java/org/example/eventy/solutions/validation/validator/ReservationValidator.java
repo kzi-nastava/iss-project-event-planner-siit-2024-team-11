@@ -31,7 +31,7 @@ public class ReservationValidator implements ConstraintValidator<ValidReservatio
     public boolean isValid(ReservationDTO reservationDTO, ConstraintValidatorContext context) {
         // 1. Check if the selected event exists
         if (eventService.getEvent(reservationDTO.getSelectedEventId()) == null) {
-            context.buildConstraintViolationWithTemplate("Selected event does not exist")
+            context.buildConstraintViolationWithTemplate("Selected event does not exist.")
                     .addPropertyNode("selectedEventId")
                     .addConstraintViolation();
             return false;
@@ -39,7 +39,7 @@ public class ReservationValidator implements ConstraintValidator<ValidReservatio
 
         // 2. Check if the selected service exists
         if (serviceService.getService(reservationDTO.getSelectedServiceId()) == null) {
-            context.buildConstraintViolationWithTemplate("Selected service does not exist")
+            context.buildConstraintViolationWithTemplate("Selected service does not exist.")
                     .addPropertyNode("selectedServiceId")
                     .addConstraintViolation();
             return false;
@@ -49,7 +49,7 @@ public class ReservationValidator implements ConstraintValidator<ValidReservatio
 
         // 3. Check if the selected service is available
         if (!selectedService.isAvailable()) {
-            context.buildConstraintViolationWithTemplate("Selected service is not available")
+            context.buildConstraintViolationWithTemplate("Selected service is not available.")
                     .addPropertyNode("selectedServiceId")
                     .addConstraintViolation();
             return false;
@@ -57,7 +57,7 @@ public class ReservationValidator implements ConstraintValidator<ValidReservatio
 
         // 4. Check if the reservation start time is in the future
         if (reservationDTO.getReservationStartDateTime().isBefore(LocalDateTime.now().plusDays(selectedService.getReservationDeadline()))) {
-            context.buildConstraintViolationWithTemplate("It's too late to make a reservation")
+            context.buildConstraintViolationWithTemplate("It's too late to make a reservation.")
                     .addPropertyNode("reservationStartDateTime")
                     .addConstraintViolation();
             return false;
@@ -65,7 +65,7 @@ public class ReservationValidator implements ConstraintValidator<ValidReservatio
 
         // 5. Check if the reservation end time is after the start time
         if (reservationDTO.getReservationEndDateTime().isBefore(reservationDTO.getReservationStartDateTime())) {
-            context.buildConstraintViolationWithTemplate("Reservation end time must be after start time")
+            context.buildConstraintViolationWithTemplate("Reservation end time must be after start time.")
                     .addPropertyNode("reservationEndDateTime")
                     .addConstraintViolation();
             return false;
@@ -74,26 +74,29 @@ public class ReservationValidator implements ConstraintValidator<ValidReservatio
         // 6. Check if the duration is invalid
         Duration duration = Duration.between(reservationDTO.getReservationStartDateTime(), reservationDTO.getReservationEndDateTime());
         if (duration.toMinutes() < selectedService.getMinReservationTime() || duration.toMinutes() > selectedService.getMaxReservationTime()) {
-            String message = "Reservation duration must be between " + selectedService.getMinReservationTime() + " and " + selectedService.getMaxReservationTime() + " minutes";
+            String message = "Reservation duration must be between " + selectedService.getMinReservationTime() + " and " + selectedService.getMaxReservationTime() + " minutes.";
             context.buildConstraintViolationWithTemplate(message)
-                    .addConstraintViolation();
-            return false;
-        }
-
-        // 7. Check if the reservation falls within the Event's date range
-        Event selectedEvent = eventService.getEvent(reservationDTO.getSelectedEventId());
-        if (reservationDTO.getReservationStartDateTime().toLocalDate().isEqual(selectedEvent.getDate().toLocalDate()) ||
-            reservationDTO.getReservationEndDateTime().toLocalDate().isEqual(selectedEvent.getDate().toLocalDate())) {
-            context.buildConstraintViolationWithTemplate("Reservation time must be within the event's date range")
                     .addPropertyNode("reservationStartDateTime")
                     .addConstraintViolation();
             return false;
         }
 
+        /* need to check the agenda for this
+        // 7. Check if the reservation falls within the Event's date range
+        Event selectedEvent = eventService.getEvent(reservationDTO.getSelectedEventId());
+        if (reservationDTO.getReservationStartDateTime().toLocalDate().isEqual(selectedEvent.getDate().toLocalDate()) ||
+            reservationDTO.getReservationEndDateTime().toLocalDate().isEqual(selectedEvent.getDate().toLocalDate())) {
+            context.buildConstraintViolationWithTemplate("Reservation time must be within the event's date range.")
+                    .addPropertyNode("reservationStartDateTime")
+                    .addConstraintViolation();
+            return false;
+        }
+        */
+
         // 8. Check if the reservation overlaps with any existing reservations
         List<Reservation> overlappingReservations = reservationService.findOverlappingReservations(reservationDTO);
         if (!overlappingReservations.isEmpty()) {
-            context.buildConstraintViolationWithTemplate("The selected time overlaps with an existing reservation")
+            context.buildConstraintViolationWithTemplate("The selected time overlaps with an existing reservation.")
                     .addPropertyNode("reservationStartDateTime")
                     .addConstraintViolation();
             return false;
@@ -103,7 +106,7 @@ public class ReservationValidator implements ConstraintValidator<ValidReservatio
         if (selectedService.getMinReservationTime().intValue() == selectedService.getMaxReservationTime().intValue()) {
             LocalDateTime calculatedEndTime = reservationDTO.getReservationStartDateTime().plusMinutes(selectedService.getMaxReservationTime());
             if (!reservationDTO.getReservationEndDateTime().equals(calculatedEndTime)) {
-                context.buildConstraintViolationWithTemplate("End time does not match the calculated duration of the service")
+                context.buildConstraintViolationWithTemplate("End time does not match the calculated duration of the service.")
                         .addPropertyNode("reservationEndDateTime")
                         .addConstraintViolation();
                 return false;

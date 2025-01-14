@@ -34,6 +34,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    List<Reservation> findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfter(
-            LocalDateTime end, LocalDateTime start);
+    List<Reservation> findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService(
+            LocalDateTime end, LocalDateTime start, Solution selectedService);
 }

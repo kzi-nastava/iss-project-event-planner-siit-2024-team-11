@@ -59,9 +59,9 @@ public class ReservationService {
     public List<Reservation> findOverlappingReservations(ReservationDTO newReservation) {
         LocalDateTime start = newReservation.getReservationStartDateTime();
         LocalDateTime end = newReservation.getReservationEndDateTime();
-
-        return reservationRepository.findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfter(
-                end, start);
+        Solution selectedService = serviceService.getService(newReservation.getSelectedServiceId());
+        return reservationRepository.findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService(
+                end, start, selectedService);
     }
 
     public Reservation saveReservation(Reservation reservation) {
