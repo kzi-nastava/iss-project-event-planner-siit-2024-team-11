@@ -28,10 +28,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/authentication")
@@ -249,7 +251,15 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/fast-registration", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<String> fastRegister(@Valid @RequestBody FastRegistrationDTO fastRegistrationDTO) {
+    public ResponseEntity<String> fastRegister(@Valid @RequestBody FastRegistrationDTO fastRegistrationDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // if there are validation errors, we return a 400 Bad Request response
+            List<String> errorMessages = bindingResult.getFieldErrors().stream()
+                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                    .collect(Collectors.toList());
+            return new ResponseEntity(errorMessages, HttpStatus.BAD_REQUEST);
+        }
+
         try {
             String email = EncryptionUtil.decrypt(fastRegistrationDTO.getEncryptedEmail());
 
@@ -309,7 +319,15 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/upgrade-profile", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<String> upgradeProfile(@Valid @RequestBody UpgradeProfileDTO upgradeProfileDTO) {
+    public ResponseEntity<String> upgradeProfile(@Valid @RequestBody UpgradeProfileDTO upgradeProfileDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // if there are validation errors, we return a 400 Bad Request response
+            List<String> errorMessages = bindingResult.getFieldErrors().stream()
+                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                    .collect(Collectors.toList());
+            return new ResponseEntity(errorMessages, HttpStatus.BAD_REQUEST);
+        }
+
         try {
             User currentUser = userService.getUserByEmail(upgradeProfileDTO.getEmail());
             User newUser;

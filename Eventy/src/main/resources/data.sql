@@ -1,6 +1,6 @@
 INSERT INTO role(id, name)
 VALUES
-    (1,'ROLE_Admin'),
+    (1, 'ROLE_Admin'),
     (2, 'ROLE_AuthenticatedUser'),
     (3, 'ROLE_Organizer'),
     (4, 'ROLE_Provider');
@@ -13,7 +13,9 @@ VALUES
     (DEFAULT, 'Organizer', 'tac@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 3, NOW(), NULL, 'Tac Tac', 'Jezickovic', NULL),
     (DEFAULT, 'Provider', 'provider@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), 'Description', NULL, NULL, 'VIT DOO'),
     (DEFAULT, 'Provider', 'provider2@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), 'Description', NULL, NULL, 'Lidl'),
-    (DEFAULT, 'Admin', 'veselin.roganovic.rogan003@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', 'Cara Dusana 72, Novi Sad', '+381 65 31 43 240', TRUE, FALSE, TRUE, FALSE, NULL, 1, NOW(), NULL, 'Veselin', 'Roganovic', NULL);
+    (DEFAULT, 'Admin', 'veselin.roganovic.rogan003@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', 'Cara Dusana 72, Novi Sad', '+381 65 31 43 240', TRUE, FALSE, TRUE, FALSE, NULL, 1, NOW(), NULL, 'Veselin', 'Roganovic', NULL),
+    (DEFAULT, 'AuthenticatedUser', 'auth@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 2, NOW(), NULL, NULL, NULL, NULL),
+    (DEFAULT, 'AuthenticatedUser', 'c.tamara333@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 2, NOW(), NULL, NULL, NULL, NULL);
 
 -- Locations
 INSERT INTO locations(latitude, longitude, id, address, name)
@@ -85,4 +87,5 @@ INSERT INTO public.users_profile_pictures(
 VALUES (1, 1),
        (2, 2),
        (4, 3),
-       (3, 4);
+       (3, 4),
+       (3, 5);

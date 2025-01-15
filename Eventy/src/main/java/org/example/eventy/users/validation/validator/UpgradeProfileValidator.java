@@ -16,15 +16,24 @@ public class UpgradeProfileValidator implements ConstraintValidator<ValidUpgrade
 
     @Override
     public boolean isValid(UpgradeProfileDTO upgradeProfileDTO, ConstraintValidatorContext context) {
-        // 1. Check email
+        // 1. Check user
         if (userService.getUserByEmail(upgradeProfileDTO.getEmail()) == null) {
-            context.buildConstraintViolationWithTemplate("An user with this email doesn't exists")
+            context.buildConstraintViolationWithTemplate("An user with this email doesn't exists.")
+                    .addPropertyNode("email")
+                    .addConstraintViolation();
+            return false;
+        }
+
+        String role = userService.getUserByEmail(upgradeProfileDTO.getEmail()).getRole().getName();
+        if (!role.equals("ROLE_AuthenticatedUser")) {
+            context.buildConstraintViolationWithTemplate("This account is already upgraded.")
+                    .addPropertyNode("accountType")
                     .addConstraintViolation();
             return false;
         }
 
         // 2. Check account type
-        if (!upgradeProfileDTO.getAccountType().equals("EVENT ORGANIZER") || !upgradeProfileDTO.getAccountType().equals("SOLUTIONS PROVIDER")) {
+        if (!(upgradeProfileDTO.getAccountType().equals("EVENT ORGANIZER") || upgradeProfileDTO.getAccountType().equals("SOLUTIONS PROVIDER"))) {
             context.buildConstraintViolationWithTemplate("Account type is not valid.")
                     .addPropertyNode("accountType")
                     .addConstraintViolation();
@@ -40,25 +49,9 @@ public class UpgradeProfileValidator implements ConstraintValidator<ValidUpgrade
                 return false;
             }
 
-                // first name only letters
-            if (!upgradeProfileDTO.getFirstName().matches("^[a-zA-Z]+$")) {
-                context.buildConstraintViolationWithTemplate("First name must contain only letters.")
-                        .addPropertyNode("firstName")
-                        .addConstraintViolation();
-                return false;
-            }
-
             // 3.2 Check last name
             if (upgradeProfileDTO.getLastName() == null) {
                 context.buildConstraintViolationWithTemplate("Last name cannot be empty.")
-                        .addPropertyNode("lastName")
-                        .addConstraintViolation();
-                return false;
-            }
-
-                // last name only letters
-            if (!upgradeProfileDTO.getLastName().matches("^[a-zA-Z]+$")) {
-                context.buildConstraintViolationWithTemplate("Last name must contain only letters.")
                         .addPropertyNode("lastName")
                         .addConstraintViolation();
                 return false;
@@ -73,25 +66,9 @@ public class UpgradeProfileValidator implements ConstraintValidator<ValidUpgrade
                 return false;
             }
 
-                // company name only letters
-            if (!upgradeProfileDTO.getCompanyName().matches("^[a-zA-Z]+$")) {
-                context.buildConstraintViolationWithTemplate("Company name must contain only letters.")
-                        .addPropertyNode("companyName")
-                        .addConstraintViolation();
-                return false;
-            }
-
             // 3.2 Check description
             if (upgradeProfileDTO.getDescription() == null) {
                 context.buildConstraintViolationWithTemplate("Description cannot be empty.")
-                        .addPropertyNode("description")
-                        .addConstraintViolation();
-                return false;
-            }
-
-                // description only letters
-            if (!upgradeProfileDTO.getDescription().matches("^[a-zA-Z]+$")) {
-                context.buildConstraintViolationWithTemplate("Description must contain only letters.")
                         .addPropertyNode("description")
                         .addConstraintViolation();
                 return false;
