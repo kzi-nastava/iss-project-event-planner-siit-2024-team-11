@@ -76,14 +76,6 @@ public class FastRegistrationValidator implements ConstraintValidator<ValidFastR
         }
 
         // 4. Check if phone number is good
-        if (!fastRegistrationDTO.getPhoneNumber().matches("\\d+")) {
-            context.buildConstraintViolationWithTemplate("Phone number must contain only digits.")
-                    .addPropertyNode("phoneNumber")
-                    .addConstraintViolation();
-            return false;
-        }
-
-            // phone already in use
         if (userService.getUserByPhoneNumber(fastRegistrationDTO.getPhoneNumber()) != null) {
             context.buildConstraintViolationWithTemplate("Phone number is already taken.")
                     .addPropertyNode("phoneNumber")

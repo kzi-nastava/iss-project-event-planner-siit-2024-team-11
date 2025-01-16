@@ -304,18 +304,6 @@ public class AuthenticationController {
         }
     }
 
-    @GetMapping(value = "/fast-registration/{encryptedData}", produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<String> decryptEmail(@PathVariable String encryptedData) {
-        try {
-            String decryptedEmail = EncryptionUtil.decrypt(encryptedData);
-            return ResponseEntity.ok(decryptedEmail);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Decryption failed: " + e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
-        }
-    }
-
     private void acceptPendingInvitations(User user) {
         List<Event> acceptedEvents = user.getAcceptedEvents();
         List<Invitation> invitations = invitationService.getPendingInvitationsByGuestEmail(user.getEmail());
@@ -327,6 +315,18 @@ public class AuthenticationController {
         if (!invitations.isEmpty()) {
             user.setAcceptedEvents(acceptedEvents);
             userService.save(user, false);
+        }
+    }
+
+    @GetMapping(value = "/fast-registration/{encryptedData}", produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<String> decryptEmail(@PathVariable String encryptedData) {
+        try {
+            String decryptedEmail = EncryptionUtil.decrypt(encryptedData);
+            return ResponseEntity.ok(decryptedEmail);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Decryption failed: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
         }
     }
 
@@ -344,72 +344,81 @@ public class AuthenticationController {
             User currentUser = userService.getUserByEmail(upgradeProfileDTO.getEmail());
             User newUser;
 
+            // Upgrate to EVENT ORGANIZER
             if (upgradeProfileDTO.getAccountType().equals("EVENT ORGANIZER")) {
-                EventOrganizer newEventOrganizer = new EventOrganizer();
-                newEventOrganizer.setId(currentUser.getId());
                 List<PicturePath> images = pictureService.save(upgradeProfileDTO.getProfilePictures());
                 if (images == null) {
                     return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
                 }
-                newEventOrganizer.setImageUrls(images);
-                newEventOrganizer.setEmail(upgradeProfileDTO.getEmail());
-                newEventOrganizer.setPassword(currentUser.getPassword());
-                newEventOrganizer.setAddress(currentUser.getAddress());
-                newEventOrganizer.setPhoneNumber(currentUser.getPhoneNumber());
-                newEventOrganizer.setActive(false);
-                newEventOrganizer.setDeactivated(false);
-                newEventOrganizer.setEnabled(false);
-                newEventOrganizer.setHasSilencedNotifications(currentUser.isHasSilencedNotifications());
-                newEventOrganizer.setRole(roleRepository.findByName("ROLE_Organizer"));
-                newEventOrganizer.setFirstName(upgradeProfileDTO.getFirstName());
-                newEventOrganizer.setLastName(upgradeProfileDTO.getLastName());
+                currentUser.setActive(false);
+                currentUser.setDeactivated(false);
+                currentUser.setEnabled(false);
+                currentUser.setRole(roleRepository.findByName("ROLE_Organizer"));
 
-                userService.deletePhysicallyById(currentUser.getId());
-                if (userService.get(currentUser.getId()) != null) {
+                try {
+                    currentUser = userService.save(currentUser, false);
+                    if (currentUser == null) {
+                        return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+                    }
+
+                    String firstName = upgradeProfileDTO.getFirstName();
+                    String lastName = upgradeProfileDTO.getLastName();
+                    String userType = "Organizer";
+
+                    currentUser = userService.upgradeUserToOrganizer(currentUser.getId(), firstName, lastName, userType);
+                    if (currentUser ==  null) {
+                        currentUser = userService.getUserByEmail(upgradeProfileDTO.getEmail());
+                        currentUser.setActive(true);  // return the previous stats of user
+                        currentUser.setDeactivated(false);
+                        currentUser.setEnabled(true);
+                        currentUser.setRole(roleRepository.findByName("ROLE_AuthenticatedUser"));
+
+                        userService.save(currentUser , false);
+                        return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+                    }
+                } catch (Exception e) {
                     return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
                 }
 
-                newEventOrganizer = (EventOrganizer) userService.save(newEventOrganizer, true);
-                if (newEventOrganizer == null) {
-                    // restore the deleted user
-                    userService.save(currentUser, false);
-                    return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
-                }
+                newUser = (User) currentUser;
 
-                newUser = (User) newEventOrganizer;
+            // Upgrate to SOLUTIONS PROVIDER
             } else {
-                SolutionProvider newSolutionProvider = new SolutionProvider();
-                newSolutionProvider.setId(currentUser.getId());
                 List<PicturePath> images = pictureService.save(upgradeProfileDTO.getProfilePictures());
                 if (images == null) {
                     return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
                 }
-                newSolutionProvider.setImageUrls(images);
-                newSolutionProvider.setEmail(upgradeProfileDTO.getEmail());
-                newSolutionProvider.setPassword(currentUser.getPassword());
-                newSolutionProvider.setAddress(currentUser.getAddress());
-                newSolutionProvider.setPhoneNumber(currentUser.getPhoneNumber());
-                newSolutionProvider.setActive(false);
-                newSolutionProvider.setDeactivated(false);
-                newSolutionProvider.setEnabled(false);
-                newSolutionProvider.setHasSilencedNotifications(currentUser.isHasSilencedNotifications());
-                newSolutionProvider.setRole(roleRepository.findByName("ROLE_Provider"));
-                newSolutionProvider.setDescription(upgradeProfileDTO.getDescription());
-                newSolutionProvider.setName(upgradeProfileDTO.getCompanyName());
+                currentUser.setActive(false);
+                currentUser.setDeactivated(false);
+                currentUser.setEnabled(false);
+                currentUser.setRole(roleRepository.findByName("ROLE_Provider"));
 
-                userService.deletePhysicallyById(currentUser.getId());
-                if (userService.get(currentUser.getId()) != null) {
+                try {
+                    currentUser = userService.save(currentUser, false);
+                    if (currentUser == null) {
+                        return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+                    }
+
+                    String name = upgradeProfileDTO.getCompanyName();
+                    String description = upgradeProfileDTO.getDescription();
+                    String userType = "Provider";
+
+                    currentUser = userService.upgradeUserToProvider(currentUser.getId(), name, description, userType);
+                    if (currentUser ==  null) {
+                        currentUser = userService.getUserByEmail(upgradeProfileDTO.getEmail());
+                        currentUser.setActive(true); // return the previous stats of user
+                        currentUser.setDeactivated(false);
+                        currentUser.setEnabled(true);
+                        currentUser.setRole(roleRepository.findByName("ROLE_AuthenticatedUser"));
+
+                        userService.save(currentUser , false);
+                        return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+                    }
+                } catch (Exception e) {
                     return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
                 }
 
-                newSolutionProvider = (SolutionProvider) userService.save(newSolutionProvider, true);
-                if (newSolutionProvider == null) {
-                    // restore the deleted user
-                    userService.save(currentUser, false);
-                    return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
-                }
-
-                newUser = (User) newSolutionProvider;
+                newUser = (User) currentUser;
             }
 
             RegistrationRequest registrationRequest = registrationRequestService.create(newUser);

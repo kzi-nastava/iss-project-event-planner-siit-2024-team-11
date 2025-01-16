@@ -22,7 +22,6 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 

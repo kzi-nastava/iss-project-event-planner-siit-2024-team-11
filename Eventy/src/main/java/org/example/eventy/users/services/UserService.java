@@ -11,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class UserService {
     @Autowired
     private UserRepository userRepository;
@@ -70,5 +72,19 @@ public class UserService {
         }
 
         return UserType.AUTHENTICATED;
+    }
+
+    public User upgradeUserToOrganizer(Long userId, String firstName, String lastName, String userType) {
+        userRepository.upgradeUserToOrganizer(userId, firstName, lastName, userType);
+        User upgradedUser = get(userId);
+
+        return save(upgradedUser, false);
+    }
+
+    public User upgradeUserToProvider(Long userId, String name, String description, String userType) {
+        userRepository.upgradeUserToProvider(userId, name, description, userType);
+        User upgradedUser = get(userId);
+
+        return save(upgradedUser, false);
     }
 }
