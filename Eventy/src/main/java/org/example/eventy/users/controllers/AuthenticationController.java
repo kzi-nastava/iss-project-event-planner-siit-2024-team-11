@@ -19,6 +19,7 @@ import org.example.eventy.users.services.UserService;
 import org.example.eventy.util.NetworkUtils;
 import org.example.eventy.util.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpHeaders;
 import java.net.URI;
 import org.springframework.http.HttpStatus;
@@ -288,19 +289,30 @@ public class AuthenticationController {
             try {
                 String url = "http://" + NetworkUtils.getLocalIpAddress() +":8080/api/authentication/confirm-registration-routing/";
                 emailService.sendEmail(
-                        newAuthenticatedUser.getEmail(),
-                        "Confirm registration",
-                        "Click on this link to confirm registration (the link is valid in the next 24h): " +
-                                "<a href=\"" + url + registrationRequest.getId() + "\">Activate account</a>"
+                    newAuthenticatedUser.getEmail(),
+                    "Confirm registration",
+                    "Click on this link to confirm registration (the link is valid in the next 24h): " +
+                            "<a href=\"" + url + registrationRequest.getId() + "\">Activate account</a>"
                 );
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 return new ResponseEntity<String>("Sending email failed!", HttpStatus.BAD_REQUEST);
             }
 
             return new ResponseEntity<String>("Confirmation email sent to the email address!", HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping(value = "/fast-registration/{encryptedData}", produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<String> decryptEmail(@PathVariable String encryptedData) {
+        try {
+            String decryptedEmail = EncryptionUtil.decrypt(encryptedData);
+            return ResponseEntity.ok(decryptedEmail);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Decryption failed: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
         }
     }
 
@@ -408,13 +420,12 @@ public class AuthenticationController {
             try {
                 String url = "http://" + NetworkUtils.getLocalIpAddress() +":8080/api/authentication/confirm-registration-routing/";
                 emailService.sendEmail(
-                        newUser.getEmail(),
-                        "Confirm upgrade",
-                        "Click on this link to confirm upgrade (the link is valid in the next 24h): " +
-                                "<a href=\"" + url + registrationRequest.getId() + "\">Activate account</a>"
+                    newUser.getEmail(),
+                    "Confirm upgrade",
+                    "Click on this link to confirm upgrade (the link is valid in the next 24h): " +
+                            "<a href=\"" + url + registrationRequest.getId() + "\">Activate account</a>"
                 );
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 return new ResponseEntity<String>("Sending email failed!", HttpStatus.BAD_REQUEST);
             }
 
