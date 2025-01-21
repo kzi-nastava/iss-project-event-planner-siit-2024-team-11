@@ -69,4 +69,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("SELECT e FROM Event e ORDER BY e.id DESC")
     ArrayList<Event> findFeaturedEvents(Pageable pageable);
+
+    @Query("SELECT DISTINCT et.name FROM EventType et JOIN Event e ON et.id = e.type.id ORDER BY et.name ASC")
+    ArrayList<String> findAllUniqueEventTypeNamesForEvents();
+
+    @Query("SELECT DISTINCT l.name FROM Location l JOIN Event e ON l.id = e.location.id ORDER BY l.name ASC")
+    ArrayList<String> findAllUniqueLocationNamesForEvents();
 }

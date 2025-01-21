@@ -15,7 +15,6 @@ import java.util.List;
 
 @Service
 public class EventService {
-
     @Autowired
     private EventRepository eventRepository;
 
@@ -64,5 +63,13 @@ public class EventService {
 
     public List<Event> getAttendingEventsByUserBetween(Long userId, LocalDate startDate, LocalDate endDate) {
         return eventRepository.findAttendingEventsByUserBetween(userId, startDate, endDate);
+    }
+
+    public ArrayList<String> getAllUniqueEventTypesForEvents() {
+        return eventRepository.findAllUniqueEventTypeNamesForEvents();
+    }
+
+    public ArrayList<String> getAllUniqueLocationsForEvents() {
+        return eventRepository.findAllUniqueLocationNamesForEvents();
     }
 }
