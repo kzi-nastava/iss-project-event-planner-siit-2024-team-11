@@ -1,6 +1,5 @@
 package org.example.eventy.solutions.controllers;
 
-import org.example.eventy.common.models.PagedResponse;
 import org.example.eventy.events.dtos.EventTypeDTO;
 import org.example.eventy.solutions.dtos.CreateProductDTO;
 import org.example.eventy.solutions.dtos.ProductDTO;
@@ -9,8 +8,6 @@ import org.example.eventy.solutions.dtos.SolutionCardDTO;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,26 +23,6 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
-
-    /* this returns SolutionCardDTOs, because there is NO CASE where:
-       1) we need ALL products
-       2) they are NOT in card shapes (they always will be if we are getting all products)
-       also SolutionCardDTO == ProductCardDTO == ServiceCardDTO (only a few of fields will be null) */
-    // GET "/api/products"
-    // ***NOTE: this should be named getProducts PROBABLY, but we already have one method below named like that
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PagedResponse<SolutionCardDTO>> getProducts(Pageable pageable) {
-        Page<Solution> products = productService.getProducts(pageable);
-
-        ArrayList<SolutionCardDTO> productsDTO = new ArrayList<>();
-        for (Solution product : products) {
-            productsDTO.add(new SolutionCardDTO(product));
-        }
-        long count = products.getTotalElements();
-
-        PagedResponse<SolutionCardDTO> response = new PagedResponse<>(productsDTO, (int) Math.ceil((double) count / pageable.getPageSize()), count);
-        return new ResponseEntity<PagedResponse<SolutionCardDTO>>(response, HttpStatus.OK);
-    }
 
     // GET "/api/products/cards/5"
     @GetMapping(value = "/cards/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)

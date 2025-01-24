@@ -1,7 +1,6 @@
 package org.example.eventy.solutions.controllers;
 
 import org.example.eventy.common.models.PagedResponse;
-import org.example.eventy.events.dtos.EventCardDTO;
 import org.example.eventy.solutions.dtos.PriceListDTO;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
 import org.example.eventy.solutions.models.Solution;
@@ -75,15 +74,32 @@ public class SolutionController {
             @RequestParam(required = false, defaultValue = "true") Boolean isAvailable,
             Pageable pageable) {
         // Pageable - page, size, sort
-        // sort by: "category", "name", "price,asc", "price,desc", "date,asc", "date,desc", "duration,asc", "duration,desc"
+        // sort by: "category", "name", "price,asc", "price,desc"
         if (startDate == null) {
             startDate = LocalDateTime.of(1970, 1, 1, 0, 0); // Very small date
         }
         if (endDate == null) {
             endDate = LocalDateTime.of(2099, 12, 31, 23, 59); // Very large date
         }
+
+        StringBuilder eventTypesConcatenated = new StringBuilder();
+        if (eventTypes != null && !eventTypes.isEmpty()) {
+            for (String et : eventTypes) {
+                eventTypesConcatenated.append(et).append(",");
+            }
+            eventTypesConcatenated.deleteCharAt(eventTypesConcatenated.length() - 1);
+        }
+
+        StringBuilder categories2 = new StringBuilder();
+        if (categories != null) {
+            for (String c : categories) {
+                categories2.append(c).append(",");
+            }
+            categories2.deleteCharAt(categories2.length() - 1);
+        }
+
         Page<Solution> solutions = solutionService.getSolutions(
-            search, type, categories, eventTypes, company, minPrice, maxPrice, startDate, endDate, isAvailable, pageable);
+            search, type, categories2.toString(), eventTypesConcatenated.toString(), company, minPrice, maxPrice, startDate, endDate, isAvailable, pageable);
 
         List<SolutionCardDTO> solutionCardsDTO = new ArrayList<>();
         for (Solution solution : solutions) {
@@ -145,5 +161,23 @@ public class SolutionController {
             return new ResponseEntity<>(HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    @GetMapping(value = "/event-types", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<String>> getAllUniqueEventTypesForSolutions() {
+        ArrayList<String> eventTypeNames = solutionService.getAllUniqueEventTypesForSolutions();
+        return new ResponseEntity<Collection<String>>(eventTypeNames, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/categories", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<String>> getAllUniqueCategoriesForSolutions() {
+        ArrayList<String> categoryNames = solutionService.getAllUniqueCategoriesForSolutions();
+        return new ResponseEntity<Collection<String>>(categoryNames, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/companies", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<String>> getAllUniqueCompaniesForSolutions() {
+        ArrayList<String> companyNames = solutionService.getAllUniqueCompaniesForSolutions();
+        return new ResponseEntity<Collection<String>>(companyNames, HttpStatus.OK);
     }
 }

@@ -1,20 +1,16 @@
 package org.example.eventy.solutions.controllers;
 
-import org.example.eventy.common.models.PagedResponse;
 import org.example.eventy.solutions.dtos.services.*;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.services.ServiceService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
-import java.util.ArrayList;
 
 @RestController
 @RequestMapping("api/services")
@@ -67,25 +63,6 @@ public class ServiceController {
     public ResponseEntity<?> deleteService(@PathVariable("id") long id) {
         serviceService.deleteService(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    /* this returns SolutionCardDTOs, because there is NO CASE where:
-       1) we need ALL services
-       2) they are NOT in card shapes (they always will be if we are getting all services)
-       also SolutionCardDTO == ProductCardDTO == ServiceCardDTO (only a few of fields will be null) */
-    // GET "/api/services"
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PagedResponse<SolutionCardDTO>> getServices(Pageable pageable) {
-        Page<Solution> services = serviceService.getServices(pageable);
-
-        ArrayList<SolutionCardDTO> servicesDTO = new ArrayList<>();
-        for (Solution service : services) {
-            servicesDTO.add(new SolutionCardDTO(service));
-        }
-        long count = services.getTotalElements();
-
-        PagedResponse<SolutionCardDTO> response = new PagedResponse<>(servicesDTO, (int) Math.ceil((double) count / pageable.getPageSize()), count);
-        return new ResponseEntity<PagedResponse<SolutionCardDTO>>(response, HttpStatus.OK);
     }
 
     // GET "/api/services/cards/5"
