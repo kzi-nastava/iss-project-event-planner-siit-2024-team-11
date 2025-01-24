@@ -3,6 +3,7 @@ package org.example.eventy.common.services;
 import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.common.repositories.PictureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -50,9 +51,9 @@ public class PictureService {
     }
 
     public static String getImage(String path) {
-        File file = new File(path); // read from where?
-
         try {
+            File file = new ClassPathResource("static/" + path).getFile();
+
             return "data:image/jpeg;base64," + Arrays.toString(Files.readAllBytes(file.toPath()));
         }
         catch (IOException e) {
@@ -73,8 +74,6 @@ public class PictureService {
         //Čitanje sadržaja fajla i njegovo kopiranje datu fajl putanju
         try (InputStream inputStream = multipartFile.getInputStream()) {
             Path filePath = uploadPath.resolve(lastPathNumber + ".jpg"); //puna putanja na kojoj treba da se sačuva fajl
-
-            System.out.println("FilePath je:" + uploadPath.toAbsolutePath());
 
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
             lastPathNumber++;
