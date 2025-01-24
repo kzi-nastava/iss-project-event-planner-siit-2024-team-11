@@ -1,10 +1,12 @@
 package org.example.eventy.users.dtos;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 public class UpdateUserProfileDTO {
     private Long id;
-    private List<String> profilePictures;
+    private List<MultipartFile> profilePictures;
     private String email;
     private String oldPassword;
     private String password;
@@ -20,7 +22,7 @@ public class UpdateUserProfileDTO {
 
     }
 
-    public UpdateUserProfileDTO(Long id, List<String> profilePictures, String email, String oldPassword, String password, String confirmedPassword, String firstName, String lastName, String name, String description, String address, String phoneNumber) {
+    public UpdateUserProfileDTO(Long id, List<MultipartFile> profilePictures, String email, String oldPassword, String password, String confirmedPassword, String firstName, String lastName, String name, String description, String address, String phoneNumber) {
         this.id = id;
         this.profilePictures = profilePictures;
         this.email = email;
@@ -43,11 +45,11 @@ public class UpdateUserProfileDTO {
         this.id = id;
     }
 
-    public List<String> getProfilePictures() {
+    public List<MultipartFile> getProfilePictures() {
         return profilePictures;
     }
 
-    public void setProfilePictures(List<String> profilePictures) {
+    public void setProfilePictures(List<MultipartFile> profilePictures) {
         this.profilePictures = profilePictures;
     }
 

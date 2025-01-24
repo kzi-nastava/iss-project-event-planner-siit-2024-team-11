@@ -29,14 +29,14 @@ public class PictureService {
         lastPathNumber = pictureDir.list().length;
     }
 
-    public List<PicturePath> save(List<String> paths) {
+    public List<PicturePath> save(List<MultipartFile> images) {
         List<PicturePath> picturePaths = new ArrayList<>();
 
-        for(String path : paths) {
+        for(MultipartFile image : images) {
             try {
                 PicturePath picturePath = new PicturePath();
                 picturePath.setPath(lastPathNumber + ".jpg");
-                this.saveImage(path);
+                this.saveImage(image);
                 picturePath = pictureRepository.save(picturePath);
                 picturePaths.add(picturePath);
             }

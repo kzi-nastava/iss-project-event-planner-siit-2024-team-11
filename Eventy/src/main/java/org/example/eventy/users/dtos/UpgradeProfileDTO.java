@@ -2,6 +2,7 @@ package org.example.eventy.users.dtos;
 
 import jakarta.validation.constraints.NotNull;
 import org.example.eventy.users.validation.annotation.ValidUpgradeProfile;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -20,14 +21,14 @@ public class UpgradeProfileDTO {
     private String description;
 
     @NotNull(message = "Picture cannot be null")
-    private List<String> profilePictures;
+    private List<MultipartFile> profilePictures;
 
     /////////////////////////////////////
 
     public UpgradeProfileDTO() {
     }
 
-    public UpgradeProfileDTO(String email, String accountType, String firstName, String lastName, String companyName, String description, List<String> profilePictures) {
+    public UpgradeProfileDTO(String email, String accountType, String firstName, String lastName, String companyName, String description, List<MultipartFile> profilePictures) {
         this.email = email;
         this.accountType = accountType;
         this.firstName = firstName;
@@ -85,11 +86,11 @@ public class UpgradeProfileDTO {
         this.description = description;
     }
 
-    public List<String> getProfilePictures() {
+    public List<MultipartFile> getProfilePictures() {
         return profilePictures;
     }
 
-    public void setProfilePictures(List<String> profilePictures) {
+    public void setProfilePictures(List<MultipartFile> profilePictures) {
         this.profilePictures = profilePictures;
     }
 }
