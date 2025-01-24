@@ -45,7 +45,7 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
              AND (:type = 'Any' OR ((:type = 'Product' AND TYPE(s) = Product) OR ( :type = 'Service' AND TYPE(s) = Service)))
              AND (:categories IS NULL OR s.category.name IN :categories)
              AND (:eventTypes IS NULL OR EXISTS (
-               SELECT 1
+               SELECT 1git 
                FROM s.eventTypes et
                WHERE et.name IN :eventTypes
                AND SIZE(s.eventTypes) = :eventTypesSize
