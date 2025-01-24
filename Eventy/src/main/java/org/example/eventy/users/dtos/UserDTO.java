@@ -1,6 +1,7 @@
 package org.example.eventy.users.dtos;
 
 import org.example.eventy.common.models.PicturePath;
+import org.example.eventy.common.services.PictureService;
 import org.example.eventy.users.models.*;
 
 import java.util.List;
@@ -45,7 +46,7 @@ public class UserDTO {
             this.lastName = "No last name for authenticated user in UserDTO.java - Tamara";
         }
 
-        this.profilePictures = user.getImageUrls().stream().map(PicturePath::getPath).collect(Collectors.toList());
+        this.profilePictures = user.getImageUrls().stream().map(PicturePath::getPath).map(PictureService::getImage).collect(Collectors.toList());
     }
 
     public UserDTO(Long id, List<String> profilePictures, UserType userType, String email, String firstName, String lastName, String name, String description, String address, String phoneNumber) {

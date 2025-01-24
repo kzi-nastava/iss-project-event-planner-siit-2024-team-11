@@ -147,17 +147,6 @@ public class EventController {
         return new ResponseEntity<PagedResponse<EventCardDTO>>(response, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/accepted/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Collection<EventDTO>> getAcceptedEventsByUser(@PathVariable Long userId) {
-        if(userId == 5) {
-            List<EventDTO> events = new ArrayList<EventDTO>();
-            return new ResponseEntity<Collection<EventDTO>>(events, HttpStatus.OK);
-        }
-
-        return new ResponseEntity<Collection<EventDTO>>(HttpStatus.NOT_FOUND);
-    }
-
     /* this returns EventCardDTOs, because there is NO CASE where:
        1) we need ALL events
        2) they are NOT in card shapes (they always will be if we are getting all events) */

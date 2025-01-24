@@ -2,6 +2,7 @@ package org.example.eventy.solutions.dtos;
 
 import org.example.eventy.common.models.ReservationConfirmationType;
 import org.example.eventy.common.models.SolutionType;
+import org.example.eventy.common.services.PictureService;
 import org.example.eventy.events.models.EventType;
 import org.example.eventy.solutions.models.Product;
 import org.example.eventy.solutions.models.Service;
@@ -84,11 +85,11 @@ public class SolutionCardDTO {
         }
         this.price = solution.getPrice();
         this.discount = solution.getDiscount();
-        this.firstImageUrl = solution.getImageUrls().get(0).getPath();
+        this.firstImageUrl = PictureService.getImage(solution.getImageUrls().get(0).getPath());
         this.isAvailable = solution.isAvailable();
         this.providerId = solution.getProvider().getId();
         this.providerName = solution.getProvider().getName();
-        this.providerImageUrl = solution.getProvider().getImageUrls().get(0).getPath();
+        this.providerImageUrl = PictureService.getImage(solution.getProvider().getImageUrls().get(0).getPath());
     }
 
     public Long getSolutionId() {

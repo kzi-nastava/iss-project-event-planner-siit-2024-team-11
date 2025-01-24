@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -48,11 +49,11 @@ public class PictureService {
         return picturePaths;
     }
 
-    public byte[] getImage(String path) {
-        File file = new File(path);
+    public static String getImage(String path) {
+        File file = new File(path); // read from where?
 
         try {
-            return Files.readAllBytes(file.toPath());
+            return "data:image/jpeg;base64," + Arrays.toString(Files.readAllBytes(file.toPath()));
         }
         catch (IOException e) {
             return null;

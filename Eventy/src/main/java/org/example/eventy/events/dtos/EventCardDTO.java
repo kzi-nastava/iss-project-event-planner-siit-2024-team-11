@@ -1,5 +1,6 @@
 package org.example.eventy.events.dtos;
 
+import org.example.eventy.common.services.PictureService;
 import org.example.eventy.events.models.Event;
 
 import java.time.LocalDateTime;
@@ -32,7 +33,7 @@ public class EventCardDTO {
         this.startDate = event.getDate();
         this.organiserId = event.getOrganiser().getId();
         this.organiserName = event.getOrganiser().getFirstName() + " " + event.getOrganiser().getLastName();
-        this.organiserImage = event.getOrganiser().getImageUrls() != null ? event.getOrganiser().getImageUrls().get(0).getPath() : "none";
+        this.organiserImage = event.getOrganiser().getImageUrls() != null ? PictureService.getImage(event.getOrganiser().getImageUrls().get(0).getPath()) : "none";
     }
 
     public EventCardDTO(Long eventId, String name, String description, int maxNumberParticipants, boolean isOpen, String eventTypeName, String locationName, LocalDateTime startDate, LocalDateTime endDate, Long organiserId, String organiserName, String organiserImage) {
