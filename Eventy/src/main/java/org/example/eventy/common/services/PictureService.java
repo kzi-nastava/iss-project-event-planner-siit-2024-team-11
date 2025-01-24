@@ -5,17 +5,11 @@ import org.example.eventy.common.repositories.PictureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
@@ -32,14 +26,14 @@ public class PictureService {
         lastPathNumber = pictureDir.list().length;
     }
 
-    public List<PicturePath> save(List<MultipartFile> images) {
+    public List<PicturePath> save(List<String> base64Images) {
         List<PicturePath> picturePaths = new ArrayList<>();
 
-        for(MultipartFile image : images) {
+        for(String base64Image : base64Images) {
             try {
                 PicturePath picturePath = new PicturePath();
                 picturePath.setPath(lastPathNumber + ".jpg");
-                this.saveImage(image);
+                this.saveImage(base64Image);
                 picturePath = pictureRepository.save(picturePath);
                 picturePaths.add(picturePath);
             }
@@ -64,7 +58,7 @@ public class PictureService {
         }
     }
 
-    private void saveImage(MultipartFile multipartFile) throws IOException {
+    private void saveImage(String base64Image) throws IOException {
 
         //Kreiranje putanje direktorijuma
         Path uploadPath = Paths.get(uploadDir);
@@ -75,10 +69,22 @@ public class PictureService {
         }
 
         //Čitanje sadržaja fajla i njegovo kopiranje datu fajl putanju
-        try (InputStream inputStream = multipartFile.getInputStream()) {
-            Path filePath = uploadPath.resolve(lastPathNumber + ".jpg"); //puna putanja na kojoj treba da se sačuva fajl
+        try {
+            // Remove the "data:image/jpeg;base64," part if it exists
+            if (base64Image.contains("base64,")) {
+                base64Image = base64Image.split("base64,")[1];
+            }
 
-            Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+            // Decode the Base64 string into a byte array
+            byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+
+            // Define the file path where the image will be saved
+            Path filePath = uploadPath.resolve(lastPathNumber + ".jpg");
+
+            // Write the decoded bytes to the file
+            Files.write(filePath, imageBytes, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+
+            // Increment the path number for the next image
             lastPathNumber++;
         } catch (IOException ioe) {
             throw new IOException("Could not save image file: " + lastPathNumber + ".jpg", ioe);

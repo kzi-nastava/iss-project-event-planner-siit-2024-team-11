@@ -6,7 +6,7 @@ import java.util.List;
 
 public class UpdateUserProfileDTO {
     private Long id;
-    private List<MultipartFile> profilePictures;
+    private List<String> profilePictures;
     private String email;
     private String oldPassword;
     private String password;
@@ -22,7 +22,7 @@ public class UpdateUserProfileDTO {
 
     }
 
-    public UpdateUserProfileDTO(Long id, List<MultipartFile> profilePictures, String email, String oldPassword, String password, String confirmedPassword, String firstName, String lastName, String name, String description, String address, String phoneNumber) {
+    public UpdateUserProfileDTO(Long id, List<String> profilePictures, String email, String oldPassword, String password, String confirmedPassword, String firstName, String lastName, String name, String description, String address, String phoneNumber) {
         this.id = id;
         this.profilePictures = profilePictures;
         this.email = email;
@@ -45,11 +45,11 @@ public class UpdateUserProfileDTO {
         this.id = id;
     }
 
-    public List<MultipartFile> getProfilePictures() {
+    public List<String> getProfilePictures() {
         return profilePictures;
     }
 
-    public void setProfilePictures(List<MultipartFile> profilePictures) {
+    public void setProfilePictures(List<String> profilePictures) {
         this.profilePictures = profilePictures;
     }
 

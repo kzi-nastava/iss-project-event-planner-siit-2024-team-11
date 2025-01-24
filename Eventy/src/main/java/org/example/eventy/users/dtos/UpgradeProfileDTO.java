@@ -21,14 +21,14 @@ public class UpgradeProfileDTO {
     private String description;
 
     @NotNull(message = "Picture cannot be null")
-    private List<MultipartFile> profilePictures;
+    private List<String> profilePictures;
 
     /////////////////////////////////////
 
     public UpgradeProfileDTO() {
     }
 
-    public UpgradeProfileDTO(String email, String accountType, String firstName, String lastName, String companyName, String description, List<MultipartFile> profilePictures) {
+    public UpgradeProfileDTO(String email, String accountType, String firstName, String lastName, String companyName, String description, List<String> profilePictures) {
         this.email = email;
         this.accountType = accountType;
         this.firstName = firstName;
@@ -86,11 +86,11 @@ public class UpgradeProfileDTO {
         this.description = description;
     }
 
-    public List<MultipartFile> getProfilePictures() {
+    public List<String> getProfilePictures() {
         return profilePictures;
     }
 
-    public void setProfilePictures(List<MultipartFile> profilePictures) {
+    public void setProfilePictures(List<String> profilePictures) {
         this.profilePictures = profilePictures;
     }
 }

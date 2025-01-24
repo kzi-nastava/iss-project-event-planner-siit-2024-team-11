@@ -5,7 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public class RegistrationDTO {
-    private List<MultipartFile> profilePictures;
+    private List<String> profilePictures;
     private String email;
     private String password;
     private String confirmedPassword;
@@ -20,7 +20,7 @@ public class RegistrationDTO {
 
     }
 
-    public RegistrationDTO(List<MultipartFile> profilePictures, String email, String password, String confirmedPassword, String firstName, String lastName, String name, String description, String address, String phoneNumber) {
+    public RegistrationDTO(List<String> profilePictures, String email, String password, String confirmedPassword, String firstName, String lastName, String name, String description, String address, String phoneNumber) {
         this.profilePictures = profilePictures;
         this.email = email;
         this.password = password;
@@ -33,11 +33,11 @@ public class RegistrationDTO {
         this.phoneNumber = phoneNumber;
     }
 
-    public List<MultipartFile> getProfilePictures() {
+    public List<String> getProfilePictures() {
         return profilePictures;
     }
 
-    public void setProfilePictures(List<MultipartFile> profilePictures) {
+    public void setProfilePictures(List<String> profilePictures) {
         this.profilePictures = profilePictures;
     }
 
