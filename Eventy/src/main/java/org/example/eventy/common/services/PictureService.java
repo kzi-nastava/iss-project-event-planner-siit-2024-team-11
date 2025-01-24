@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -54,7 +55,9 @@ public class PictureService {
         try {
             File file = new ClassPathResource("static/" + path).getFile();
 
-            return "data:image/jpeg;base64," + Arrays.toString(Files.readAllBytes(file.toPath()));
+            byte[] fileBytes = Files.readAllBytes(file.toPath());
+            String base64Image = Base64.getEncoder().encodeToString(fileBytes);
+            return "data:image/jpeg;base64," + base64Image;
         }
         catch (IOException e) {
             return null;
