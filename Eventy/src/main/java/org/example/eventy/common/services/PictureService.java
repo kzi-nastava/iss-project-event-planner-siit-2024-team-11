@@ -45,11 +45,11 @@ public class PictureService {
         return picturePaths;
     }
 
-    public static String getImage(String path) {
+    public static String getImage(String imagePath) {
         try {
-            File file = new ClassPathResource("static/" + path).getFile();
+            Path path = Paths.get("src/main/resources/static/" + imagePath);
 
-            byte[] fileBytes = Files.readAllBytes(file.toPath());
+            byte[] fileBytes = Files.readAllBytes(path);
             String base64Image = Base64.getEncoder().encodeToString(fileBytes);
             return "data:image/jpeg;base64," + base64Image;
         }
