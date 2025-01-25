@@ -7,7 +7,9 @@ import org.example.eventy.events.dtos.*;
 import org.example.eventy.events.models.*;
 import org.example.eventy.events.services.*;
 import org.example.eventy.users.models.EventOrganizer;
+import org.example.eventy.users.models.User;
 import org.example.eventy.users.services.UserService;
+import org.example.eventy.util.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,14 +43,22 @@ public class EventController {
     UserService userService;
     @Autowired
     EmailService emailService;
+    @Autowired
+    private TokenUtils tokenUtils;
 
     @GetMapping(value = "/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EventDTO> getEvent(@PathVariable Long eventId) {
-        if(eventId == 5) {
-            return new ResponseEntity<EventDTO>(new EventDTO(), HttpStatus.OK);
+    public ResponseEntity<EventDetailsDTO> getEvent(@PathVariable Long eventId, @RequestHeader("Authorization") String token) {
+        Event event = eventService.getEvent(eventId);
+        User user = null;
+        if(token != null) {
+            user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
         }
 
-        return new ResponseEntity<EventDTO>(HttpStatus.NOT_FOUND);
+        if(event != null) {
+            return new ResponseEntity<EventDetailsDTO>(new EventDetailsDTO(event, user), HttpStatus.OK);
+        }
+
+        return new ResponseEntity<EventDetailsDTO>(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -114,14 +124,35 @@ public class EventController {
         return new ResponseEntity<Collection<EventStatsDTO>>(eventStatsDTOs, HttpStatus.OK);
     }
 
-    @PutMapping(value = "/favorite", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EventDTO> favoriteEvent(@RequestBody EventDTO eventDTO) {
-        if(eventDTO.getName().equals("event")) {
-            // here we call service function that will make this a favorite of the currently logged-in user
-            return new ResponseEntity<EventDTO>(HttpStatus.OK);
+    @PutMapping(value = "/favorite/{eventId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> toggleFavoriteEvent(@PathVariable Long eventId, @RequestHeader("Authorization") String token) {
+        Event event = eventService.getEvent(eventId);
+
+        if(event == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<EventDTO>(HttpStatus.NOT_FOUND);
+        if (token == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        User user;
+        try {
+            user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+
+            if(user == null) {
+                throw new Exception();
+            }
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        if (!user.getFavoriteEvents().remove(event)) {
+            user.getFavoriteEvents().add(event);
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping(value = "/favorite/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
