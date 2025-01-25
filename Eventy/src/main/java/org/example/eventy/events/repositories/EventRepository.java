@@ -1,6 +1,7 @@
 package org.example.eventy.events.repositories;
 
 import org.example.eventy.events.models.Event;
+import org.example.eventy.users.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -75,4 +76,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("SELECT DISTINCT l.name FROM Location l JOIN Event e ON l.id = e.location.id ORDER BY l.name ASC")
     ArrayList<String> findAllUniqueLocationNamesForEvents();
+
+    @Query("SELECT u FROM User u JOIN u.acceptedEvents e WHERE e.id = :eventId")
+    List<User> findAttendingUsersByEvent(@Param("eventId") Long eventId);
 }
