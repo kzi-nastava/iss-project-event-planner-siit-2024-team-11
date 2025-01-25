@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 @RestController
 @RequestMapping("/api/events/pdfs")
@@ -92,7 +91,7 @@ public class EventDownloadPDFController {
 
             // Set headers for PDF download
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=guest_list_event_" + eventId + ".pdf");
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + event.getName()  + "_details.pdf");
             headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
 
             // Return the PDF as a byte array
@@ -132,7 +131,7 @@ public class EventDownloadPDFController {
 
             // Set headers for PDF download
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=guest_list_event_" + eventId + ".pdf");
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=guest_list_event_" + event.getName() + ".pdf");
             headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
 
             // Return the PDF as a byte array
