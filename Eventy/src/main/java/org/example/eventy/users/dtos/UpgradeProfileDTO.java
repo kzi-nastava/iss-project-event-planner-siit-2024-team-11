@@ -2,6 +2,7 @@ package org.example.eventy.users.dtos;
 
 import jakarta.validation.constraints.NotNull;
 import org.example.eventy.users.validation.annotation.ValidUpgradeProfile;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 

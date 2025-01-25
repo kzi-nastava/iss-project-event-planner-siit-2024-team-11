@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PictureRepository extends JpaRepository<PicturePath, Long> {
-    PicturePath findFirstByPath(String path);
+
 }

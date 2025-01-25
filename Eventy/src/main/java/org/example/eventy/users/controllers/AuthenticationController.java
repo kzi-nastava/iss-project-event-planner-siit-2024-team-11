@@ -19,7 +19,6 @@ import org.example.eventy.users.services.UserService;
 import org.example.eventy.util.NetworkUtils;
 import org.example.eventy.util.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpHeaders;
 import java.net.URI;
 import org.springframework.http.HttpStatus;
@@ -32,7 +31,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -144,14 +142,7 @@ public class AuthenticationController {
             newProvider.setDeactivated(false);
             newProvider.setHasSilencedNotifications(false);
             newProvider.setRole(roleRepository.findByName("ROLE_Provider"));
-            List<PicturePath> profilePictures = new ArrayList<>();
-            for(String path : registrationDTO.getProfilePictures()) {
-                PicturePath picturePath = new PicturePath();
-                picturePath.setPath(path);
-                profilePictures.add(picturePath);
-                // no need for PictureService right?
-            }
-            newProvider.setImageUrls(profilePictures);
+            newProvider.setImageUrls(this.pictureService.save(registrationDTO.getProfilePictures()));
 
             if(registrationDTO.getName() == null || registrationDTO.getDescription() == null) {
                 return new ResponseEntity<String>("Provider validation failed!", HttpStatus.BAD_REQUEST);

@@ -1,5 +1,7 @@
 package org.example.eventy.users.dtos;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 public class RegistrationDTO {
