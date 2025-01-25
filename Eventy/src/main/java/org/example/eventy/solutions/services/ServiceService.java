@@ -6,13 +6,9 @@ import org.example.eventy.common.models.Status;
 import org.example.eventy.events.models.EventType;
 import org.example.eventy.solutions.dtos.services.*;
 import org.example.eventy.solutions.models.Category;
-import org.example.eventy.solutions.models.Service;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.repositories.SolutionRepository;
-import org.example.eventy.users.models.SolutionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.*;
 
@@ -140,10 +136,6 @@ public class ServiceService {
 
     public void deleteService(long id) {
         allServices.removeIf(s -> s.getId() == id);
-    }
-
-    public Page<Solution> getServices(Pageable pageable) {
-        return solutionRepository.findAll(null, null, null, null, null, null, null, null, null, null, null, pageable);
     }
 
     public Solution getService(Long serviceId) {

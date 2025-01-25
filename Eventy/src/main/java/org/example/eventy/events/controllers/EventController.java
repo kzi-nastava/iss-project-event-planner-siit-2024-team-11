@@ -211,5 +211,17 @@ public class EventController {
 
         return new ResponseEntity<Collection<EventCardDTO>>(featuredEventsDTO, HttpStatus.OK);
     }
+
+    @GetMapping(value = "/event-types", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<String>> getAllUniqueEventTypesForEvents() {
+        ArrayList<String> eventTypeNames = eventService.getAllUniqueEventTypesForEvents();
+        return new ResponseEntity<Collection<String>>(eventTypeNames, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/locations", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<String>> getAllUniqueLocationsForEvents() {
+        ArrayList<String> locationNames = eventService.getAllUniqueLocationsForEvents();
+        return new ResponseEntity<Collection<String>>(locationNames, HttpStatus.OK);
+    }
 }
 

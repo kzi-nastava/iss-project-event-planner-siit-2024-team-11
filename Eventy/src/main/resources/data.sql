@@ -27,24 +27,26 @@ VALUES
 -- Event Types
 INSERT INTO event_types(is_active, id, description, name)
 VALUES
-    (TRUE, DEFAULT, 'Description for EventType 1', 'EventType 1'),
-    (TRUE, DEFAULT, 'Description for EventType 2', 'EventType 2'),
-    (FALSE, DEFAULT, 'Description for EventType 3', 'EventType 3');
+    (TRUE, DEFAULT, 'You know what we want? A HUGE PARTY!', 'Party'),
+    (TRUE, DEFAULT, 'Graduations of all types!', 'Graduation'),
+    (FALSE, DEFAULT, 'Only for luxurious event', 'Luxury'),
+    (TRUE, DEFAULT, 'P U M P A J', 'Workout'),
+    (TRUE, DEFAULT, 'All tech events, let`s rock TOGETHER!!', 'Tech');
 
 -- Events
 INSERT INTO events(
     max_number_participants, privacy, date,event_type_id, id, location_id, organizer_id, description, name
 )
 VALUES
-    (50, 0, '2024-12-25 15:00:00', 1, DEFAULT, 1, 1, 'Sample Event Description for Event Type 1', 'Sample Event Name for Event Type 1'),
-    (100, 0, '2024-12-26 15:00:00', 2, DEFAULT, 2, 1, 'Sample Event Description for Event Type 2', 'Sample Event Name for Event Type 2'),
-    (150, 0, '2024-12-27 15:00:00', 3, DEFAULT, 3, 1, 'Sample Event Description for Event Type 3', 'Sample Event Name for Event Type 3');
+    (50, 0, '2024-12-25 15:00:00', 1, DEFAULT, 1, 1, 'This is a birthday party for our friend John, I hope he does not know we are organizing this!', 'Birthday Party for John'),
+    (100, 0, '2024-12-26 15:00:00', 2, DEFAULT, 2, 1, 'High school students of prestigious high school "Jonny Smith" are graduating this month!', 'High School Graduation'),
+    (150, 0, '2024-12-27 15:00:00', 1, DEFAULT, 3, 1, 'Lunch in our best office ever! See you there! Big thanks to Eventy for being such a cool platform! #sponsored', 'Office Lunch');
 
 -- Categories
 INSERT INTO categories (id, name, description, status, is_deleted)
 VALUES
-    (DEFAULT, 'Lighting & Decorations', 'Items for event lighting and venue decoration.', 0, false),
-    (DEFAULT, 'Photography & Videography', 'Services for capturing memories of events.', 0, false),
+    (DEFAULT, 'Decorations', 'Items for event lighting and venue decoration.', 0, false),
+    (DEFAULT, 'Photography', 'Services for capturing memories of events.', 0, false),
     (DEFAULT, 'Catering', 'Food and drink services for events.', 0, false);
 
 -- Solutions
@@ -82,10 +84,27 @@ VALUES
     (DEFAULT, 8, 'cleaning.webp');
 
 -- Users Profile Pictures
-INSERT INTO public.users_profile_pictures(
-    picture_id, user_id)
+INSERT INTO public.users_profile_pictures(picture_id, user_id)
 VALUES (1, 1),
        (2, 2),
        (4, 3),
        (3, 4),
        (3, 5);
+
+-- Suggested Event Types for Solutions
+INSERT INTO public.suggested_event_types(solution_id, event_type_id)
+VALUES (1, 4), -- Dumbbell suggested for Workout
+       (1, 5), -- Dumbbell suggested for Tech
+       (2, 2), -- Office Chair suggested for Graduation
+       (3, 1), -- Table Lamp suggested for Party
+       (3, 3), -- Table Lamp suggested for Luxury
+       (3, 5), -- Table Lamp suggested for Tech
+       (4, 5), -- Gaming Keyboard suggested for Tech
+       (5, 1), -- Photography package suggested for Party
+       (5, 2), -- Photography package suggested for Graduation
+       (5, 3), -- Photography package suggested for Luxury
+       (6, 4), -- Personal Training suggested for Workout
+       (7, 1), -- Event Planning suggested for Party
+       (7, 2), -- Event Planning suggested for Graduation
+       (7, 3), -- Event Planning suggested for Luxury
+       (8, 1); -- House Cleaning suggested for Party
