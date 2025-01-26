@@ -66,7 +66,7 @@ public class EventController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    //@PreAuthorize("hasRole('Organizer')")
+    @PreAuthorize("hasRole('Organizer')")
     public ResponseEntity<EventDTO> organizeEvent(@Valid @RequestBody OrganizeEventDTO organizeEventDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             // if there are validation errors, we return a 400 Bad Request response
@@ -129,6 +129,7 @@ public class EventController {
     }
 
     @PutMapping(value = "/favorite/{eventId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> toggleFavoriteEvent(@PathVariable Long eventId, @RequestHeader("Authorization") String token) {
         Event event = eventService.getEvent(eventId);
 
