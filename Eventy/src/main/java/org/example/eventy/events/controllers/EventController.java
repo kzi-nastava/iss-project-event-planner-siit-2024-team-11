@@ -51,6 +51,8 @@ public class EventController {
         Event event = eventService.getEvent(eventId);
         User user = null;
         if(token != null) {
+            token = token.substring(7);
+
             try {
                 user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
             }
@@ -143,6 +145,7 @@ public class EventController {
 
         User user;
         try {
+            token = token.substring(7);
             user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
 
             if(user == null) {
@@ -168,6 +171,7 @@ public class EventController {
         User user = null;
         if(token != null) {
             try {
+                token = token.substring(7);
                 user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
             }
             catch (Exception ignored) {
@@ -192,6 +196,7 @@ public class EventController {
         User user = null;
         if(token != null) {
             try {
+                token = token.substring(7);
                 user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
             }
             catch (Exception ignored) {
@@ -236,6 +241,7 @@ public class EventController {
         User user = null;
         if(token != null) {
             try {
+                token = token.substring(7);
                 user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
             }
             catch (Exception ignored) {
@@ -262,6 +268,7 @@ public class EventController {
             User user = null;
             if(token != null) {
                 try {
+                    token = token.substring(7);
                     user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
                 }
                 catch (Exception ignored) {
@@ -287,6 +294,7 @@ public class EventController {
         User user = null;
         if(token != null) {
             try {
+                token = token.substring(7);
                 user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
             }
             catch (Exception ignored) {
