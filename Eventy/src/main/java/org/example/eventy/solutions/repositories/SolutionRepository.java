@@ -168,7 +168,7 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
                               OR (CAST(:endDate AS timestamp) >= r.reservation_start_date_time AND CAST(:endDate AS timestamp) <= r.reservation_end_date_time)
                           )
                      ))
-            );
+            ) AS cnt;
             """, nativeQuery = true)
     int findTotalCount(@Param("search") String search,
                        @Param("type") String type,
