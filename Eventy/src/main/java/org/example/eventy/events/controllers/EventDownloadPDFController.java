@@ -31,7 +31,7 @@ public class EventDownloadPDFController {
     @Autowired
     EventService eventService;
 
-    @GetMapping(value = "/details/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/details/{eventId}", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> downloadEventDetailsPDF(@PathVariable Long eventId) {
         Event event = eventService.getEvent(eventId);
 
@@ -102,7 +102,7 @@ public class EventDownloadPDFController {
         }
     }
 
-    @GetMapping(value = "/guest-list/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/guest-list/{eventId}", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> downloadGuestListPDF(@PathVariable Long eventId) {
         Event event = eventService.getEvent(eventId);
 
@@ -142,7 +142,7 @@ public class EventDownloadPDFController {
         }
     }
 
-    @GetMapping(value = "/stats/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/stats/{eventId}", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<String> downloadEventStatsPDF(@PathVariable Long eventId) {
         if(eventId == 5) {
             return new ResponseEntity<String>("Downloaded", HttpStatus.OK);
