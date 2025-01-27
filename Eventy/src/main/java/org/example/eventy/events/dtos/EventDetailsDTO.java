@@ -1,5 +1,6 @@
 package org.example.eventy.events.dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.example.eventy.events.models.Event;
 import org.example.eventy.users.models.User;
 
@@ -17,6 +18,7 @@ public class EventDetailsDTO {
     private List<ActivityDTO> agenda;
     private Long organizerId;
     private String organizerName;
+    @JsonProperty("isFavorite")
     private boolean isFavorite;
 
     public EventDetailsDTO() {
@@ -108,7 +110,7 @@ public class EventDetailsDTO {
         this.organizerName = organizerName;
     }
 
-    public boolean isFavorite() {
+    public boolean getIsFavorite() {
         return isFavorite;
     }
 

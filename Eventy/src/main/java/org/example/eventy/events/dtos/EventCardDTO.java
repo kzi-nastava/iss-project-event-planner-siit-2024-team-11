@@ -1,5 +1,6 @@
 package org.example.eventy.events.dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.example.eventy.common.services.PictureService;
 import org.example.eventy.events.models.Event;
 import org.example.eventy.users.models.User;
@@ -19,6 +20,7 @@ public class EventCardDTO {
     private Long organiserId; // when we click on picture/name it shows organiser profile
     private String organiserName;
     private String organiserImage;
+    @JsonProperty("isFavorite")
     private boolean isFavorite;
 
     public EventCardDTO() {
@@ -150,7 +152,7 @@ public class EventCardDTO {
         this.organiserImage = organiserImage;
     }
 
-    public boolean isFavorite() {
+    public boolean getIsFavorite() {
         return isFavorite;
     }
 
