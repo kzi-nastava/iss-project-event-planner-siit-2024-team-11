@@ -156,9 +156,7 @@ public class EventController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        if (!user.getFavoriteEvents().remove(event)) {
-            user.getFavoriteEvents().add(event);
-        }
+        userService.toggleFavoriteEvent(user, event);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

@@ -58,7 +58,7 @@ public abstract class User implements UserDetails {
     @JoinTable(name = "UsersAttendingEvents", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id"))
     private List<Event> acceptedEvents;
 
-    @ManyToMany(cascade = CascadeType.REFRESH)
+    @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE})
     @JoinTable(name = "UsersFavoriteEvents", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id"))
     private List<Event> favoriteEvents;
 
