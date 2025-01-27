@@ -357,6 +357,7 @@ public class AuthenticationController {
                 if (images == null) {
                     return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
                 }
+                currentUser.setImageUrls(images);
                 currentUser.setActive(false);
                 currentUser.setDeactivated(false);
                 currentUser.setEnabled(false);
@@ -395,6 +396,7 @@ public class AuthenticationController {
                 if (images == null) {
                     return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
                 }
+                currentUser.setImageUrls(images);
                 currentUser.setActive(false);
                 currentUser.setDeactivated(false);
                 currentUser.setEnabled(false);
