@@ -20,10 +20,7 @@ public class FastRegistrationDTO {
     @NotNull(message = "Phone number cannot be null")
     private String phoneNumber;
 
-    ///////////////////////////////
-
-    public FastRegistrationDTO() {
-    }
+    public FastRegistrationDTO() {}
 
     public FastRegistrationDTO(String encryptedEmail, String password, String confirmedPassword, String address, String phoneNumber) {
         this.encryptedEmail = encryptedEmail;

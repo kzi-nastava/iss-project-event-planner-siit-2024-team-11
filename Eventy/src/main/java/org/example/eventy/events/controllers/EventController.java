@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -183,6 +185,22 @@ public class EventController {
         return new ResponseEntity<PagedResponse<EventCardDTO>>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/homepage-routing/")
+    public ResponseEntity<Void> homepageRouting(@RequestHeader("User-Agent") String userAgent) {
+        // if the device is mobile
+        if (userAgent.toLowerCase().contains("android")) {
+            String deepLink = "eventy://homepage";
+            HttpHeaders headers = new HttpHeaders();
+            headers.setLocation(URI.create(deepLink));
+            return new ResponseEntity<>(headers, HttpStatus.FOUND);
+        }
+
+        String webLink = "http://localhost:4200/";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(webLink));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
+    }
+
     // GET "/api/events/cards/5"
     @GetMapping(value = "/cards/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EventCardDTO> getEventCard(@PathVariable Long eventId) {
@@ -194,6 +212,22 @@ public class EventController {
         }
 
         return new ResponseEntity<EventCardDTO>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/details-routing/{eventId}")
+    public ResponseEntity<Void> eventDetailsRouting(@PathVariable String eventId, @RequestHeader("User-Agent") String userAgent) {
+        // if the device is mobile
+        if (userAgent.toLowerCase().contains("android")) {
+            String deepLink = "eventy://event-details?id=" + eventId;
+            HttpHeaders headers = new HttpHeaders();
+            headers.setLocation(URI.create(deepLink));
+            return new ResponseEntity<>(headers, HttpStatus.FOUND);
+        }
+
+        String webLink = "http://localhost:4200/events/" + eventId;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(webLink));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
     /* this returns EventCardDTOs, because there is NO CASE where:

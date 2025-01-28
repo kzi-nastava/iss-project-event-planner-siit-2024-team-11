@@ -5,14 +5,13 @@ import jakarta.mail.internet.InternetAddress;
 import org.example.eventy.common.models.Status;
 import org.example.eventy.common.util.ActiveUserManager;
 import org.example.eventy.common.util.EncryptionUtil;
-import org.example.eventy.events.dtos.CreateLocationDTO;
-import org.example.eventy.events.dtos.OrganizeEventDTO;
 import org.example.eventy.events.models.Event;
 import org.example.eventy.events.models.Invitation;
 import org.example.eventy.events.models.Location;
 import org.example.eventy.events.services.InvitationService;
 import org.example.eventy.users.models.User;
 import org.example.eventy.users.services.UserService;
+import org.example.eventy.util.NetworkUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -64,23 +63,23 @@ public class EmailService {
                 helper.setTo(email);
                 helper.setSubject("\uD83D\uDCC5  You're invited to '" + eventName + "'!");
 
-                // create HTML content
-                String htmlContent;
-                String homepageLink = "http://localhost:4200/";
-
                 // encrypted email in link with expiration date (1 day)
                 long expirationTime = System.currentTimeMillis() + (24 * 60 * 60 * 1000);
                 String encryptedEmail = EncryptionUtil.encrypt(email, expirationTime);
-                String registrationLink = "http://localhost:4200/fast-registration?value=" + encryptedEmail;
+
+                String registrationLink = "http://" + NetworkUtils.getLocalIpAddress() +":8080/api/authentication/fast-registration-routing/" + encryptedEmail;
+                String homepageLink = "http://" + NetworkUtils.getLocalIpAddress() +":8080/api/events/homepage-routing/";
+                String eventDetailsLink = "http://" + NetworkUtils.getLocalIpAddress() +":8080/api/events/details-routing/" + event.getId();
 
                 String organizerEmailLink = "mailto:" + organizerEmail + "?subject=Event%20Invitation&body=Hello%2C%0D%0A%0D%0AI%20would%20like%20to%20know%20more%20about%20the%20event%20'" + eventName + "'.%0D%0A%0D%0ABest%20regards%2C%0D%0A";
                 String eventyLogoSrc = "src/main/resources/static/logo-nav.png";
-                String eventDetailsLink = "http://localhost:4200/events/5";
 
                 User user = userService.findByEmail(email);
-                // depending on the user, send the right email
-                String type = (user != null) ? "normal_invite" : "fast_registration";
-                htmlContent = buildEmailContent(type, email, organizerEmail, eventName, eventDate, eventLocation, homepageLink, registrationLink, organizerEmailLink, eventyLogoSrc, eventDetailsLink);
+                String invitationType = (user != null) ? "normal_invite" : "fast_registration";
+
+                // create HTML content
+                String htmlContent;
+                htmlContent = buildEmailContent(invitationType, email, organizerEmail, eventName, eventDate, eventLocation, homepageLink, registrationLink, organizerEmailLink, eventyLogoSrc, eventDetailsLink);
                 helper.setText(htmlContent, true);
 
                 // add Eventy Logo image --> <img src="cid:logoImage" alt="Eventy Logo"/>

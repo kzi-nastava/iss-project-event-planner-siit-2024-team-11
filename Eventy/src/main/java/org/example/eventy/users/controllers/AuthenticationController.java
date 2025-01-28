@@ -309,6 +309,22 @@ public class AuthenticationController {
         }
     }
 
+    @GetMapping("/fast-registration-routing/{encryptedEmail}")
+    public ResponseEntity<Void> fastRegistrationRouting(@PathVariable String encryptedEmail, @RequestHeader("User-Agent") String userAgent) {
+        // if the device is mobile
+        if (userAgent.toLowerCase().contains("android")) {
+            String deepLink = "eventy://fast-registration?value=" + encryptedEmail;
+            HttpHeaders headers = new HttpHeaders();
+            headers.setLocation(URI.create(deepLink));
+            return new ResponseEntity<>(headers, HttpStatus.FOUND);
+        }
+
+        String webLink = "http://localhost:4200/fast-registration?value=" + encryptedEmail;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(webLink));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
+    }
+
     @GetMapping(value = "/fast-registration/{encryptedData}", produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> decryptEmail(@PathVariable String encryptedData) {
         try {
@@ -341,6 +357,7 @@ public class AuthenticationController {
                 if (images == null) {
                     return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
                 }
+                currentUser.setImageUrls(images);
                 currentUser.setActive(false);
                 currentUser.setDeactivated(false);
                 currentUser.setEnabled(false);
@@ -379,6 +396,7 @@ public class AuthenticationController {
                 if (images == null) {
                     return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
                 }
+                currentUser.setImageUrls(images);
                 currentUser.setActive(false);
                 currentUser.setDeactivated(false);
                 currentUser.setEnabled(false);

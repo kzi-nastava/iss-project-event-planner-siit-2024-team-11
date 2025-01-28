@@ -111,7 +111,7 @@ public class UserProfileController {
     public ResponseEntity<UserDTO> getProfile(@PathVariable Long userId) {
         User user = userService.get(userId);
 
-        if(user != null) {
+        if(user != null && user.isEnabled() && user.isActive() && !user.isDeactivated()) {
             return new ResponseEntity<UserDTO>(new UserDTO(user, userService.getUserType(user)),
                     HttpStatus.OK);
         }
