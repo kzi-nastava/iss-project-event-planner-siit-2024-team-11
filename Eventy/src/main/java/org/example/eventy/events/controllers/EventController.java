@@ -47,7 +47,7 @@ public class EventController {
     private TokenUtils tokenUtils;
 
     @GetMapping(value = "/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EventDetailsDTO> getEvent(@PathVariable Long eventId, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<EventDetailsDTO> getEvent(@PathVariable Long eventId, @RequestHeader(value = "Authorization", required = false) String token) {
         Event event = eventService.getEvent(eventId);
         User user = null;
         if(token != null) {
@@ -132,7 +132,7 @@ public class EventController {
 
     @PutMapping(value = "/favorite/{eventId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> toggleFavoriteEvent(@PathVariable Long eventId, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> toggleFavoriteEvent(@PathVariable Long eventId, @RequestHeader(value = "Authorization", required = false) String token) {
         Event event = eventService.getEvent(eventId);
 
         if(event == null) {
@@ -163,7 +163,7 @@ public class EventController {
 
     @GetMapping(value = "/favorite/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PagedResponse<EventCardDTO>> getFavoriteEvents(@PathVariable Long userId, @RequestParam(required = false) String search,
-                                                                  Pageable pageable, @RequestHeader("Authorization") String token) {
+                                                                  Pageable pageable, @RequestHeader(value = "Authorization", required = false) String token) {
         List<Event> favoriteEvents = eventService.getFavoriteEventsByUser(userId, search, pageable);
 
         User user = null;
@@ -188,7 +188,7 @@ public class EventController {
     @GetMapping(value = "/organized/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PagedResponse<EventCardDTO>> getEventsOrganizedByUser(@PathVariable Long userId, @RequestParam(required = false) String search,
-                                                                                Pageable pageable, @RequestHeader("Authorization") String token) {
+                                                                                Pageable pageable, @RequestHeader(value = "Authorization", required = false) String token) {
         List<Event> organizersEvents = eventService.getEventsByEventOrganizer(userId, search, pageable);
 
         User user = null;
@@ -223,7 +223,7 @@ public class EventController {
             @RequestParam(required = false, defaultValue = "9999") Integer maxParticipants,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
-            Pageable pageable, @RequestHeader("Authorization") String token) {
+            Pageable pageable, @RequestHeader(value = "Authorization", required = false) String token) {
         // Pageable - page, size, sort
         // sort by: "type", "name", "maxNumberParticipants,asc", "maxNumberParticipants,desc", "location", "date,asc", "date,desc"
 
@@ -259,7 +259,7 @@ public class EventController {
 
     // GET "/api/events/cards/5"
     @GetMapping(value = "/cards/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EventCardDTO> getEventCard(@PathVariable Long eventId, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<EventCardDTO> getEventCard(@PathVariable Long eventId, @RequestHeader(value = "Authorization", required = false) String token) {
         Event event = eventService.getEvent(eventId);
 
         if (event != null) {
@@ -286,7 +286,7 @@ public class EventController {
       2) they are NOT in card shapes (they always will be if we are getting all featured events) */
     // GET "/api/events/featured"
     @GetMapping(value = "/featured", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<EventCardDTO>> getFeaturedEvents(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<Collection<EventCardDTO>> getFeaturedEvents(@RequestHeader(value = "Authorization", required = false) String token) {
         ArrayList<Event> featuredEvents = eventService.getFeaturedEvents();
 
         User user = null;
