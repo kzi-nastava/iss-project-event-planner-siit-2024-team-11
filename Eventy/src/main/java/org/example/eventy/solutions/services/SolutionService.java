@@ -1,5 +1,6 @@
 package org.example.eventy.solutions.services;
 
+import org.example.eventy.solutions.models.Category;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.repositories.SolutionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,5 +70,17 @@ public class SolutionService {
 
     public ArrayList<String> getAllUniqueCompaniesForSolutions() {
         return solutionRepository.findAllUniqueCompanyNamesForSolutions();
+    }
+
+    public boolean replaceCategoryForSolutionsWithOldCategory(Category oldCategory, Category newCategory) {
+        return solutionRepository.updateCategoryForAllSolutions(oldCategory, newCategory) == 1;
+    }
+
+    public Solution findSolutionWithPendingCategory(Category category) {
+        return solutionRepository.findByCategory(category).get(0);
+    }
+
+    public List<Solution> findAllByCategory(Category category) {
+        return solutionRepository.findByCategory(category);
     }
 }

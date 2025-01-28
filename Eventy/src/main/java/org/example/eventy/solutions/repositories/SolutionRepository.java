@@ -1,11 +1,14 @@
 package org.example.eventy.solutions.repositories;
 
+import org.example.eventy.solutions.models.Category;
 import org.example.eventy.solutions.models.Solution;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,6 +24,13 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
 
     @Query("SELECT COUNT(s) FROM Solution s WHERE s.provider.id = :providerId")
     long countByProviderId(@Param("providerId") Long providerId);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Solution s SET s.category = :newCategory WHERE s.category = :oldCategory")
+    int updateCategoryForAllSolutions(@Param("oldCategory") Category oldCategory, @Param("newCategory") Category newCategory);
+
+    List<Solution> findByCategory(Category category);
 
     @Query("SELECT s FROM Solution s WHERE s.id IN " +
             "(SELECT us.id FROM User u JOIN u.favoriteSolutions us WHERE u.id = :userId)" +
