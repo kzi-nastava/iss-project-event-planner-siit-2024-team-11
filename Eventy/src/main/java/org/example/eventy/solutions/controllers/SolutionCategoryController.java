@@ -22,7 +22,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("api/categories")
-@PreAuthorize("hasRole('Admin') or hasRole('Provider') or hasRole('Organizer')")
+
 public class SolutionCategoryController {
 
     @Autowired
@@ -31,12 +31,14 @@ public class SolutionCategoryController {
     @Autowired
     private SolutionService solutionService;
 
+    @PreAuthorize("hasRole('Admin') or hasRole('Provider')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CategoryWithIDDTO> createCategory(@RequestBody CreateCategoryDTO newCategory) {
         CategoryWithIDDTO createdCategory = service.createCategory(newCategory);
         return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasRole('Admin') or hasRole('Provider')")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<CategoryWithIDDTO>> getAcceptedCategories() {
         List<Category> categories = service.getAcceptedCategories();
@@ -45,6 +47,7 @@ public class SolutionCategoryController {
         return new ResponseEntity<>(categoryDTOs, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('Admin')")
     @GetMapping(value = "/paged", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PagedResponse<CategoryWithIDDTO>> getAcceptedCategoriesPaged(Pageable pageable) {
         Page<CategoryWithIDDTO> categories = service.getAcceptedCategories(pageable);
@@ -53,6 +56,7 @@ public class SolutionCategoryController {
         return new ResponseEntity<>(pagedCategoriesDTO, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('Admin')")
     @GetMapping(value = "/requests", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PagedResponse<CategoryWithIDDTO>> getCategoryRequests(Pageable pageable) {
         Page<CategoryWithIDDTO> categories = service.getCategoryRequests(pageable);
@@ -61,6 +65,7 @@ public class SolutionCategoryController {
         return new ResponseEntity<>(pagedCategoriesDTO, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('Admin')")
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CategoryWithIDDTO> updateCategory(@RequestBody CategoryWithIDDTO updateCategory) {
         Category categoryToChange = service.getCategory(updateCategory.getId());
@@ -79,6 +84,7 @@ public class SolutionCategoryController {
         return new ResponseEntity<>(new CategoryWithIDDTO(updatedCategory), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('Admin')")
     @PutMapping(value = "/requests/accept/{requestId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CategoryWithIDDTO> acceptRequest(@PathVariable long requestId) {
         Solution changedSolution = solutionService.findSolutionWithPendingCategory(service.getCategory(requestId));
@@ -96,6 +102,7 @@ public class SolutionCategoryController {
         return new ResponseEntity<>(new CategoryWithIDDTO(acceptedCategory), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('Admin')")
     @PutMapping(value="/requests/change",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CategoryWithIDDTO> changeRequest(@RequestBody CategoryWithIDDTO changedCategory) {
         Solution changedSolution = solutionService.findSolutionWithPendingCategory(service.getCategory(changedCategory.getId()));
@@ -112,6 +119,7 @@ public class SolutionCategoryController {
         return new ResponseEntity<>(new CategoryWithIDDTO(updatedCategory), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('Admin')")
     @PutMapping(value="/requests/replace",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Boolean> replaceRequest(@RequestParam (required = true) Long replacedCategoryId,
                                                            @RequestParam (required = true) Long newlyUsedCategoryId) {
@@ -134,6 +142,7 @@ public class SolutionCategoryController {
         return new ResponseEntity<Boolean>(true, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('Admin')")
     @DeleteMapping(value = "/{categoryId}")
     public ResponseEntity<?> deleteCategory(@PathVariable Long categoryId) {
         boolean success = service.deleteCategory(categoryId);
