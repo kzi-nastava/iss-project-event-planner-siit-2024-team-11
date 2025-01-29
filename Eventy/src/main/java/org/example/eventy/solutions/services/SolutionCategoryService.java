@@ -50,7 +50,7 @@ public class SolutionCategoryService {
 
     }
 
-    public CategoryWithIDDTO updateCategory(CategoryWithIDDTO newCategory) {
+    public Category updateCategory(CategoryWithIDDTO newCategory) {
         // check if exists
         Optional<Category> oldCategory = solutionCategoryRepository.findById(newCategory.getId());
         if (!oldCategory.isPresent()) {
@@ -64,7 +64,7 @@ public class SolutionCategoryService {
         category.setStatus(newCategory.getStatus());
 
         // save and return updated DTO
-        return new CategoryWithIDDTO(solutionCategoryRepository.save(category));
+        return solutionCategoryRepository.save(category);
     }
 
     public boolean deleteCategory(Long id) {
@@ -74,5 +74,33 @@ public class SolutionCategoryService {
         }
         solutionCategoryRepository.deleteById(id);
         return true;
+    }
+
+    public Category acceptCategory(Long id) {
+        Optional<Category> storedCategory = solutionCategoryRepository.findById(id);
+        if (storedCategory.isPresent()) {
+            Category acceptedCategory = storedCategory.get();
+            if (acceptedCategory.getStatus() != Status.PENDING) {
+                return null;
+            }
+            acceptedCategory.setStatus(Status.ACCEPTED);
+            return solutionCategoryRepository.save(acceptedCategory);
+        }
+        return null;
+    }
+
+    public Category changeCategory(CategoryWithIDDTO newCategory) {
+        Optional<Category> oldCategory = solutionCategoryRepository.findById(newCategory.getId());
+        if (oldCategory.isPresent()) {
+            Category category = oldCategory.get();
+            if (category.getStatus() != Status.PENDING) {
+                return null;
+            }
+            category.setName(newCategory.getName());
+            category.setDescription(newCategory.getDescription());
+            category.setStatus(Status.ACCEPTED);
+            return solutionCategoryRepository.save(category);
+        }
+        return null;
     }
 }

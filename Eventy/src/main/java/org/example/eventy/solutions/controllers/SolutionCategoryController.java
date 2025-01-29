@@ -1,9 +1,13 @@
 package org.example.eventy.solutions.controllers;
 
 import org.example.eventy.common.models.PagedResponse;
+import org.example.eventy.common.models.Status;
 import org.example.eventy.solutions.dtos.categories.CreateCategoryDTO;
 import org.example.eventy.solutions.dtos.categories.CategoryWithIDDTO;
+import org.example.eventy.solutions.models.Category;
+import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.services.SolutionCategoryService;
+import org.example.eventy.solutions.services.SolutionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
+import java.util.*;
 
 @RestController
 @RequestMapping("api/categories")
@@ -20,6 +24,9 @@ public class SolutionCategoryController {
 
     @Autowired
     private SolutionCategoryService service;
+
+    @Autowired
+    private SolutionService solutionService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CategoryWithIDDTO> createCategory(@RequestBody CreateCategoryDTO newCategory) {
@@ -45,11 +52,69 @@ public class SolutionCategoryController {
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CategoryWithIDDTO> updateCategory(@RequestBody CategoryWithIDDTO updateCategory) {
-        CategoryWithIDDTO updatedCategory = service.updateCategory(updateCategory);
+        Category categoryToChange = service.getCategory(updateCategory.getId());
+        List<Solution> changedSolutions = solutionService.findAllByCategory(categoryToChange);
+        Set<Long> providersToNotify = new HashSet<Long>();
+        changedSolutions.forEach(changedSolution -> providersToNotify.add(changedSolution.getProvider().getId()));
+        // notify
+
+        Category updatedCategory = service.updateCategory(updateCategory);
         if (updatedCategory == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(updatedCategory, HttpStatus.OK);
+        return new ResponseEntity<>(new CategoryWithIDDTO(updatedCategory), HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/requests/accept/{requestId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CategoryWithIDDTO> acceptRequest(@PathVariable long requestId) {
+        Solution changedSolution = solutionService.findSolutionWithPendingCategory(service.getCategory(requestId));
+        Long providerIdToNotify = changedSolution.getProvider().getId();
+        // notify
+
+        Category acceptedCategory = service.acceptCategory(requestId);
+        if (acceptedCategory == null) {
+            // not found or isn't already pending
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(new CategoryWithIDDTO(acceptedCategory), HttpStatus.OK);
+    }
+
+    @PutMapping(value="/requests/change",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CategoryWithIDDTO> changeRequest(@RequestBody CategoryWithIDDTO changedCategory) {
+        Solution changedSolution = solutionService.findSolutionWithPendingCategory(service.getCategory(changedCategory.getId()));
+        Long providerIdToNotify = changedSolution.getProvider().getId();
+        // notify
+
+        Category updatedCategory = service.changeCategory(changedCategory);
+        if (updatedCategory == null) {
+            // not found or isn't already pending
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(new CategoryWithIDDTO(updatedCategory), HttpStatus.OK);
+    }
+
+    @PutMapping(value="/requests/replace",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> replaceRequest(@RequestParam (required = true) Long replacedCategoryId,
+                                                           @RequestParam (required = true) Long newlyUsedCategoryId) {
+        Category replacedCategory = service.getCategory(replacedCategoryId);
+        if (replacedCategory == null || replacedCategory.getStatus() != Status.PENDING) {
+            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
+        }
+
+        Solution changedSolution = solutionService.findSolutionWithPendingCategory(replacedCategory);
+        Long providerIdToNotify = changedSolution.getProvider().getId();
+        // notify
+
+        Category newCategory = service.getCategory(newlyUsedCategoryId);
+        boolean successfullyReplaced = solutionService.replaceCategoryForSolutionsWithOldCategory(replacedCategory, newCategory);
+        if (!successfullyReplaced) {
+            //panic :(
+            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        service.deleteCategory(replacedCategoryId);
+
+        return new ResponseEntity<Boolean>(true, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{categoryId}")
