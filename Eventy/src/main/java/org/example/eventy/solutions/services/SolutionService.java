@@ -77,7 +77,9 @@ public class SolutionService {
     }
 
     public Solution findSolutionWithPendingCategory(Category category) {
-        return solutionRepository.findByCategory(category).get(0);
+        List<Solution> wanted = solutionRepository.findByCategory(category);
+        if (wanted.isEmpty()) return null;
+        return wanted.get(0);
     }
 
     public List<Solution> findAllByCategory(Category category) {
