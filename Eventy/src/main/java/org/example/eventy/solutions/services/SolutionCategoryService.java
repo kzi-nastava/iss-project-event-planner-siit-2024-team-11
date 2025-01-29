@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -42,6 +43,10 @@ public class SolutionCategoryService {
 
     public Page<CategoryWithIDDTO> getAcceptedCategories(Pageable pageable) {
         return solutionCategoryRepository.findByStatus(pageable, Status.ACCEPTED).map(CategoryWithIDDTO::new);
+    }
+
+    public List<Category> getAcceptedCategories() {
+        return solutionCategoryRepository.findAllByStatus(Status.ACCEPTED);
     }
 
     public Category getCategory(Long id) {
