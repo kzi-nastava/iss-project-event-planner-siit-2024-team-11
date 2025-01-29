@@ -149,4 +149,38 @@ public class UserProfileController {
 
         return new ResponseEntity<List<CalendarOccupancyDTO>>(calendar, HttpStatus.OK);
     }
+
+    @GetMapping(value = "/{userId}/notifications-info", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> getUserNotificationsInfo(@PathVariable Long userId) {
+        User user = userService.get(userId);
+
+        if(user != null && user.isEnabled() && user.isActive() && !user.isDeactivated()) {
+            return new ResponseEntity<Boolean>(user.isHasSilencedNotifications(), HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @PutMapping(value = "/{userId}/notifications-info", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> toggleNotifications(@PathVariable Long userId) {
+        User user = userService.get(userId);
+
+        if(user != null) {
+            Boolean notificationsOption = user.isHasSilencedNotifications();
+            notificationsOption = !notificationsOption;
+
+            user.setHasSilencedNotifications(notificationsOption);
+            user = userService.save(user, true);
+
+            if (user == null) {
+                notificationsOption = !notificationsOption;
+                return new ResponseEntity<Boolean>(notificationsOption, HttpStatus.BAD_REQUEST);
+            }
+
+            return new ResponseEntity<Boolean>(notificationsOption, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<Boolean>(HttpStatus.NOT_FOUND);
+
+    }
 }

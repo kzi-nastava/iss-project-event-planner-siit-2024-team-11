@@ -1,52 +1,45 @@
-package org.example.eventy.interactions.model;
+package org.example.eventy.interactions.dtos;
 
-import jakarta.persistence.*;
-import org.example.eventy.users.models.User;
+import org.example.eventy.interactions.model.Notification;
+import org.example.eventy.interactions.model.NotificationType;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "Notifications")
-public class Notification {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class NotificationDTO {
     private Long id;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private NotificationType type;
-
-    @Column()
     private Integer redirectionId;
-
-    @Column(nullable = false)
     private String title;
-
-    @Column(nullable = false)
     private String message;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "grader_id", referencedColumnName = "id")
-    private User grader;
-
-    @Column()
+    private String graderImage;
+    private String graderEmail;
     private Integer grade;
-
-    @Column(nullable = false)
     private LocalDateTime timestamp;
 
-    ///////////////////////////////////////////
+    public NotificationDTO() {}
 
-    public Notification() {}
-
-    public Notification(NotificationType type, Integer redirectionId, String title, String message, User grader, Integer grade, LocalDateTime timestamp) {
+    public NotificationDTO(Long id, NotificationType type, Integer redirectionId, String title, String message, String graderImage, String graderEmail, Integer grade, LocalDateTime timestamp) {
+        this.id = id;
         this.type = type;
         this.redirectionId = redirectionId;
         this.title = title;
         this.message = message;
-        this.grader = grader;
+        this.graderImage = graderImage;
+        this.graderEmail = graderEmail;
         this.grade = grade;
         this.timestamp = timestamp;
+    }
+
+    public NotificationDTO(Notification notification) {
+        this.id = notification.getId();
+        this.type = notification.getType();
+        this.redirectionId = notification.getRedirectionId();
+        this.title = notification.getTitle();
+        this.message = notification.getMessage();
+        this.graderImage = String.valueOf(notification.getGrader().getImageUrls().get(0));
+        this.graderEmail = notification.getGrader().getEmail();
+        this.grade = notification.getGrade();
+        this.timestamp = notification.getTimestamp();
     }
 
     public Long getId() {
@@ -89,12 +82,20 @@ public class Notification {
         this.message = message;
     }
 
-    public User getGrader() {
-        return grader;
+    public String getGraderImage() {
+        return graderImage;
     }
 
-    public void setGrader(User grader) {
-        this.grader = grader;
+    public void setGraderImage(String graderImage) {
+        this.graderImage = graderImage;
+    }
+
+    public String getGraderEmail() {
+        return graderEmail;
+    }
+
+    public void setGraderEmail(String graderEmail) {
+        this.graderEmail = graderEmail;
     }
 
     public Integer getGrade() {
@@ -115,13 +116,14 @@ public class Notification {
 
     @Override
     public String toString() {
-        return "Notification{" +
+        return "NotificationDTO{" +
                 "id=" + id +
                 ", type=" + type +
                 ", redirectionId=" + redirectionId +
                 ", title='" + title + '\'' +
                 ", message='" + message + '\'' +
-                ", grader=" + grader +
+                ", graderImage='" + graderImage + '\'' +
+                ", graderFullName='" + graderEmail + '\'' +
                 ", grade=" + grade +
                 ", timestamp=" + timestamp +
                 '}';
