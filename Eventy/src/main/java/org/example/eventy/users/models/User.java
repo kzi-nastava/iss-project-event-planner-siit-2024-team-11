@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.events.models.Event;
+import org.example.eventy.interactions.model.Notification;
 import org.example.eventy.solutions.models.Solution;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.lang.reflect.Array;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -46,6 +46,17 @@ public abstract class User implements UserDetails {
 
     @Column(nullable = false)
     private boolean hasSilencedNotifications;
+
+    @Column()
+    private LocalDateTime lastReadNotifications;
+
+    @ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "UserNotifications",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "notification_id", referencedColumnName = "id")
+    )
+    private List<Notification> notifications = new ArrayList<>();
 
     @Column()
     private LocalDateTime suspensionDeadline;
@@ -180,6 +191,22 @@ public abstract class User implements UserDetails {
 
     public void setHasSilencedNotifications(boolean hasSilencedNotifications) {
         this.hasSilencedNotifications = hasSilencedNotifications;
+    }
+
+    public LocalDateTime getLastReadNotifications() {
+        return lastReadNotifications;
+    }
+
+    public void setLastReadNotifications(LocalDateTime lastReadNotifications) {
+        this.lastReadNotifications = lastReadNotifications;
+    }
+
+    public List<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(List<Notification> notifications) {
+        this.notifications = notifications;
     }
 
     public LocalDateTime getSuspensionDeadline() {

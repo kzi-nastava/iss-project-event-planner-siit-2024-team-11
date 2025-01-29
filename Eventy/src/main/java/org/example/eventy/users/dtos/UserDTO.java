@@ -40,10 +40,8 @@ public class UserDTO {
             this.firstName = ((Admin) user).getFirstName();
             this.lastName = ((Admin) user).getLastName();
         } else {
-            //this.firstName = ((AuthenticatedUser) user).getFirstName();
-            //this.lastName = ((AuthenticatedUser) user).getLastName();
-            this.firstName = "No first name for authenticated user in UserDTO.java - Tamara";
-            this.lastName = "No last name for authenticated user in UserDTO.java - Tamara";
+            this.firstName = "";
+            this.lastName = "";
         }
 
         this.profilePictures = user.getImageUrls().stream().map(PicturePath::getPath).map(PictureService::getImage).collect(Collectors.toList());
