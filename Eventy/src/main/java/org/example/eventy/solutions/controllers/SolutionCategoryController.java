@@ -8,18 +8,21 @@ import org.example.eventy.solutions.models.Category;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.services.SolutionCategoryService;
 import org.example.eventy.solutions.services.SolutionService;
+import org.example.eventy.users.models.Admin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
 @RestController
 @RequestMapping("api/categories")
+
 public class SolutionCategoryController {
 
     @Autowired
@@ -28,20 +31,32 @@ public class SolutionCategoryController {
     @Autowired
     private SolutionService solutionService;
 
+    @PreAuthorize("hasRole('Admin') or hasRole('Provider')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CategoryWithIDDTO> createCategory(@RequestBody CreateCategoryDTO newCategory) {
         CategoryWithIDDTO createdCategory = service.createCategory(newCategory);
         return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasRole('Admin') or hasRole('Provider')")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PagedResponse<CategoryWithIDDTO>> getAcceptedCategories(Pageable pageable) {
+    public ResponseEntity<Collection<CategoryWithIDDTO>> getAcceptedCategories() {
+        List<Category> categories = service.getAcceptedCategories();
+        List<CategoryWithIDDTO> categoryDTOs = new ArrayList<>();
+        categories.forEach(category -> categoryDTOs.add(new CategoryWithIDDTO(category)));
+        return new ResponseEntity<>(categoryDTOs, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('Admin')")
+    @GetMapping(value = "/paged", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PagedResponse<CategoryWithIDDTO>> getAcceptedCategoriesPaged(Pageable pageable) {
         Page<CategoryWithIDDTO> categories = service.getAcceptedCategories(pageable);
         long count = service.getAcceptedCategoryCount();
         PagedResponse<CategoryWithIDDTO> pagedCategoriesDTO = new PagedResponse<>(categories.getContent(), (int) Math.ceil((double) count / pageable.getPageSize()), count);
         return new ResponseEntity<>(pagedCategoriesDTO, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('Admin')")
     @GetMapping(value = "/requests", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PagedResponse<CategoryWithIDDTO>> getCategoryRequests(Pageable pageable) {
         Page<CategoryWithIDDTO> categories = service.getCategoryRequests(pageable);
@@ -50,13 +65,17 @@ public class SolutionCategoryController {
         return new ResponseEntity<>(pagedCategoriesDTO, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('Admin')")
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CategoryWithIDDTO> updateCategory(@RequestBody CategoryWithIDDTO updateCategory) {
         Category categoryToChange = service.getCategory(updateCategory.getId());
         List<Solution> changedSolutions = solutionService.findAllByCategory(categoryToChange);
-        Set<Long> providersToNotify = new HashSet<Long>();
-        changedSolutions.forEach(changedSolution -> providersToNotify.add(changedSolution.getProvider().getId()));
-        // notify
+        if (!changedSolutions.isEmpty()) {
+            Set<Long> providersToNotify = new HashSet<Long>();
+            changedSolutions.forEach(changedSolution -> providersToNotify.add(changedSolution.getProvider().getId()));
+            // notify
+        }
+
 
         Category updatedCategory = service.updateCategory(updateCategory);
         if (updatedCategory == null) {
@@ -65,11 +84,15 @@ public class SolutionCategoryController {
         return new ResponseEntity<>(new CategoryWithIDDTO(updatedCategory), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('Admin')")
     @PutMapping(value = "/requests/accept/{requestId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CategoryWithIDDTO> acceptRequest(@PathVariable long requestId) {
         Solution changedSolution = solutionService.findSolutionWithPendingCategory(service.getCategory(requestId));
-        Long providerIdToNotify = changedSolution.getProvider().getId();
-        // notify
+        if (changedSolution != null) {
+            Long providerIdToNotify = changedSolution.getProvider().getId();
+            // notify
+        }
+
 
         Category acceptedCategory = service.acceptCategory(requestId);
         if (acceptedCategory == null) {
@@ -79,11 +102,14 @@ public class SolutionCategoryController {
         return new ResponseEntity<>(new CategoryWithIDDTO(acceptedCategory), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('Admin')")
     @PutMapping(value="/requests/change",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CategoryWithIDDTO> changeRequest(@RequestBody CategoryWithIDDTO changedCategory) {
         Solution changedSolution = solutionService.findSolutionWithPendingCategory(service.getCategory(changedCategory.getId()));
-        Long providerIdToNotify = changedSolution.getProvider().getId();
-        // notify
+        if (changedSolution != null) {
+            Long providerIdToNotify = changedSolution.getProvider().getId();
+            // notify
+        }
 
         Category updatedCategory = service.changeCategory(changedCategory);
         if (updatedCategory == null) {
@@ -93,6 +119,7 @@ public class SolutionCategoryController {
         return new ResponseEntity<>(new CategoryWithIDDTO(updatedCategory), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('Admin')")
     @PutMapping(value="/requests/replace",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Boolean> replaceRequest(@RequestParam (required = true) Long replacedCategoryId,
                                                            @RequestParam (required = true) Long newlyUsedCategoryId) {
@@ -102,21 +129,20 @@ public class SolutionCategoryController {
         }
 
         Solution changedSolution = solutionService.findSolutionWithPendingCategory(replacedCategory);
-        Long providerIdToNotify = changedSolution.getProvider().getId();
-        // notify
+        if (changedSolution != null) {
+            Long providerIdToNotify = changedSolution.getProvider().getId();
+            // notify
+        }
 
         Category newCategory = service.getCategory(newlyUsedCategoryId);
         boolean successfullyReplaced = solutionService.replaceCategoryForSolutionsWithOldCategory(replacedCategory, newCategory);
-        if (!successfullyReplaced) {
-            //panic :(
-            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
 
         service.deleteCategory(replacedCategoryId);
 
         return new ResponseEntity<Boolean>(true, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('Admin')")
     @DeleteMapping(value = "/{categoryId}")
     public ResponseEntity<?> deleteCategory(@PathVariable Long categoryId) {
         boolean success = service.deleteCategory(categoryId);
