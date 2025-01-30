@@ -2,6 +2,7 @@ package org.example.eventy.events.services;
 
 import org.example.eventy.events.models.*;
 import org.example.eventy.events.repositories.EventRepository;
+import org.example.eventy.users.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -71,5 +72,9 @@ public class EventService {
 
     public ArrayList<String> getAllUniqueLocationsForEvents() {
         return eventRepository.findAllUniqueLocationNamesForEvents();
+    }
+
+    public List<User> getAttendingUsersByEvent(Long eventId) {
+        return eventRepository.findAttendingUsersByEvent(eventId);
     }
 }
