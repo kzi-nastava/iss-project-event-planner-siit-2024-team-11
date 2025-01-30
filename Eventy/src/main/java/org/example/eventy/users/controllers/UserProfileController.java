@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -180,5 +181,23 @@ public class UserProfileController {
         }
 
         return new ResponseEntity<Boolean>(HttpStatus.NOT_FOUND);
+    }
+
+    @PutMapping(value = "/{userId}/last-read-notifications", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<LocalDateTime> updateLastReadNotifications(@PathVariable Long userId) {
+        User user = userService.get(userId);
+
+        if(user != null) {
+            user.setLastReadNotifications(LocalDateTime.now());
+
+            user = userService.save(user, false);
+            if (user == null) {
+                return new ResponseEntity<LocalDateTime>(HttpStatus.BAD_REQUEST);
+            }
+
+            return new ResponseEntity<LocalDateTime>(user.getLastReadNotifications(), HttpStatus.OK);
+        }
+
+        return new ResponseEntity<LocalDateTime>(HttpStatus.NOT_FOUND);
     }
 }

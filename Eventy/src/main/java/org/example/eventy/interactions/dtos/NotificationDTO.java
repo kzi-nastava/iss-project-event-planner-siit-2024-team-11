@@ -1,5 +1,6 @@
 package org.example.eventy.interactions.dtos;
 
+import org.example.eventy.common.services.PictureService;
 import org.example.eventy.interactions.model.Notification;
 import org.example.eventy.interactions.model.NotificationType;
 
@@ -36,7 +37,7 @@ public class NotificationDTO {
         this.redirectionId = notification.getRedirectionId();
         this.title = notification.getTitle();
         this.message = notification.getMessage();
-        this.graderImage = String.valueOf(notification.getGrader().getImageUrls().get(0));
+        this.graderImage = notification.getGrader().getImageUrls() != null ? PictureService.getImage(notification.getGrader().getImageUrls().get(0).getPath()) : "none";
         this.graderEmail = notification.getGrader().getEmail();
         this.grade = notification.getGrade();
         this.timestamp = notification.getTimestamp();

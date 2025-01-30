@@ -10,7 +10,7 @@ INSERT INTO users (
     id, user_type, email, password, address, phone_number, is_active, is_deactivated, enabled, has_silenced_notifications, suspension_deadline, role_id, last_password_reset_date, last_read_notifications, description, first_name, last_name, name
 )
 VALUES
-    (DEFAULT, 'Organizer', 'tac@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, TRUE, NULL, 3, NOW(), '2000-01-01 00:00:00', NULL, 'Tac Tac', 'Jezickovic', NULL),
+    (DEFAULT, 'Organizer', 'tac@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 3, NOW(), '2025-10-30 00:00:00', NULL, 'Tac Tac', 'Jezickovic', NULL),
     (DEFAULT, 'Provider', 'provider@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), '2000-01-01 00:00:00', 'Description', NULL, NULL, 'VIT DOO'),
     (DEFAULT, 'Provider', 'provider2@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), '2000-01-01 00:00:00', 'Description', NULL, NULL, 'Lidl'),
     (DEFAULT, 'Admin', 'veselin.roganovic.rogan003@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', 'Cara Dusana 72, Novi Sad', '+381 65 31 43 240', TRUE, FALSE, TRUE, FALSE, NULL, 1, NOW(), '2000-01-01 00:00:00', NULL, 'Veselin', 'Roganovic', NULL),
@@ -89,7 +89,8 @@ VALUES (1, 1),
        (2, 2),
        (4, 3),
        (3, 4),
-       (3, 5);
+       (5, 5),
+       (5, 6);
 
 -- Suggested Event Types for Solutions
 INSERT INTO suggested_event_types(solution_id, event_type_id)
@@ -111,17 +112,17 @@ VALUES (1, 4), -- Dumbbell suggested for Workout
 
 -- Notifications
 INSERT INTO notifications (id, type, redirection_id, title, message, grader_id, grade, timestamp)
-VALUES (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, NOW()),
-       (DEFAULT, 'EVENT_CHANGE', 102, 'Event Updated', 'The event "Tech Conference" has a new date.', 2, NULL, NOW()),
+VALUES (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2025-11-01 00:00:00'),
+       (DEFAULT, 'EVENT_CHANGE', 102, 'Event Updated', 'The event "Tech Conference" has a new date.', 2, NULL, '2025-11-02 00:00:00'),
 
-       (DEFAULT, 'RATING_EVENT', 201, 'New Event Rating', 'Your event "Charity Run" received a new rating.', 3, 5, NOW()),
-       (DEFAULT, 'RATING_EVENT', 202, 'Event Rated', 'Someone rated your event "Food Festival".', 4, 4, NOW()),
+       (DEFAULT, 'RATING_EVENT', 201, 'New Event Rating', 'Your event "Charity Run" received a new rating.', 3, 5, '2025-11-03 00:00:00'),
+       (DEFAULT, 'RATING_EVENT', 202, 'Event Rated', 'Someone rated your event "Food Festival".', 4, 3, '2025-11-04 00:00:00'),
 
-       (DEFAULT, 'RATING_SERVICE', 301, 'Service Review', 'Your catering service received a new rating.', 2, 5, NOW()),
-       (DEFAULT, 'RATING_SERVICE', 302, 'Service Feedback', 'A user left feedback on your photography service.', 3, 3, NOW()),
+       (DEFAULT, 'RATING_SERVICE', 301, 'Service Review', 'Your catering service received a new rating.', 2, 4, '2025-11-05 00:00:00'),
+       (DEFAULT, 'RATING_SERVICE', 302, 'Service Feedback', 'A user left feedback on your photography service.', 3, 3, '2000-01-01 00:00:00'),
 
-       (DEFAULT, 'RATING_PRODUCT', 401, 'Product Rated', 'Your decoration package received a 5-star rating.', 5, 5, NOW()),
-       (DEFAULT, 'RATING_PRODUCT', 402, 'New Product Feedback', 'Your sound system rental got a review.', 6, 4, NOW()),
+       (DEFAULT, 'RATING_PRODUCT', 401, 'Product Rated', 'Your decoration package received a 5-star rating.', 5, 2, '2000-01-01 00:00:00'),
+       (DEFAULT, 'RATING_PRODUCT', 402, 'New Product Feedback', 'Your sound system rental got a review.', 6, 4, '2000-01-01 00:00:00'),
 
        (DEFAULT, 'CATEGORY_UPDATED', 501, 'Category Update', 'A category you follow has been updated.', 2, NULL, NOW()),
        (DEFAULT, 'CATEGORY_UPDATED', 502, 'Category Changed', 'A service category has been modified.', 3, NULL, NOW()),
