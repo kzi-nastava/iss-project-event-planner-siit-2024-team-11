@@ -25,9 +25,9 @@ public class NotificationController {
     NotificationService notificationService;
 
     @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PagedResponse<NotificationDTO>> getNotifications(@PathVariable("userId") String userId,
-                                                                           Pageable pageable) {
-        Page<Notification> notifications = notificationService.getNotificationsByUser(userId, pageable);
+    public ResponseEntity<PagedResponse<NotificationDTO>> getNotificationsByUserId(@PathVariable("userId") Long userId,
+                                                                                   Pageable pageable) {
+        Page<Notification> notifications = notificationService.getNotificationsByUserId(userId, pageable);
 
         List<NotificationDTO> notificationsDTO = new ArrayList<>();
         for (Notification notification : notifications) {

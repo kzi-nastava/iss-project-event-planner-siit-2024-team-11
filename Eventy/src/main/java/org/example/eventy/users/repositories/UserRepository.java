@@ -33,6 +33,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
                                @Param("description") String description,
                                @Param("userType") String userType);
 
-    @Query(value = "SELECT u.notifications FROM User u WHERE u.id = :userId")
-    Page<Notification> findAllNotificationsByUserId(String userId, Pageable pageable);
+    @Query("SELECT n FROM User u JOIN u.notifications n WHERE u.id = :userId ORDER BY n.timestamp DESC")
+    Page<Notification> findAllNotificationsByUserId(@Param("userId") Long userId,
+                                                    Pageable pageable);
+
+    @Query("SELECT COUNT(n) > 0 FROM User u JOIN u.notifications n WHERE u.id = :userId AND n.timestamp > u.lastReadNotifications")
+    boolean hasNewNotifications(@Param("userId") Long userId);
 }

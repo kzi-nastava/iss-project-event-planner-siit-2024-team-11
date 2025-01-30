@@ -15,7 +15,11 @@ public class NotificationService {
     @Autowired
     UserRepository userRepository;
 
-    public Page<Notification> getNotificationsByUser(String userId, Pageable pageable) {
+    public Page<Notification> getNotificationsByUserId(Long userId, Pageable pageable) {
         return userRepository.findAllNotificationsByUserId(userId, pageable);
+    }
+
+    public boolean hasUserNewNotifications(Long userId) {
+        return userRepository.hasNewNotifications(userId);
     }
 }
