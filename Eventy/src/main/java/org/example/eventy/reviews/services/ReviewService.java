@@ -16,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReviewService {
@@ -58,5 +60,9 @@ public class ReviewService {
         catch (Exception e) {
             return null;
         }
+    }
+
+    public List<Integer> getGradesForEvent(Long eventId) {
+        return reviewRepository.findAllGradesForEvent(eventId);
     }
 }
