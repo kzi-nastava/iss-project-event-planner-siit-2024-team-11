@@ -1,29 +1,50 @@
 package org.example.eventy.reviews.controllers;
 
+import jakarta.validation.Valid;
 import org.example.eventy.common.models.PagedResponse;
 import org.example.eventy.common.models.Status;
+import org.example.eventy.events.models.Event;
+import org.example.eventy.events.services.EventService;
+import org.example.eventy.interactions.model.Notification;
+import org.example.eventy.interactions.model.NotificationType;
+import org.example.eventy.interactions.services.NotificationService;
 import org.example.eventy.reviews.dtos.CreateReviewDTO;
-import org.example.eventy.reviews.dtos.CreatedReviewDTO;
 import org.example.eventy.reviews.dtos.ReviewDTO;
 import org.example.eventy.reviews.dtos.UpdateReviewDTO;
 import org.example.eventy.reviews.models.Review;
 import org.example.eventy.reviews.services.ReviewService;
+import org.example.eventy.solutions.models.Service;
+import org.example.eventy.solutions.models.Solution;
+import org.example.eventy.solutions.services.SolutionService;
+import org.example.eventy.users.models.User;
+import org.example.eventy.users.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/reviews")
 public class ReviewController {
-
     @Autowired
     private ReviewService reviewService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private EventService eventService;
+    @Autowired
+    private SolutionService solutionService;
+    @Autowired
+    private NotificationService notificationService;
 
     // GET "/api/reviews/pending"
     @GetMapping(value = "/pending", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -109,17 +130,77 @@ public class ReviewController {
 
     // POST "/api/reviews"
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CreatedReviewDTO> createReview(@RequestBody CreateReviewDTO reviewDTO) {
-        // create Review in service
-        CreatedReviewDTO responseDTO = new CreatedReviewDTO();
-        responseDTO.setId(1337L);
-        responseDTO.setReviewerId(42L);
-        responseDTO.setComment("Literally me");
-        responseDTO.setGrade(5);
-        responseDTO.setStatus(Status.PENDING);
-        responseDTO.setEventName("Ryan Reynolds theme party");
-        responseDTO.setSolutionName(null);
-        // SolutionName == null -> it's an Event review; else, it's a Solution review
-        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+    public ResponseEntity<CreateReviewDTO> createReview(@Valid @RequestBody CreateReviewDTO reviewDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // if there are validation errors, we return a 400 Bad Request response
+            List<String> errorMessages = bindingResult.getFieldErrors().stream()
+                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                    .collect(Collectors.toList());
+            return new ResponseEntity(errorMessages, HttpStatus.BAD_REQUEST);
+        }
+
+        Review review = new Review();
+        User grader = userService.get(reviewDTO.getGraderId());
+        if (grader == null) {
+            return new ResponseEntity<CreateReviewDTO>(reviewDTO, HttpStatus.BAD_REQUEST);
+        }
+        review.setGrader(grader);
+
+        Event selectedEvent = null;
+        Solution selectectedSolution = null;
+        if (reviewDTO.getEventId() != null) {
+            selectedEvent = eventService.getEvent(reviewDTO.getEventId());
+        } else {
+            selectectedSolution = solutionService.getSolution(reviewDTO.getSolutionId());
+        }
+        review.setEvent(selectedEvent);
+        review.setSolution(selectectedSolution);
+
+        review.setComment(reviewDTO.getComment());
+        review.setGrade(reviewDTO.getGrade());
+        review.setStatus(Status.PENDING);
+        review.setDeleted(false);
+
+        review = reviewService.saveReview(review);
+        if (review == null) {
+            return new ResponseEntity<CreateReviewDTO>(HttpStatus.BAD_REQUEST);
+        }
+
+        sendNotification(review);
+        return new ResponseEntity<CreateReviewDTO>(new CreateReviewDTO(review), HttpStatus.CREATED);
+    }
+
+    private void sendNotification(Review review) {
+        NotificationType type = null;
+        Long redirectionId = null;
+        String title = null;
+        User owner = null;
+        User grader = review.getGrader();
+        Integer grade = review.getGrade();
+        String message = review.getComment();
+
+        if (review.getEvent() != null) {
+            // event
+            type = NotificationType.RATING_EVENT;
+            redirectionId = review.getEvent().getId();
+            title = "\"" + review.getEvent().getName() + "\"";
+            owner = review.getEvent().getOrganiser();
+
+        } else {
+            // solution
+            if (review.getSolution() instanceof Service) {
+                type = NotificationType.RATING_SERVICE;
+            } else {
+                type = NotificationType.RATING_PRODUCT;
+            }
+            title = "\"" + review.getSolution().getName() + "\"";
+            redirectionId = review.getSolution().getId();
+            owner = review.getSolution().getProvider();
+        }
+
+        LocalDateTime timestamp = LocalDateTime.now();
+        Notification notification = new Notification(type, redirectionId, title, message, grader, grade, timestamp);
+
+        notificationService.sendNotification(notification, owner);
     }
 }

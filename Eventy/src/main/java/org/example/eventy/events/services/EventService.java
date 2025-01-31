@@ -72,4 +72,9 @@ public class EventService {
     public ArrayList<String> getAllUniqueLocationsForEvents() {
         return eventRepository.findAllUniqueLocationNamesForEvents();
     }
+
+    public ArrayList<Event> getUnreviewedAcceptedEventsByUserId(Long userId) {
+        LocalDateTime dateNowMinusOne = LocalDateTime.now().minusDays(1);
+        return eventRepository.findUnreviewedAcceptedEvents(userId, dateNowMinusOne);
+    }
 }

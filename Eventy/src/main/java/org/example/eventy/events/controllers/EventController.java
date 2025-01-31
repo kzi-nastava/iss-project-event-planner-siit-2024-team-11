@@ -257,5 +257,17 @@ public class EventController {
         ArrayList<String> locationNames = eventService.getAllUniqueLocationsForEvents();
         return new ResponseEntity<Collection<String>>(locationNames, HttpStatus.OK);
     }
+
+    @GetMapping(value = "/unreviewed/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<UnreviewedEventDTO>> getUnreviewedAcceptedEventsByUserId(@PathVariable Long userId) {
+        ArrayList<Event> unreviewedAcceptedEvents = eventService.getUnreviewedAcceptedEventsByUserId(userId);
+        ArrayList<UnreviewedEventDTO> unreviewedEventDTO = new ArrayList<UnreviewedEventDTO>();
+
+        for(Event event : unreviewedAcceptedEvents) {
+            unreviewedEventDTO.add(new UnreviewedEventDTO(event));
+        }
+
+        return new ResponseEntity<Collection<UnreviewedEventDTO>>(unreviewedEventDTO, HttpStatus.OK);
+    }
 }
 

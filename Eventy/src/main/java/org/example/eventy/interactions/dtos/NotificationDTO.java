@@ -34,7 +34,7 @@ public class NotificationDTO {
     public NotificationDTO(Notification notification) {
         this.id = notification.getId();
         this.type = notification.getType();
-        this.redirectionId = notification.getRedirectionId();
+        this.redirectionId = Math.toIntExact(notification.getRedirectionId());
         this.title = notification.getTitle();
         this.message = notification.getMessage();
         this.graderImage = notification.getGrader().getImageUrls() != null ? PictureService.getImage(notification.getGrader().getImageUrls().get(0).getPath()) : "none";

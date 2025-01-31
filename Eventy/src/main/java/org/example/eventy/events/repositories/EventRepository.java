@@ -76,14 +76,11 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("SELECT DISTINCT l.name FROM Location l JOIN Event e ON l.id = e.location.id ORDER BY l.name ASC")
     ArrayList<String> findAllUniqueLocationNamesForEvents();
 
-    /*@Query("""
-        SELECT u.acceptedEvents AS e
-        FROM User u
-        WHERE u.id = :userId
-          AND e.date < CURRENT_DATE
-          AND NOT EXISTS (
-              SELECT r FROM Review r WHERE r.sender.id = :userId AND r.event.id = e.id
-          )
-    """)
-    List<Event> findReviewableEvents(@Param("userId") Long userId);*/
+    @Query("SELECT e FROM User u " +
+           "JOIN u.acceptedEvents e " +
+           "LEFT JOIN Review r ON r.event = e AND r.grader.id = :userId " +
+           "WHERE u.id = :userId " + "AND r.id IS NULL " +
+           "AND e.date < :dateTime ")
+    ArrayList<Event> findUnreviewedAcceptedEvents(@Param("userId") Long userId,
+                                                  @Param("dateTime") LocalDateTime dateTime);
 }

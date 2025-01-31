@@ -23,6 +23,7 @@ public class Event {
     @Column(nullable = false)
     private int maxNumberParticipants;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PrivacyType privacy;
 

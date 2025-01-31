@@ -17,7 +17,7 @@ public class Notification {
     private NotificationType type;
 
     @Column()
-    private Integer redirectionId;
+    private Long redirectionId;
 
     @Column(nullable = false)
     private String title;
@@ -39,7 +39,7 @@ public class Notification {
 
     public Notification() {}
 
-    public Notification(NotificationType type, Integer redirectionId, String title, String message, User grader, Integer grade, LocalDateTime timestamp) {
+    public Notification(NotificationType type, Long redirectionId, String title, String message, User grader, Integer grade, LocalDateTime timestamp) {
         this.type = type;
         this.redirectionId = redirectionId;
         this.title = title;
@@ -65,11 +65,11 @@ public class Notification {
         this.type = type;
     }
 
-    public Integer getRedirectionId() {
+    public Long getRedirectionId() {
         return redirectionId;
     }
 
-    public void setRedirectionId(Integer redirectionId) {
+    public void setRedirectionId(Long redirectionId) {
         this.redirectionId = redirectionId;
     }
 
