@@ -211,7 +211,7 @@ public class EventDownloadPDFController {
                     .setFontSize(18)
                     .setTextAlignment(TextAlignment.CENTER);
 
-            JFreeChart gradeAverageChart = createDialChart((double) (gradesSum / (double) grades.size()), 5, "Average Grade");
+            JFreeChart gradeAverageChart = createDialChart(!grades.isEmpty() ? (double) (gradesSum / (double) grades.size()) : 0, 5, "Average Grade");
             document.add(createImageOfChart(gradeAverageChart));
 
             // Close the document

@@ -189,7 +189,7 @@ public class EventController {
                 gradesSum += grade;
             }
 
-            eventStatsDTOs.add(new EventStatsDTO(new EventCardDTO(event, finalUser), visitors, (double) (gradesSum / (double) grades.size()), gradeDistribution));
+            eventStatsDTOs.add(new EventStatsDTO(new EventCardDTO(event, finalUser), visitors, !grades.isEmpty() ? (double) (gradesSum / (double) grades.size()) : 0, gradeDistribution));
         }
         long count = events.getTotalElements();
 
