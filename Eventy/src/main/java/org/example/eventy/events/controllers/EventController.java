@@ -2,10 +2,13 @@ package org.example.eventy.events.controllers;
 
 import jakarta.validation.Valid;
 import org.example.eventy.common.models.PagedResponse;
+import org.example.eventy.common.models.Status;
 import org.example.eventy.common.services.EmailService;
 import org.example.eventy.events.dtos.*;
 import org.example.eventy.events.models.*;
 import org.example.eventy.events.services.*;
+import org.example.eventy.reviews.models.Review;
+import org.example.eventy.reviews.services.ReviewService;
 import org.example.eventy.users.models.EventOrganizer;
 import org.example.eventy.users.models.User;
 import org.example.eventy.users.services.UserService;
@@ -47,6 +50,8 @@ public class EventController {
     EmailService emailService;
     @Autowired
     private TokenUtils tokenUtils;
+    @Autowired
+    private ReviewService reviewService;
 
     @GetMapping(value = "/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EventDetailsDTO> getEvent(@PathVariable Long eventId, @RequestHeader(value = "Authorization", required = false) String token) {
@@ -127,9 +132,69 @@ public class EventController {
     }
 
     @GetMapping(value = "/stats", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<EventStatsDTO>> getEventsWithStats() {
-        List<EventStatsDTO> eventStatsDTOs = new ArrayList<EventStatsDTO>();
-        return new ResponseEntity<Collection<EventStatsDTO>>(eventStatsDTOs, HttpStatus.OK);
+    @PreAuthorize("hasRole('Organizer') OR hasRole('Admin')")
+    public ResponseEntity<PagedResponse<EventStatsDTO>> getEventsWithStats(
+            @RequestParam(required = false, defaultValue = "") String search,
+            @RequestParam(required = false) ArrayList<String> eventTypes,
+            @RequestParam(required = false, defaultValue = "") String location,
+            @RequestParam(required = false, defaultValue = "9999") Integer maxParticipants,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            Pageable pageable, @RequestHeader(value = "Authorization", required = false) String token) {
+        // Pageable - page, size, sort
+        // sort by: "type", "name", "maxNumberParticipants,asc", "maxNumberParticipants,desc", "location", "date,asc", "date,desc"
+
+        // Set default values for startDate and endDate
+        if (startDate == null) {
+            startDate = LocalDateTime.of(1970, 1, 1, 0, 0); // Very small date
+        }
+        if (endDate == null) {
+            endDate = LocalDateTime.of(2099, 12, 31, 23, 59); // Very large date
+        }
+
+        User user = null;
+        if(token != null) {
+            try {
+                token = token.substring(7);
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
+        }
+
+        if (user == null) {
+            return new ResponseEntity<PagedResponse<EventStatsDTO>>(HttpStatus.FORBIDDEN);
+        }
+
+        Page<Event> events;
+
+        if(user.getRole().getName().equals("ROLE_Organizer")) {
+            events = eventService.getPublicEventsForUser(search, eventTypes, maxParticipants, location, startDate, endDate, pageable, user);
+        }
+        else {
+            events = eventService.getPublicEvents(search, eventTypes, maxParticipants, location, startDate, endDate, pageable);
+        }
+
+        User finalUser = user;
+        List<EventStatsDTO> eventStatsDTOs = new ArrayList<>();
+        for (Event event : events) {
+            int visitors = (int) event.getInvitations().stream().filter(inv -> inv.getStatus() == Status.ACCEPTED).count();
+            java.util.List<Integer> grades = reviewService.getGradesForEvent(event.getId());
+
+            int[] gradeDistribution = new int[5];
+            double gradesSum = 0;
+
+            for(int grade : grades) {
+                gradeDistribution[grade - 1]++;
+                gradesSum += grade;
+            }
+
+            eventStatsDTOs.add(new EventStatsDTO(new EventCardDTO(event, finalUser), visitors, (double) (gradesSum / (double) grades.size()), gradeDistribution));
+        }
+        long count = events.getTotalElements();
+
+        PagedResponse<EventStatsDTO> eventStats = new PagedResponse<EventStatsDTO>(eventStatsDTOs, (int) Math.ceil((double) count / pageable.getPageSize()), count);
+        return new ResponseEntity<PagedResponse<EventStatsDTO>>(eventStats, HttpStatus.OK);
     }
 
     @PutMapping(value = "/favorite/{eventId}", consumes = MediaType.APPLICATION_JSON_VALUE)
