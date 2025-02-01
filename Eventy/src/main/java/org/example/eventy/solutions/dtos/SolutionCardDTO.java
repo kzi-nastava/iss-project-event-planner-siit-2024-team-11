@@ -1,5 +1,6 @@
 package org.example.eventy.solutions.dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.example.eventy.common.models.ReservationConfirmationType;
 import org.example.eventy.common.models.SolutionType;
 import org.example.eventy.common.services.PictureService;
@@ -26,6 +27,8 @@ public class SolutionCardDTO {
     private Double price;
     private Integer discount;
     private String firstImageUrl;
+
+    @JsonProperty("isAvailable")
     private Boolean isAvailable;
     private Long providerId;
     private String providerName;
