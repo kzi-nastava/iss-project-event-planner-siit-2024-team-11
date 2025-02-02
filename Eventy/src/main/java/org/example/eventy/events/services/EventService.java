@@ -22,6 +22,10 @@ public class EventService {
         return eventRepository.findAll(search, eventTypes, maxParticipants, location, startDate, endDate, pageable);
     }
 
+    public Page<Event> getEvents(Long userId, String search, ArrayList<String> eventTypes, Integer maxParticipants, String location, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+        return eventRepository.findAll(userId, search, eventTypes, maxParticipants, location, startDate, endDate, pageable);
+    }
+
     public Event getEvent(Long eventId) {
         return eventRepository.findById(eventId).orElse(null);
     }

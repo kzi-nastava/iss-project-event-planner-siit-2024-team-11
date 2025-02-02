@@ -1,7 +1,9 @@
 package org.example.eventy.reviews.dtos;
 
 import org.example.eventy.reviews.models.Review;
+import org.example.eventy.reviews.validation.annotation.ValidCreateReview;
 
+@ValidCreateReview
 public class CreateReviewDTO {
     private Long graderId;
     private Long solutionId;
