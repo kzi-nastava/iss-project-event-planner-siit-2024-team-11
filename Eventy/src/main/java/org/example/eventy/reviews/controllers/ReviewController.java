@@ -203,4 +203,12 @@ public class ReviewController {
 
         notificationService.sendNotification(notification, owner);
     }
+
+    // GET "/api/reviews/user/{userId}/solution/{solutionId}"
+    @GetMapping(value = "/user/{userId}/solution/{solutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> isSolutionReviewedByUser(@PathVariable Long userId, @PathVariable Long solutionId) {
+        Boolean exists = reviewService.isSolutionReviewedByUser(userId, solutionId);
+        return new ResponseEntity<Boolean>(exists, HttpStatus.OK);
+    }
+
 }

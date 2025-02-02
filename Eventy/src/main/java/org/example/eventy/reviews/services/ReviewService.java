@@ -59,4 +59,8 @@ public class ReviewService {
             return null;
         }
     }
+
+    public Boolean isSolutionReviewedByUser(Long userId, Long solutionId) {
+        return reviewRepository.existsByGraderIdAndSolutionId(userId, solutionId);
+    }
 }
