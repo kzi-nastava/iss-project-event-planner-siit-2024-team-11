@@ -24,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +46,8 @@ public class ReviewController {
     private SolutionService solutionService;
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     // GET "/api/reviews/pending"
     @GetMapping(value = "/pending", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -201,7 +204,17 @@ public class ReviewController {
         LocalDateTime timestamp = LocalDateTime.now();
         Notification notification = new Notification(type, redirectionId, title, message, grader, grade, timestamp);
 
-        notificationService.sendNotification(notification, owner);
+        notificationService.saveNotification( owner.getId(), notification);
+        sendNotificationToWeb(owner.getId(), notification);
+        sendNotificationToMobile(owner.getId(), notification);
+    }
+
+    private void sendNotificationToWeb(Long userId, Notification notification) {
+        messagingTemplate.convertAndSend("/topic/web/" + userId, notification);
+    }
+
+    private void sendNotificationToMobile(Long userId, Notification notification) {
+        messagingTemplate.convertAndSend("/topic/mobile/" + userId, notification);
     }
 
     // GET "/api/reviews/user/{userId}/solution/{solutionId}"

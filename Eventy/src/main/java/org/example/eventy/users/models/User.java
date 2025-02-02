@@ -1,5 +1,6 @@
 package org.example.eventy.users.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.example.eventy.common.models.PicturePath;
@@ -56,6 +57,7 @@ public abstract class User implements UserDetails {
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "notification_id", referencedColumnName = "id")
     )
+    @JsonBackReference
     private List<Notification> notifications = new ArrayList<>();
 
     @Column()

@@ -26,20 +26,14 @@ public class NotificationService {
         return userRepository.hasNewNotifications(userId);
     }
 
-    public void sendNotification(Notification notification, User user) {
-        notificationRepository.save(notification);
-        user.getNotifications().add(notification);
-        userRepository.save(user);
-    }
-
-    public void sendNotifications(Notification notification, ArrayList<Long> userIds) {
-        notificationRepository.save(notification);
-        for (Long userId : userIds) {
-            User user = userRepository.findById(userId).orElse(null);
-            if (user != null) {
-                user.getNotifications().add(notification);
-                userRepository.save(user);
-            }
+    public Notification saveNotification(Long userId, Notification notification) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            notification = notificationRepository.save(notification);
+            user.getNotifications().add(notification);
+            userRepository.save(user);
         }
+
+        return notification;
     }
 }

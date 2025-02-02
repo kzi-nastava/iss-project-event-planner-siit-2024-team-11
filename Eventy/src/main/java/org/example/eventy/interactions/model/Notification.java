@@ -1,5 +1,6 @@
 package org.example.eventy.interactions.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.example.eventy.users.models.User;
 
@@ -27,6 +28,7 @@ public class Notification {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "grader_id", referencedColumnName = "id")
+    @JsonManagedReference
     private User grader;
 
     @Column()
