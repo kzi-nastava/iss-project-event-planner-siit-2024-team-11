@@ -17,7 +17,8 @@ public class BudgetItemDTO {
         this.category = budgetItem.getCategory().getName();
         this.plannedFunds = budgetItem.getPlannedFunds();
         this.budgetedEntries = new ArrayList<>();
-        budgetItem.getReservedItems().forEach(v -> budgetedEntries.add(new SolutionCardDTO(v)));
+        // TO-DO: pass loggedInUser here
+        budgetItem.getReservedItems().forEach(v -> budgetedEntries.add(new SolutionCardDTO(v, null)));
     }
 
     public String getCategory() {
