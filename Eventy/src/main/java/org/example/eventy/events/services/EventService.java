@@ -23,6 +23,14 @@ public class EventService {
         return eventRepository.findAll(search, eventTypes, maxParticipants, location, startDate, endDate, pageable);
     }
 
+    public Page<Event> getPublicEvents(String search, ArrayList<String> eventTypes, Integer maxParticipants, String location, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+        return eventRepository.findAllPublic(search, eventTypes, maxParticipants, location, startDate, endDate, pageable);
+    }
+
+    public Page<Event> getPublicEventsForUser(String search, ArrayList<String> eventTypes, Integer maxParticipants, String location, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable, User user) {
+        return eventRepository.findAllPublicForUser(search, eventTypes, maxParticipants, location, startDate, endDate, user, pageable);
+    }
+
     public Event getEvent(Long eventId) {
         return eventRepository.findById(eventId).orElse(null);
     }

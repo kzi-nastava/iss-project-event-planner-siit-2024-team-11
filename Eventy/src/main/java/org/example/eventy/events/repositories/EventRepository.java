@@ -68,6 +68,40 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                         @Param("endDate") LocalDateTime endDate,
                         Pageable pageable);
 
+    @Query("SELECT e FROM Event e " +
+           "WHERE ((:search IS NULL OR :search = '' OR e.name ILIKE ('%' || :search || '%')) " +
+           "   OR (:search IS NULL OR :search = '' OR e.description ILIKE ('%' || :search || '%'))) " +
+           "AND (:maxParticipants IS NULL OR e.maxNumberParticipants <= :maxParticipants) " +
+           "AND (:location IS NULL OR :location = '' OR LOWER(e.location.name) = LOWER(:location)) " +
+           "AND (CAST(:startDate AS timestamp) IS NULL OR CAST(:endDate AS timestamp) IS NULL OR e.date BETWEEN CAST(:startDate AS timestamp) AND CAST(:endDate AS timestamp)) " +
+           "AND (:eventTypes IS NULL OR e.type.name IN :eventTypes)" +
+           "AND e.privacy = org.example.eventy.events.models.PrivacyType.PUBLIC")
+    Page<Event> findAllPublic(@Param("search") String search,
+                        @Param("eventTypes") ArrayList<String> eventTypes,
+                        @Param("maxParticipants") Integer maxParticipants,
+                        @Param("location") String location,
+                        @Param("startDate") LocalDateTime startDate,
+                        @Param("endDate") LocalDateTime endDate,
+                        Pageable pageable);
+
+    @Query("SELECT e FROM Event e " +
+           "WHERE ((:search IS NULL OR :search = '' OR e.name ILIKE ('%' || :search || '%')) " +
+           "   OR (:search IS NULL OR :search = '' OR e.description ILIKE ('%' || :search || '%'))) " +
+           "AND (:maxParticipants IS NULL OR e.maxNumberParticipants <= :maxParticipants) " +
+           "AND (:location IS NULL OR :location = '' OR LOWER(e.location.name) = LOWER(:location)) " +
+           "AND (CAST(:startDate AS timestamp) IS NULL OR CAST(:endDate AS timestamp) IS NULL OR e.date BETWEEN CAST(:startDate AS timestamp) AND CAST(:endDate AS timestamp)) " +
+           "AND (:eventTypes IS NULL OR e.type.name IN :eventTypes)" +
+           "AND e.privacy = org.example.eventy.events.models.PrivacyType.PUBLIC " +
+           "AND e.organiser = :user")
+    Page<Event> findAllPublicForUser(@Param("search") String search,
+                              @Param("eventTypes") ArrayList<String> eventTypes,
+                              @Param("maxParticipants") Integer maxParticipants,
+                              @Param("location") String location,
+                              @Param("startDate") LocalDateTime startDate,
+                              @Param("endDate") LocalDateTime endDate,
+                              @Param("user") User user,
+                              Pageable pageable);
+
     @Query("SELECT e FROM Event e ORDER BY e.id DESC")
     ArrayList<Event> findFeaturedEvents(Pageable pageable);
 

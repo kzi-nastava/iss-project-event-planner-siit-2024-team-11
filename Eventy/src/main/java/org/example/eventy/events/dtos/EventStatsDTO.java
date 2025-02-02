@@ -1,29 +1,24 @@
 package org.example.eventy.events.dtos;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 public class EventStatsDTO {
-    private EventDTO event;
+    private EventCardDTO eventCard;
     private int visitors;
     private double averageGrade;
+    private int[] gradeDistribution;
 
-    public EventStatsDTO(EventDTO event) {
-
-    }
-
-    public EventStatsDTO(EventDTO event, int visitors, double averageGrade) {
-        this.event = event;
+    public EventStatsDTO(EventCardDTO eventCard, int visitors, double averageGrade, int[] gradeDistribution) {
+        this.eventCard = eventCard;
         this.visitors = visitors;
         this.averageGrade = averageGrade;
+        this.gradeDistribution = gradeDistribution;
     }
 
-    public EventDTO getEvent() {
-        return event;
+    public EventCardDTO getEventCard() {
+        return eventCard;
     }
 
-    public void setEvent(EventDTO event) {
-        this.event = event;
+    public void setEventCard(EventCardDTO eventCard) {
+        this.eventCard = eventCard;
     }
 
     public int getVisitors() {
@@ -40,5 +35,13 @@ public class EventStatsDTO {
 
     public void setAverageGrade(double averageGrade) {
         this.averageGrade = averageGrade;
+    }
+
+    public int[] getGradeDistribution() {
+        return gradeDistribution;
+    }
+
+    public void setGradeDistribution(int[] gradeDistribution) {
+        this.gradeDistribution = gradeDistribution;
     }
 }
