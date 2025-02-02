@@ -1,5 +1,6 @@
 package org.example.eventy.solutions.dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.example.eventy.common.models.ReservationConfirmationType;
 import org.example.eventy.common.models.SolutionType;
 import org.example.eventy.common.services.PictureService;
@@ -7,6 +8,7 @@ import org.example.eventy.events.models.EventType;
 import org.example.eventy.solutions.models.Product;
 import org.example.eventy.solutions.models.Service;
 import org.example.eventy.solutions.models.Solution;
+import org.example.eventy.users.models.User;
 
 import java.util.ArrayList;
 
@@ -26,16 +28,21 @@ public class SolutionCardDTO {
     private Double price;
     private Integer discount;
     private String firstImageUrl;
+
+    @JsonProperty("isAvailable")
     private Boolean isAvailable;
     private Long providerId;
     private String providerName;
     private String providerImageUrl;
 
+    @JsonProperty("isFavorite")
+    private boolean isFavorite;
+
     public SolutionCardDTO() {
 
     }
 
-    public SolutionCardDTO(Long solutionId, SolutionType type, String name, String categoryName, String description, String specifics, Integer minReservationTime, Integer maxReservationTime, Integer reservationDeadline, Integer cancellationDeadline, ReservationConfirmationType reservationType, ArrayList<String> eventTypeNames, Double price, Integer discount, String firstImageUrl, Boolean isAvailable, Long providerId, String providerName, String providerImageUrl) {
+    public SolutionCardDTO(Long solutionId, SolutionType type, String name, String categoryName, String description, String specifics, Integer minReservationTime, Integer maxReservationTime, Integer reservationDeadline, Integer cancellationDeadline, ReservationConfirmationType reservationType, ArrayList<String> eventTypeNames, Double price, Integer discount, String firstImageUrl, Boolean isAvailable, Long providerId, String providerName, String providerImageUrl, Boolean isFavorite) {
         this.solutionId = solutionId;
         this.type = type;
         this.name = name;
@@ -55,9 +62,10 @@ public class SolutionCardDTO {
         this.providerId = providerId;
         this.providerName = providerName;
         this.providerImageUrl = providerImageUrl;
+        this.isFavorite = isFavorite;
     }
 
-    public SolutionCardDTO(Solution solution) {
+    public SolutionCardDTO(Solution solution, User loggedInUser) {
         this.solutionId = solution.getId();
         this.name = solution.getName();
         this.categoryName = solution.getCategory().getName();
@@ -90,7 +98,9 @@ public class SolutionCardDTO {
         this.providerId = solution.getProvider().getId();
         this.providerName = solution.getProvider().getName();
         this.providerImageUrl = PictureService.getImage(solution.getProvider().getImageUrls().get(0).getPath());
+        this.isFavorite = loggedInUser != null && loggedInUser.getFavoriteSolutions().contains(solution);
     }
+
 
     public Long getSolutionId() {
         return solutionId;
