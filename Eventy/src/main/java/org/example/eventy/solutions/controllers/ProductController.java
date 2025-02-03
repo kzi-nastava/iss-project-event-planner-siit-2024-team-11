@@ -22,7 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -134,8 +133,8 @@ public class ProductController {
             productDTO.setPrice(5.0);
             productDTO.setDiscount(7.0);
             productDTO.setDescription("Product 5 Description");
-            productDTO.setAvailability(true);
-            productDTO.setVisibility(true);
+            productDTO.setAvailable(true);
+            productDTO.setVisible(true);
             productDTO.setImages(new ArrayList<String>());
             productDTO.setRelatedEventTypes(new ArrayList<EventTypeDTO>());
             return new ResponseEntity<>(productDTO, HttpStatus.OK);
