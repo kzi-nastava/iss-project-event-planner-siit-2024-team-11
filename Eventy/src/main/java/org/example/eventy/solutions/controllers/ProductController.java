@@ -106,18 +106,6 @@ public class ProductController {
         return new ResponseEntity<>(productDTO, HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping(value = "/provider/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<ProductDTO>> getProductsProvider(@PathVariable Long userId) {
-        List<ProductDTO> products = new ArrayList<>();
-        if(userId == 5) {
-            products.add(new ProductDTO(1L, "Product 1", "Product 1 Description", 1.0, 10.0, new ArrayList<EventTypeDTO>(), new ArrayList<String>(), false, false));
-            products.add(new ProductDTO(2L, "Product 2", "Product 2 Description", 2.0, 8.0, new ArrayList<EventTypeDTO>(), new ArrayList<String>(), true, false));
-            return new ResponseEntity<>(products, HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(products, HttpStatus.NOT_FOUND);
-    }
-
     @PutMapping(value = "/{productId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ProductDTO> updateProduct(@RequestBody ProductDTO productDTO, @PathVariable Long productId) {
         ProductDTO updatedProductDTO = new ProductDTO();
