@@ -2,13 +2,19 @@ package org.example.eventy.solutions.services;
 
 import org.example.eventy.events.models.Event;
 import org.example.eventy.events.services.EventService;
+import org.example.eventy.interactions.model.Notification;
+import org.example.eventy.interactions.model.NotificationType;
+import org.example.eventy.interactions.services.NotificationService;
 import org.example.eventy.solutions.dtos.ReservationDTO;
 import org.example.eventy.solutions.models.Reservation;
 import org.example.eventy.solutions.models.Solution;
+import org.example.eventy.users.models.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.example.eventy.solutions.repositories.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -27,6 +33,10 @@ public class ReservationService {
     private EventService eventService;
     @Autowired
     private ServiceService serviceService;
+    @Autowired
+    private NotificationService notificationService;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     public Reservation getReservation(Long reservationId) {
         return reservationRepository.findById(reservationId).orElse(null);
@@ -75,5 +85,39 @@ public class ReservationService {
 
     public List<Reservation> getReservationByProviderBetween(Long providerId, LocalDate startDateTime, LocalDate endDateTime) {
         return reservationRepository.findReservationsByProvider(providerId, startDateTime.atStartOfDay(), endDateTime.atStartOfDay());
+    }
+
+    @Scheduled(fixedRate = 60000) // 1 minute
+    public void checkReservationsAndNotify() {
+        List<Reservation> reservationsToNotify = reservationRepository.findReservationsToNotify();
+
+        for (Reservation reservation : reservationsToNotify) {
+            NotificationType type = NotificationType.REMINDER_SERVICE;
+            Long redirectionId = reservation.getSelectedEvent().getId();
+            String title = "Upcoming Service REMINDER";
+            User owner = reservation.getSelectedEvent().getOrganiser();
+            User grader = null;
+            Integer grade = null;
+            String message = "Your reserved service \"" + reservation.getSelectedService().getName() +
+                             "\" for event \"" + reservation.getSelectedEvent().getName() + "\"" +
+                             " will begin in 1 hour. Tap to see more!";
+            LocalDateTime timestamp = LocalDateTime.now();
+            Notification notification = new Notification(type, redirectionId, title, message, grader, grade, timestamp);
+
+            notificationService.saveNotification(owner.getId(), notification);
+            sendNotificationToWeb(owner.getId(), notification);
+            sendNotificationToMobile(owner.getId(), notification);
+
+            reservation.setNotificationSent(true);
+            reservationRepository.save(reservation);
+        }
+    }
+
+    private void sendNotificationToWeb(Long userId, Notification notification) {
+        messagingTemplate.convertAndSend("/topic/web/" + userId, notification);
+    }
+
+    private void sendNotificationToMobile(Long userId, Notification notification) {
+        messagingTemplate.convertAndSend("/topic/mobile/" + userId, notification);
     }
 }

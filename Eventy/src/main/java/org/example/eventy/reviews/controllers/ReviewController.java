@@ -204,7 +204,7 @@ public class ReviewController {
         LocalDateTime timestamp = LocalDateTime.now();
         Notification notification = new Notification(type, redirectionId, title, message, grader, grade, timestamp);
 
-        notificationService.saveNotification( owner.getId(), notification);
+        notificationService.saveNotification(owner.getId(), notification);
         sendNotificationToWeb(owner.getId(), notification);
         sendNotificationToMobile(owner.getId(), notification);
     }

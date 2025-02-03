@@ -37,8 +37,13 @@ public class NotificationDTO {
         this.redirectionId = Math.toIntExact(notification.getRedirectionId());
         this.title = notification.getTitle();
         this.message = notification.getMessage();
-        this.graderImage = notification.getGrader().getImageUrls() != null ? PictureService.getImage(notification.getGrader().getImageUrls().get(0).getPath()) : "none";
-        this.graderEmail = notification.getGrader().getEmail();
+        if (notification.getGrader() != null) {
+            this.graderImage = notification.getGrader().getImageUrls() != null ? PictureService.getImage(notification.getGrader().getImageUrls().get(0).getPath()) : "none";
+            this.graderEmail = notification.getGrader().getEmail();
+        } else {
+            this.graderImage = null;
+            this.graderEmail = null;
+        }
         this.grade = notification.getGrade();
         this.timestamp = notification.getTimestamp();
     }

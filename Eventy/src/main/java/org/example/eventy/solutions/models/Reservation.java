@@ -34,15 +34,20 @@ public class Reservation {
     @Future(message = "Reservation end time must be in the future")
     private LocalDateTime reservationEndDateTime;
 
-    public Reservation() {
-    }
+    @Column()
+    private boolean notificationSent = false;
 
-    public Reservation(Long id, Event selectedEvent, Solution selectedService, LocalDateTime reservationStartDateTime, LocalDateTime reservationEndDateTime) {
+    ///////////////////////////////////////
+
+    public Reservation() {}
+
+    public Reservation(Long id, Event selectedEvent, Solution selectedService, LocalDateTime reservationStartDateTime, LocalDateTime reservationEndDateTime, boolean notificationSent) {
         this.id = id;
         this.selectedEvent = selectedEvent;
         this.selectedService = selectedService;
         this.reservationStartDateTime = reservationStartDateTime;
         this.reservationEndDateTime = reservationEndDateTime;
+        this.notificationSent = notificationSent;
     }
 
     public Long getId() {
@@ -53,35 +58,43 @@ public class Reservation {
         this.id = id;
     }
 
-    public Event getSelectedEvent() {
+    public @NotNull(message = "Event must not be null") Event getSelectedEvent() {
         return selectedEvent;
     }
 
-    public void setSelectedEvent(Event selectedEvent) {
+    public void setSelectedEvent(@NotNull(message = "Event must not be null") Event selectedEvent) {
         this.selectedEvent = selectedEvent;
     }
 
-    public Solution getSelectedService() {
+    public @NotNull(message = "Service must not be null") Solution getSelectedService() {
         return selectedService;
     }
 
-    public void setSelectedService(Solution selectedService) {
+    public void setSelectedService(@NotNull(message = "Service must not be null") Solution selectedService) {
         this.selectedService = selectedService;
     }
 
-    public LocalDateTime getReservationStartDateTime() {
+    public @NotNull(message = "Reservation start time cannot be null") @Future(message = "Reservation start time must be in the future") LocalDateTime getReservationStartDateTime() {
         return reservationStartDateTime;
     }
 
-    public void setReservationStartDateTime(LocalDateTime reservationStartDateTime) {
+    public void setReservationStartDateTime(@NotNull(message = "Reservation start time cannot be null") @Future(message = "Reservation start time must be in the future") LocalDateTime reservationStartDateTime) {
         this.reservationStartDateTime = reservationStartDateTime;
     }
 
-    public LocalDateTime getReservationEndDateTime() {
+    public @NotNull(message = "Reservation end time cannot be null") @Future(message = "Reservation end time must be in the future") LocalDateTime getReservationEndDateTime() {
         return reservationEndDateTime;
     }
 
-    public void setReservationEndDateTime(LocalDateTime reservationEndDateTime) {
+    public void setReservationEndDateTime(@NotNull(message = "Reservation end time cannot be null") @Future(message = "Reservation end time must be in the future") LocalDateTime reservationEndDateTime) {
         this.reservationEndDateTime = reservationEndDateTime;
+    }
+
+    public boolean isNotificationSent() {
+        return notificationSent;
+    }
+
+    public void setNotificationSent(boolean notificationSent) {
+        this.notificationSent = notificationSent;
     }
 }

@@ -27,12 +27,8 @@ public class NotificationService {
     }
 
     public Notification saveNotification(Long userId, Notification notification) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user != null) {
-            notification = notificationRepository.save(notification);
-            user.getNotifications().add(notification);
-            userRepository.save(user);
-        }
+        notification = notificationRepository.save(notification);
+        notificationRepository.saveNotificationToStudent(notification.getId(), userId);
 
         return notification;
     }
