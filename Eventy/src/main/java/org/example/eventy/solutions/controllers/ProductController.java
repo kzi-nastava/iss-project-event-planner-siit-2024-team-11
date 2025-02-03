@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -146,25 +147,29 @@ public class ProductController {
     @PutMapping(value = "/{productId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('Provider')")
     public ResponseEntity<ProductDTO> updateProduct(@RequestBody ProductDTO productDTO, @PathVariable Long productId) {
-        ProductDTO updatedProductDTO = new ProductDTO();
-        if(productDTO.getId() == 5L && productId == 5L) {
-            updatedProductDTO.setId(productDTO.getId());
-            updatedProductDTO.setName(productDTO.getName());
-            updatedProductDTO.setPrice(productDTO.getPrice());
-            updatedProductDTO.setDiscount(productDTO.getDiscount());
-            updatedProductDTO.setDescription(productDTO.getDescription());
-            updatedProductDTO.setAvailability(productDTO.isAvailable());
-            updatedProductDTO.setVisibility(productDTO.isVisible());
-            updatedProductDTO.setImages(productDTO.getImages());
-            updatedProductDTO.setRelatedEventTypes(productDTO.getRelatedEventTypes());
-            return new ResponseEntity<ProductDTO>(updatedProductDTO, HttpStatus.OK);
+        Product product = (Product) productService.getProduct(productId);
+
+        if (product == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        if(productId == 100L) {
-            return new ResponseEntity<ProductDTO>(updatedProductDTO, HttpStatus.BAD_REQUEST);
+        product.setName(productDTO.getName());
+        product.setDescription(productDTO.getDescription());
+        product.setPrice(productDTO.getPrice());
+        product.setDiscount((int) productDTO.getDiscount());
+        product.setImageUrls(pictureService.save(productDTO.getImages()));
+        product.setEventTypes(productDTO.getRelatedEventTypes().stream().map(eventType -> eventTypeService.get(eventType.getId())).collect(Collectors.toList()));
+        product.setVisible(productDTO.isVisible());
+        product.setAvailable(productDTO.isAvailable());
+        product.setCurrentProduct(productHistoryService.save(new ProductHistory(product)));
+
+        product = productService.save(product);
+
+        if(product == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<ProductDTO>(updatedProductDTO, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<ProductDTO>(new ProductDTO(product), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{productId}")
