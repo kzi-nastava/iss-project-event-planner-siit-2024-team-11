@@ -14,7 +14,7 @@ VALUES
     (DEFAULT, 'Organizer', 'ves@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3815361', TRUE, FALSE, TRUE, FALSE, NULL, 3, NOW(), '2024-10-30 00:00:00', NULL, 'Ves Ves', 'Jezickovic', NULL),
     (DEFAULT, 'Provider', 'provider@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), '2000-01-01 00:00:00', 'Description', NULL, NULL, 'VIT DOO'),
     (DEFAULT, 'Provider', 'provider2@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), '2000-01-01 00:00:00', 'Description', NULL, NULL, 'Lidl'),
-    (DEFAULT, 'Admin', 'veselin.roganovic.rogan003@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', 'Cara Dusana 72, Novi Sad', '+381 65 31 43 240', TRUE, FALSE, TRUE, FALSE, NULL, 1, NOW(), '2000-01-01 00:00:00', NULL, 'Veselin', 'Roganovic', NULL),
+    (DEFAULT, 'Admin', 'admin@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', 'Cara Dusana 72, Novi Sad', '+381 65 31 43 240', TRUE, FALSE, TRUE, FALSE, NULL, 1, NOW(), '2000-01-01 00:00:00', NULL, 'Veselin', 'Roganovic', NULL),
     (DEFAULT, 'AuthenticatedUser', 'auth@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 2, NOW(), '2000-01-01 00:00:00', NULL, NULL, NULL, NULL),
     (DEFAULT, 'AuthenticatedUser', 'c.tamara333@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 2, NOW(), '2000-01-01 00:00:00', NULL, NULL, NULL, NULL);
 
@@ -52,8 +52,7 @@ INSERT INTO categories (id, name, description, status, is_deleted)
 VALUES
     (DEFAULT, 'Decorations', 'Items for event lighting and venue decoration.', 0, false),
     (DEFAULT, 'Photography', 'Services for capturing memories of events.', 0, false),
-    (DEFAULT, 'Catering', 'Food and drink services for events.', 0, false),
-    (DEFAULT, 'Birthday', 'For best birthdays ever!', 1, false);
+    (DEFAULT, 'Catering', 'Food and drink services for events.', 0, false);
 
 -- Solutions
 INSERT INTO solutions(
@@ -70,7 +69,7 @@ VALUES
     (15, 15, FALSE, FALSE, TRUE, 240, 60, 99.99, 7, 0, 2, DEFAULT, NULL, 4, NULL, 'Service', 'Wedding photography package', 'Photography', 'Includes editing and delivery in 2 weeks'),
     (12, 20, TRUE, FALSE, TRUE, 180, 30, 149.99, 0, 1, 3, DEFAULT, NULL, 4, NULL, 'Service', 'Personal training session', 'Training', 'One-on-one session with certified trainer'),
     (7, 10, TRUE, FALSE, TRUE, 300, 90, 199.99, 14, 1, 2, DEFAULT, NULL, 4, NULL, 'Service', 'Event planning service', 'Event Planning', 'Full-service planning and coordination'),
-    (17, 25, TRUE, FALSE, TRUE, 120, 30, 79.99, 14, 0, 4, DEFAULT, NULL, 3, NULL, 'Service', 'House cleaning service', 'Cleaning', 'Deep cleaning for apartments and houses');
+    (17, 25, TRUE, FALSE, TRUE, 120, 30, 79.99, 14, 0, 3, DEFAULT, NULL, 3, NULL, 'Service', 'House cleaning service', 'Cleaning', 'Deep cleaning for apartments and houses');
 
 -- Pictures
 INSERT INTO pictures
@@ -121,55 +120,12 @@ INSERT INTO notifications (id, type, redirection_id, title, message, grader_id, 
 VALUES
        -- 1
        (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2023-11-01 00:00:00'),
-       (DEFAULT, 'EVENT_CHANGE', 102, 'Event Updated', 'The event "Tech Conference" has a new date.', 2, NULL, '2023-11-02 00:00:00'),
-
-       -- 3
-       (DEFAULT, 'RATING_EVENT', 201, 'New Event Rating', 'Your event "Charity Run" received a new rating.', 3, 5, '2023-11-03 00:00:00'),
-       (DEFAULT, 'RATING_EVENT', 202, 'Event Rated', 'Someone rated your event "Food Festival".', 4, 3, '2023-11-04 00:00:00'),
-
-       -- 5
-       (DEFAULT, 'RATING_SERVICE', 301, 'Service Review', 'Your catering service received a new rating.', 2, 4, '2023-11-05 00:00:00'),
-       (DEFAULT, 'RATING_SERVICE', 302, 'Service Feedback', 'A user left feedback on your photography service.', 3, 3, '2000-01-01 00:00:00'),
-
-       -- 7
-       (DEFAULT, 'RATING_PRODUCT', 401, 'Product Rated', 'Your decoration package received a 5-star rating.', 5, 2, '2000-01-01 00:00:00'),
-       (DEFAULT, 'RATING_PRODUCT', 402, 'New Product Feedback', 'Your sound system rental got a review.', 6, 4, '2000-01-01 00:00:00'),
-
-       -- 9
-       (DEFAULT, 'CATEGORY_UPDATED', 501, 'Category Update', 'A category you follow has been updated.', 2, NULL, NOW()),
-       (DEFAULT, 'CATEGORY_UPDATED', 502, 'Category Changed', 'A service category has been modified.', 3, NULL, NOW()),
-
-       -- 11
-       (DEFAULT, 'NEW_CATEGORY_SUGGESTION_SERVICE', 601, 'New Service Category', 'A new category suggestion has been submitted.', 4, NULL, NOW()),
-       (DEFAULT, 'NEW_CATEGORY_SUGGESTION_SERVICE', 602, 'Category Suggestion', 'Someone suggested a new service category.', 5, NULL, NOW()),
-
-       -- 13
-       (DEFAULT, 'NEW_CATEGORY_SUGGESTION_PRODUCT', 701, 'Product Category Suggestion', 'A new product category has been proposed.', 6, NULL, NOW()),
-       (DEFAULT, 'NEW_CATEGORY_SUGGESTION_PRODUCT', 702, 'Product Category Request', 'A user suggested a new product category.', 1, NULL, NOW()),
-
-       -- 15
-       (DEFAULT, 'CATEGORY_SUGGESTION_ACCEPTED', 801, 'Category Approved', 'Your suggested category has been approved.', 2, NULL, NOW()),
-       (DEFAULT, 'CATEGORY_SUGGESTION_ACCEPTED', 802, 'Category Accepted', 'A suggested category is now live.', 3, NULL, NOW()),
-
-       -- 17
-       (DEFAULT, 'CATEGORY_SUGGESTION_CHANGED', 901, 'Category Modification', 'A suggested category has been changed.', 4, NULL, NOW()),
-       (DEFAULT, 'CATEGORY_SUGGESTION_CHANGED', 902, 'Suggestion Updated', 'Your category suggestion was updated.', 5, NULL, NOW()),
-
-       -- 19
-       (DEFAULT, 'CATEGORY_SUGGESTION_REPLACED', 1001, 'Category Replaced', 'A suggested category was replaced with another.', 6, NULL, NOW()),
-       (DEFAULT, 'CATEGORY_SUGGESTION_REPLACED', 1002, 'Suggestion Modified', 'A new category has replaced an existing one.', 1, NULL, NOW()),
-
-       -- 21
-       (DEFAULT, 'REMINDER_SERVICE', 1101, 'Service Reminder', 'Dont forget about your upcoming service.', 2, NULL, NOW()),
-       (DEFAULT, 'REMINDER_SERVICE', 1102, 'Upcoming Service Alert', 'A reminder for your booked service.', 3, NULL, NOW());
+       (DEFAULT, 'RATING_EVENT', 201, 'New Event Rating', 'Your event "Charity Run" received a new rating.', 3, 5, '2023-11-03 00:00:00');
 
 -- Assign Notifications to Users
 INSERT INTO user_notifications (user_id, notification_id) VALUES
     (1, 1),
-    (1, 3),
-    (1, 5),
-    (1, 7),
-    (1, 15);
+    (1, 2);
 
 -- Reviews
 INSERT INTO Reviews (user_id, event_id, solution_id, comment, grade, status, is_deleted)

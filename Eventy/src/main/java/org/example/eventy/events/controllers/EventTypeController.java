@@ -42,7 +42,7 @@ public class EventTypeController {
     }
 
     @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('Organizer')")
+    @PreAuthorize("hasRole('Organizer') or hasRole('Provider')")
     public ResponseEntity<Collection<EventTypeCardDTO>> getActiveTypes() {
         List<EventType> eventTypes = eventTypeService.getActiveTypes();
         List<EventTypeCardDTO> eventTypeDTOs = new ArrayList<EventTypeCardDTO>();

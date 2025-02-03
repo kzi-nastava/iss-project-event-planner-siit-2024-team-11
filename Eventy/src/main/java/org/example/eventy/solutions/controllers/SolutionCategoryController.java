@@ -43,7 +43,27 @@ public class SolutionCategoryController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CategoryWithIDDTO> createCategory(@RequestBody CreateCategoryDTO newCategory) {
         CategoryWithIDDTO createdCategory = service.createCategory(newCategory);
+        if (createdCategory.getStatus().equals(Status.PENDING)) {
+            sendNotification(createdCategory);
+        }
         return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
+    }
+
+    private void sendNotification(CategoryWithIDDTO newCategory) {
+        NotificationType type = NotificationType.NEW_CATEGORY_SUGGESTION;
+        Long redirectionId = 5L; // admin ID
+        String title = "NEW Category Suggestion!";
+        Long ownerId = 5L; // admin ID
+        User grader = null;
+        Integer grade = null;
+        String message = "A new request for a category with the name \"" + newCategory.getName() + "\" has been submitted. Tap to see more!";
+
+        LocalDateTime timestamp = LocalDateTime.now();
+        Notification notification = new Notification(type, redirectionId, title, message, grader, grade, timestamp);
+
+        notificationService.saveNotification(ownerId, notification);
+        sendNotificationToWeb(ownerId, notification);
+        sendNotificationToMobile(ownerId, notification);
     }
 
     @PreAuthorize("hasRole('Admin') or hasRole('Provider')")
@@ -77,15 +97,13 @@ public class SolutionCategoryController {
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CategoryWithIDDTO> updateCategory(@RequestBody CategoryWithIDDTO updateCategory) {
         Category categoryToChange = service.getCategory(updateCategory.getId());
-        String oldCategoryName = categoryToChange.getName();
-        String newCategoryName = updateCategory.getName();
 
         List<Solution> changedSolutions = solutionService.findAllByCategory(categoryToChange);
         if (!changedSolutions.isEmpty()) {
             Set<Long> providersToNotify = new HashSet<Long>();
             changedSolutions.forEach(changedSolution -> providersToNotify.add(changedSolution.getProvider().getId()));
             for (Long providerId : providersToNotify) {
-                sendNotification(providerId, oldCategoryName, newCategoryName);
+                sendNotification(providerId, categoryToChange, updateCategory);
             }
         }
 
@@ -96,14 +114,32 @@ public class SolutionCategoryController {
         return new ResponseEntity<>(new CategoryWithIDDTO(updatedCategory), HttpStatus.OK);
     }
 
-    private void sendNotification(Long providerId, String oldCategoryName, String newCategoryName) {
+    private void sendNotification(Long providerId, Category oldCategory, CategoryWithIDDTO newCategory) {
         NotificationType type = NotificationType.CATEGORY_UPDATED;
         Long redirectionId = providerId;
-        String title = "Category name UPDATED!";
+        String title = "Existing Category UPDATED!";
         Long ownerId = providerId;
+        String message = null;
         User grader = null;
         Integer grade = null;
-        String message = "The category \"" + oldCategoryName + "\" was changed to \"" + newCategoryName + "\".";
+
+        String oldCategoryName = oldCategory.getName();
+        String newCategoryName = newCategory.getName();
+        String oldCategoryDescription = oldCategory.getDescription();
+        String newCategoryDescription = newCategory.getDescription();
+
+        if (!oldCategoryName.equals(newCategoryName) && !oldCategoryDescription.equals(newCategoryDescription)) {
+            message = "The category \"" + oldCategoryName + "\" was changed to \"" + newCategoryName + "\". " +
+                      "New description: \"" + newCategoryDescription + "\".";
+        }
+
+        if (!oldCategoryName.equals(newCategoryName) && oldCategoryDescription.equals(newCategoryDescription)) {
+            message = "The category \"" + oldCategoryName + "\" was changed to \"" + newCategoryName + "\". ";
+        }
+
+        if (oldCategoryName.equals(newCategoryName) && !oldCategoryDescription.equals(newCategoryDescription)) {
+            message = "The category \"" + oldCategoryName + "\" has a new description: \"" + newCategoryDescription + "\". ";
+        }
 
         LocalDateTime timestamp = LocalDateTime.now();
         Notification notification = new Notification(type, redirectionId, title, message, grader, grade, timestamp);
