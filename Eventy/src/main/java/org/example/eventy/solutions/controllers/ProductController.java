@@ -1,12 +1,19 @@
 package org.example.eventy.solutions.controllers;
 
+import org.example.eventy.common.services.PictureService;
 import org.example.eventy.events.dtos.EventTypeDTO;
+import org.example.eventy.events.services.EventTypeService;
 import org.example.eventy.solutions.dtos.CreateProductDTO;
 import org.example.eventy.solutions.dtos.ProductDTO;
 import org.example.eventy.solutions.dtos.ProductPurchaseDTO;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
+import org.example.eventy.solutions.models.Product;
+import org.example.eventy.solutions.models.ProductHistory;
 import org.example.eventy.solutions.models.Solution;
+import org.example.eventy.solutions.services.ProductHistoryService;
 import org.example.eventy.solutions.services.ProductService;
+import org.example.eventy.solutions.services.SolutionCategoryService;
+import org.example.eventy.users.models.SolutionProvider;
 import org.example.eventy.users.models.User;
 import org.example.eventy.users.services.UserService;
 import org.example.eventy.util.TokenUtils;
@@ -14,11 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/products")
@@ -30,6 +37,14 @@ public class ProductController {
     private UserService userService;
     @Autowired
     private TokenUtils tokenUtils;
+    @Autowired
+    private PictureService pictureService;
+    @Autowired
+    private SolutionCategoryService solutionCategoryService;
+    @Autowired
+    private EventTypeService eventTypeService;
+    @Autowired
+    private ProductHistoryService productHistoryService;
 
     // GET "/api/products/cards/5"
     @GetMapping(value = "/cards/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -55,25 +70,45 @@ public class ProductController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ProductDTO> createProduct(@RequestBody CreateProductDTO createProductDTO) {
-        ProductDTO productDTO = new ProductDTO();
+    @PreAuthorize("hasRole('Provider')")
+    public ResponseEntity<ProductDTO> createProduct(@RequestBody CreateProductDTO createProductDTO,
+                                                    @RequestHeader(value = "Authorization", required = false) String token) {
+        Product product = new Product();
 
-        if(createProductDTO.getName().equals("product")) {
-            productDTO.setId(5L);
-            productDTO.setName(createProductDTO.getName());
-            productDTO.setPrice(createProductDTO.getPrice());
-            productDTO.setDescription(createProductDTO.getDescription());
-            productDTO.setAvailability(createProductDTO.isAvailable());
-            productDTO.setVisibility(createProductDTO.isVisible());
-            productDTO.setImages(createProductDTO.getImages());
-            productDTO.setPrice(createProductDTO.getPrice());
-            productDTO.setDiscount(createProductDTO.getDiscount());
-            productDTO.setRelatedEventTypes(createProductDTO.getRelatedEventTypes());
-            return new ResponseEntity<ProductDTO>(productDTO, HttpStatus.CREATED);
+        User user = null;
+        if(token != null) {
+            try {
+                token = token.substring(7);
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
         }
 
-        // validation failed
-        return new ResponseEntity<ProductDTO>(productDTO, HttpStatus.BAD_REQUEST);
+        if (user == null) {
+            return new ResponseEntity<ProductDTO>(HttpStatus.FORBIDDEN);
+        }
+
+        product.setName(createProductDTO.getName());
+        product.setDescription(createProductDTO.getDescription());
+        product.setPrice(createProductDTO.getPrice());
+        product.setDiscount(createProductDTO.getDiscount());
+        product.setImageUrls(pictureService.save(createProductDTO.getImageUrls()));
+        product.setCategory(solutionCategoryService.getCategory(createProductDTO.getCategory().getId()));
+        product.setEventTypes(createProductDTO.getRelatedEventTypes().stream().map(eventType -> eventTypeService.get(eventType.getId())).collect(Collectors.toList()));
+        product.setVisible(createProductDTO.isVisible());
+        product.setAvailable(createProductDTO.isAvailable());
+        product.setDeleted(false);
+        product.setProvider((SolutionProvider) user);
+        product.setCurrentProduct(productHistoryService.save(new ProductHistory(product)));
+
+        product = productService.save(product);
+
+        if(product == null) {
+            return new ResponseEntity<ProductDTO>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<ProductDTO>(new ProductDTO(product), HttpStatus.CREATED);
     }
 
     /*

@@ -41,6 +41,15 @@ public class ProductHistory  {
         this.isAvailable = isAvailable;
     }
 
+    public ProductHistory(Product product) {
+        this.name = product.getName();
+        this.description = product.getDescription();
+        this.price = product.getPrice();
+        this.discount = product.getDiscount();
+        this.isVisible = product.isVisible();
+        this.isAvailable = product.isAvailable();
+    }
+
     public Long getId() {
         return id;
     }

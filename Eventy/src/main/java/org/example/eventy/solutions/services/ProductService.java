@@ -1,5 +1,6 @@
 package org.example.eventy.solutions.services;
 
+import org.example.eventy.solutions.models.Product;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.repositories.SolutionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,5 +12,9 @@ public class ProductService {
 
     public Solution getProduct(Long productId) {
         return solutionRepository.findById(productId).orElse(null);
+    }
+
+    public Product save(Product product) {
+        return solutionRepository.save(product);
     }
 }
