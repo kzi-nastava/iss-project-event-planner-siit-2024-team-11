@@ -1,6 +1,9 @@
 package org.example.eventy.users.repositories;
 
+import org.example.eventy.interactions.model.Notification;
 import org.example.eventy.users.models.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -29,4 +32,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
                                @Param("name") String name,
                                @Param("description") String description,
                                @Param("userType") String userType);
+
+    @Query("SELECT n FROM User u JOIN u.notifications n WHERE u.id = :userId ORDER BY n.timestamp DESC")
+    Page<Notification> findAllNotificationsByUserId(@Param("userId") Long userId,
+                                                    Pageable pageable);
+
+    @Query("SELECT COUNT(n) > 0 FROM User u JOIN u.notifications n WHERE u.id = :userId AND n.timestamp > u.lastReadNotifications")
+    boolean hasNewNotifications(@Param("userId") Long userId);
 }

@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("api/reservations")
 public class ReservationController {
-
     @Autowired
     private ReservationService reservationService;
 

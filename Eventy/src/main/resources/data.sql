@@ -7,15 +7,16 @@ VALUES
 
 -- Users
 INSERT INTO users (
-    id, user_type, email, password, address, phone_number, is_active, is_deactivated, enabled, has_silenced_notifications, suspension_deadline, role_id, last_password_reset_date, description, first_name, last_name, name
+    id, user_type, email, password, address, phone_number, is_active, is_deactivated, enabled, has_silenced_notifications, suspension_deadline, role_id, last_password_reset_date, last_read_notifications, description, first_name, last_name, name
 )
 VALUES
-    (DEFAULT, 'Organizer', 'tac@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 3, NOW(), NULL, 'Tac Tac', 'Jezickovic', NULL),
-    (DEFAULT, 'Provider', 'provider@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), 'Description', NULL, NULL, 'VIT DOO'),
-    (DEFAULT, 'Provider', 'provider2@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), 'Description', NULL, NULL, 'Lidl'),
-    (DEFAULT, 'Admin', 'veselin.roganovic.rogan003@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', 'Cara Dusana 72, Novi Sad', '+381 65 31 43 240', TRUE, FALSE, TRUE, FALSE, NULL, 1, NOW(), NULL, 'Veselin', 'Roganovic', NULL),
-    (DEFAULT, 'AuthenticatedUser', 'auth@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 2, NOW(), NULL, NULL, NULL, NULL),
-    (DEFAULT, 'AuthenticatedUser', 'c.tamara333@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 2, NOW(), NULL, NULL, NULL, NULL);
+    (DEFAULT, 'Organizer', 'tac@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 3, NOW(), '2024-10-30 00:00:00', NULL, 'Tac Tac', 'Jezickovic', NULL),
+    (DEFAULT, 'Organizer', 'ves@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3815361', TRUE, FALSE, TRUE, FALSE, NULL, 3, NOW(), '2024-10-30 00:00:00', NULL, 'Ves Ves', 'Jezickovic', NULL),
+    (DEFAULT, 'Provider', 'provider@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), '2000-01-01 00:00:00', 'Description', NULL, NULL, 'VIT DOO'),
+    (DEFAULT, 'Provider', 'provider2@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), '2000-01-01 00:00:00', 'Description', NULL, NULL, 'Lidl'),
+    (DEFAULT, 'Admin', 'veselin.roganovic.rogan003@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', 'Cara Dusana 72, Novi Sad', '+381 65 31 43 240', TRUE, FALSE, TRUE, FALSE, NULL, 1, NOW(), '2000-01-01 00:00:00', NULL, 'Veselin', 'Roganovic', NULL),
+    (DEFAULT, 'AuthenticatedUser', 'auth@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 2, NOW(), '2000-01-01 00:00:00', NULL, NULL, NULL, NULL),
+    (DEFAULT, 'AuthenticatedUser', 'c.tamara333@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 2, NOW(), '2000-01-01 00:00:00', NULL, NULL, NULL, NULL);
 
 -- Locations
 INSERT INTO locations(latitude, longitude, id, address, name)
@@ -35,12 +36,16 @@ VALUES
 
 -- Events
 INSERT INTO events(
-    max_number_participants, privacy, date,event_type_id, id, location_id, organizer_id, description, name
+    max_number_participants, privacy, date, event_type_id, id, location_id, organizer_id, description, name
 )
 VALUES
-    (50, 1, '2024-12-25 15:00:00', 1, DEFAULT, 1, 1, 'This is a birthday party for our friend John, I hope he does not know we are organizing this!', 'Birthday Party for John'),
-    (100, 0, '2024-12-26 15:00:00', 2, DEFAULT, 2, 1, 'High school students of prestigious high school "Jonny Smith" are graduating this month!', 'High School Graduation'),
-    (150, 0, '2024-12-27 15:00:00', 1, DEFAULT, 3, 1, 'Lunch in our best office ever! See you there! Big thanks to Eventy for being such a cool platform! #sponsored', 'Office Lunch');
+    (50, 'PUBLIC', '2024-12-25 15:00:00', 1, DEFAULT, 1, 1, 'This is a birthday party for our friend John, I hope he does not know we are organizing this!', 'Birthday Party for John'),
+    (100, 'PUBLIC', '2024-12-26 15:00:00', 2, DEFAULT, 2, 1, 'High school students of prestigious high school "Jonny Smith" are graduating this month!', 'High School Graduation'),
+    (150, 'PUBLIC', '2024-12-27 15:00:00', 1, DEFAULT, 3, 2, 'Lunch in our best office ever! See you there! Big thanks to Eventy for being such a cool platform! #sponsored', 'Office Lunch');
+
+-- Accepted Events
+INSERT INTO users_attending_events (event_id, user_id) VALUES
+(3, 1);
 
 -- Categories
 INSERT INTO categories (id, name, description, status, is_deleted)
@@ -50,7 +55,7 @@ VALUES
     (DEFAULT, 'Catering', 'Food and drink services for events.', 0, false);
 
 -- Solutions
-INSERT INTO public.solutions(
+INSERT INTO solutions(
     cancellation_deadline, discount, is_available, is_deleted, is_visible, max_reservation_time, min_reservation_time, price,
     reservation_deadline, reservation_type, category_id, id, product_history_id, provider_id, service_history_id, type, description, name, specifics)
 VALUES
@@ -84,15 +89,16 @@ VALUES
     (DEFAULT, 8, 'cleaning.webp');
 
 -- Users Profile Pictures
-INSERT INTO public.users_profile_pictures(picture_id, user_id)
+INSERT INTO users_profile_pictures(picture_id, user_id)
 VALUES (1, 1),
        (2, 2),
        (4, 3),
        (3, 4),
-       (3, 5);
+       (5, 5),
+       (5, 6);
 
 -- Suggested Event Types for Solutions
-INSERT INTO public.suggested_event_types(solution_id, event_type_id)
+INSERT INTO suggested_event_types(solution_id, event_type_id)
 VALUES (1, 4), -- Dumbbell suggested for Workout
        (1, 5), -- Dumbbell suggested for Tech
        (2, 2), -- Office Chair suggested for Graduation
@@ -108,3 +114,63 @@ VALUES (1, 4), -- Dumbbell suggested for Workout
        (7, 2), -- Event Planning suggested for Graduation
        (7, 3), -- Event Planning suggested for Luxury
        (8, 1); -- House Cleaning suggested for Party
+
+-- Notifications
+INSERT INTO notifications (id, type, redirection_id, title, message, grader_id, grade, timestamp)
+VALUES
+       -- 1
+       (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2023-11-01 00:00:00'),
+       (DEFAULT, 'EVENT_CHANGE', 102, 'Event Updated', 'The event "Tech Conference" has a new date.', 2, NULL, '2023-11-02 00:00:00'),
+
+       -- 3
+       (DEFAULT, 'RATING_EVENT', 201, 'New Event Rating', 'Your event "Charity Run" received a new rating.', 3, 5, '2023-11-03 00:00:00'),
+       (DEFAULT, 'RATING_EVENT', 202, 'Event Rated', 'Someone rated your event "Food Festival".', 4, 3, '2023-11-04 00:00:00'),
+
+       -- 5
+       (DEFAULT, 'RATING_SERVICE', 301, 'Service Review', 'Your catering service received a new rating.', 2, 4, '2023-11-05 00:00:00'),
+       (DEFAULT, 'RATING_SERVICE', 302, 'Service Feedback', 'A user left feedback on your photography service.', 3, 3, '2000-01-01 00:00:00'),
+
+       -- 7
+       (DEFAULT, 'RATING_PRODUCT', 401, 'Product Rated', 'Your decoration package received a 5-star rating.', 5, 2, '2000-01-01 00:00:00'),
+       (DEFAULT, 'RATING_PRODUCT', 402, 'New Product Feedback', 'Your sound system rental got a review.', 6, 4, '2000-01-01 00:00:00'),
+
+       -- 9
+       (DEFAULT, 'CATEGORY_UPDATED', 501, 'Category Update', 'A category you follow has been updated.', 2, NULL, NOW()),
+       (DEFAULT, 'CATEGORY_UPDATED', 502, 'Category Changed', 'A service category has been modified.', 3, NULL, NOW()),
+
+       -- 11
+       (DEFAULT, 'NEW_CATEGORY_SUGGESTION_SERVICE', 601, 'New Service Category', 'A new category suggestion has been submitted.', 4, NULL, NOW()),
+       (DEFAULT, 'NEW_CATEGORY_SUGGESTION_SERVICE', 602, 'Category Suggestion', 'Someone suggested a new service category.', 5, NULL, NOW()),
+
+       -- 13
+       (DEFAULT, 'NEW_CATEGORY_SUGGESTION_PRODUCT', 701, 'Product Category Suggestion', 'A new product category has been proposed.', 6, NULL, NOW()),
+       (DEFAULT, 'NEW_CATEGORY_SUGGESTION_PRODUCT', 702, 'Product Category Request', 'A user suggested a new product category.', 1, NULL, NOW()),
+
+       -- 15
+       (DEFAULT, 'CATEGORY_SUGGESTION_ACCEPTED', 801, 'Category Approved', 'Your suggested category has been approved.', 2, NULL, NOW()),
+       (DEFAULT, 'CATEGORY_SUGGESTION_ACCEPTED', 802, 'Category Accepted', 'A suggested category is now live.', 3, NULL, NOW()),
+
+       -- 17
+       (DEFAULT, 'CATEGORY_SUGGESTION_CHANGED', 901, 'Category Modification', 'A suggested category has been changed.', 4, NULL, NOW()),
+       (DEFAULT, 'CATEGORY_SUGGESTION_CHANGED', 902, 'Suggestion Updated', 'Your category suggestion was updated.', 5, NULL, NOW()),
+
+       -- 19
+       (DEFAULT, 'CATEGORY_SUGGESTION_REPLACED', 1001, 'Category Replaced', 'A suggested category was replaced with another.', 6, NULL, NOW()),
+       (DEFAULT, 'CATEGORY_SUGGESTION_REPLACED', 1002, 'Suggestion Modified', 'A new category has replaced an existing one.', 1, NULL, NOW()),
+
+       -- 21
+       (DEFAULT, 'REMINDER_SERVICE', 1101, 'Service Reminder', 'Dont forget about your upcoming service.', 2, NULL, NOW()),
+       (DEFAULT, 'REMINDER_SERVICE', 1102, 'Upcoming Service Alert', 'A reminder for your booked service.', 3, NULL, NOW());
+
+-- Assign Notifications to Users
+INSERT INTO user_notifications (user_id, notification_id) VALUES
+    (1, 1),
+    (1, 3),
+    (1, 5),
+    (1, 7),
+    (1, 15);
+
+-- Reviews
+INSERT INTO Reviews (user_id, event_id, solution_id, comment, grade, status, is_deleted)
+VALUES
+    (1, 2, NULL, 'Great event, really enjoyed it!', 5, 'ACCEPTED', false);

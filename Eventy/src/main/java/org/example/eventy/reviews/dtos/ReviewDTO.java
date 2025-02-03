@@ -32,7 +32,7 @@ public class ReviewDTO {
         this.id = review.getId();
         this.comment = review.getComment();
         this.grade = review.getGrade();
-        this.senderEmail = review.getSender().getEmail();
+        this.senderEmail = review.getGrader().getEmail();
         this.recipientEmail = review.getSolution() == null ? review.getEvent().getOrganiser().getEmail() : review.getSolution().getProvider().getEmail();
         this.title = review.getSolution() == null ? review.getEvent().getName() : review.getSolution().getName();
         this.status = review.getStatus();

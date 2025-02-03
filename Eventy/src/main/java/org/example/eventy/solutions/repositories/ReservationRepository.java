@@ -36,4 +36,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService(
             LocalDateTime end, LocalDateTime start, Solution selectedService);
+
+    @Query("SELECT r FROM Reservation r " +
+           "WHERE r.reservationStartDateTime - 1 hour <= CURRENT_TIMESTAMP " +
+           "AND r.notificationSent = false")
+    List<Reservation> findReservationsToNotify();
 }

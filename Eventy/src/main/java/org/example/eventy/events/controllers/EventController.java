@@ -324,6 +324,38 @@ public class EventController {
         return new ResponseEntity<PagedResponse<EventCardDTO>>(response, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/user/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PagedResponse<EventCardDTO>> getEventsByUserId(
+            @PathVariable Long userId,
+            @RequestParam(required = false, defaultValue = "") String search,
+            @RequestParam(required = false) ArrayList<String> eventTypes,
+            @RequestParam(required = false, defaultValue = "") String location,
+            @RequestParam(required = false, defaultValue = "9999") Integer maxParticipants,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            Pageable pageable) {
+        // Pageable - page, size, sort
+        // sort by: "type", "name", "maxNumberParticipants,asc", "maxNumberParticipants,desc", "location", "date,asc", "date,desc"
+
+        // Set default values for startDate and endDate
+        if (startDate == null) {
+            startDate = LocalDateTime.of(1970, 1, 1, 0, 0); // Very small date
+        }
+        if (endDate == null) {
+            endDate = LocalDateTime.of(2099, 12, 31, 23, 59); // Very large date
+        }
+        Page<Event> events = eventService.getEvents(userId, search, eventTypes, maxParticipants, location, startDate, endDate, pageable);
+
+        List<EventCardDTO> eventsDTO = new ArrayList<>();
+        for (Event event : events) {
+            eventsDTO.add(new EventCardDTO(event));
+        }
+        long count = events.getTotalElements();
+
+        PagedResponse<EventCardDTO> response = new PagedResponse<>(eventsDTO, (int) Math.ceil((double) count / pageable.getPageSize()), count);
+        return new ResponseEntity<PagedResponse<EventCardDTO>>(response, HttpStatus.OK);
+    }
+
     @GetMapping("/homepage-routing/")
     public ResponseEntity<Void> homepageRouting(@RequestHeader("User-Agent") String userAgent) {
         // if the device is mobile
@@ -417,6 +449,18 @@ public class EventController {
     public ResponseEntity<Collection<String>> getAllUniqueLocationsForEvents() {
         ArrayList<String> locationNames = eventService.getAllUniqueLocationsForEvents();
         return new ResponseEntity<Collection<String>>(locationNames, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/unreviewed/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<UnreviewedEventDTO>> getUnreviewedAcceptedEventsByUserId(@PathVariable Long userId) {
+        ArrayList<Event> unreviewedAcceptedEvents = eventService.getUnreviewedAcceptedEventsByUserId(userId);
+        ArrayList<UnreviewedEventDTO> unreviewedEventDTO = new ArrayList<UnreviewedEventDTO>();
+
+        for(Event event : unreviewedAcceptedEvents) {
+            unreviewedEventDTO.add(new UnreviewedEventDTO(event));
+        }
+
+        return new ResponseEntity<Collection<UnreviewedEventDTO>>(unreviewedEventDTO, HttpStatus.OK);
     }
 }
 

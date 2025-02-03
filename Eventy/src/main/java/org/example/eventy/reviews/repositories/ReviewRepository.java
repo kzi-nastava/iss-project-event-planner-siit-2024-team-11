@@ -15,6 +15,9 @@ import java.util.List;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     Page<Review> findAllByStatusOrderByIdDesc(Pageable pageable, Status status);
+  
     @Query("SELECT r.grade FROM Review r WHERE r.event.id = :eventId")
     List<Integer> findAllGradesForEvent(@Param("eventId") Long eventId);
+  
+    Boolean existsByGraderIdAndSolutionId(Long userId, Long solutionId);
 }

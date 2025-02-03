@@ -22,7 +22,11 @@ public class EventService {
     public Page<Event> getEvents(String search, ArrayList<String> eventTypes, Integer maxParticipants, String location, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
         return eventRepository.findAll(search, eventTypes, maxParticipants, location, startDate, endDate, pageable);
     }
-
+  
+    public Page<Event> getEvents(Long userId, String search, ArrayList<String> eventTypes, Integer maxParticipants, String location, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+        return eventRepository.findAll(userId, search, eventTypes, maxParticipants, location, startDate, endDate, pageable);
+    }
+  
     public Page<Event> getPublicEvents(String search, ArrayList<String> eventTypes, Integer maxParticipants, String location, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
         return eventRepository.findAllPublic(search, eventTypes, maxParticipants, location, startDate, endDate, pageable);
     }
@@ -84,5 +88,10 @@ public class EventService {
 
     public List<User> getAttendingUsersByEvent(Long eventId) {
         return eventRepository.findAttendingUsersByEvent(eventId);
+    }
+  
+    public ArrayList<Event> getUnreviewedAcceptedEventsByUserId(Long userId) {
+        LocalDateTime dateNowMinusOne = LocalDateTime.now().minusDays(1);
+        return eventRepository.findUnreviewedAcceptedEvents(userId, dateNowMinusOne);
     }
 }

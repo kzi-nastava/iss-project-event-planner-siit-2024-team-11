@@ -3,6 +3,7 @@ package org.example.eventy.users.controllers;
 import org.example.eventy.common.services.PictureService;
 import org.example.eventy.events.models.Event;
 import org.example.eventy.events.services.EventService;
+import org.example.eventy.interactions.services.NotificationService;
 import org.example.eventy.solutions.models.Reservation;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.services.ReservationService;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,18 +29,16 @@ import java.util.List;
 public class UserProfileController {
     @Autowired
     private UserService userService;
-
     @Autowired
     private PictureService pictureService;
-
     @Autowired
     private EventService eventService;
-
     @Autowired
     private ReservationService reservationService;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private NotificationService notificationService;
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> updateProfile(@RequestBody UpdateUserProfileDTO updateUserProfileDTO) {
@@ -148,5 +148,56 @@ public class UserProfileController {
         }
 
         return new ResponseEntity<List<CalendarOccupancyDTO>>(calendar, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{userId}/notifications-info", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserNotificationInfoDTO> getUserNotificationsInfo(@PathVariable Long userId) {
+        User user = userService.get(userId);
+
+        if(user != null && user.isEnabled() && user.isActive() && !user.isDeactivated()) {
+            boolean hasUserNewNotifications = notificationService.hasUserNewNotifications(userId);
+
+            UserNotificationInfoDTO userNotificationInfoDTO = new UserNotificationInfoDTO(user, hasUserNewNotifications);
+            return new ResponseEntity<UserNotificationInfoDTO>(userNotificationInfoDTO, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @PutMapping(value = "/{userId}/notifications-info", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> toggleNotifications(@PathVariable Long userId,
+                                                       @RequestBody Boolean toggleValue) {
+        User user = userService.get(userId);
+
+        if(user != null) {
+            user.setHasSilencedNotifications(toggleValue);
+
+            user = userService.save(user, false);
+            if (user == null) {
+                return new ResponseEntity<Boolean>(HttpStatus.BAD_REQUEST);
+            }
+
+            return new ResponseEntity<Boolean>(user.isHasSilencedNotifications(), HttpStatus.OK);
+        }
+
+        return new ResponseEntity<Boolean>(HttpStatus.NOT_FOUND);
+    }
+
+    @PutMapping(value = "/{userId}/last-read-notifications", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<LocalDateTime> updateLastReadNotifications(@PathVariable Long userId) {
+        User user = userService.get(userId);
+
+        if(user != null) {
+            user.setLastReadNotifications(LocalDateTime.now());
+
+            user = userService.save(user, false);
+            if (user == null) {
+                return new ResponseEntity<LocalDateTime>(HttpStatus.BAD_REQUEST);
+            }
+
+            return new ResponseEntity<LocalDateTime>(user.getLastReadNotifications(), HttpStatus.OK);
+        }
+
+        return new ResponseEntity<LocalDateTime>(HttpStatus.NOT_FOUND);
     }
 }

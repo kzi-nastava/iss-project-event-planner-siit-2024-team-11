@@ -68,6 +68,23 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                         @Param("endDate") LocalDateTime endDate,
                         Pageable pageable);
 
+  @Query("SELECT e FROM Event e " +
+            "WHERE ((:search IS NULL OR :search = '' OR e.name ILIKE ('%' || :search || '%')) " +
+            "   OR (:search IS NULL OR :search = '' OR e.description ILIKE ('%' || :search || '%'))) " +
+            "AND (:maxParticipants IS NULL OR e.maxNumberParticipants <= :maxParticipants) " +
+            "AND (:location IS NULL OR :location = '' OR LOWER(e.location.name) = LOWER(:location)) " +
+            "AND (CAST(:startDate AS timestamp) IS NULL OR CAST(:endDate AS timestamp) IS NULL OR e.date BETWEEN CAST(:startDate AS timestamp) AND CAST(:endDate AS timestamp)) " +
+            "AND (:eventTypes IS NULL OR e.type.name IN :eventTypes) " +
+            "AND (e.organiser.id = :userId) ")
+    Page<Event> findAll(@Param("userId") Long userId,
+                        @Param("search") String search,
+                        @Param("eventTypes") ArrayList<String> eventTypes,
+                        @Param("maxParticipants") Integer maxParticipants,
+                        @Param("location") String location,
+                        @Param("startDate") LocalDateTime startDate,
+                        @Param("endDate") LocalDateTime endDate,
+                        Pageable pageable);
+  
     @Query("SELECT e FROM Event e " +
            "WHERE ((:search IS NULL OR :search = '' OR e.name ILIKE ('%' || :search || '%')) " +
            "   OR (:search IS NULL OR :search = '' OR e.description ILIKE ('%' || :search || '%'))) " +
@@ -101,7 +118,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                               @Param("endDate") LocalDateTime endDate,
                               @Param("user") User user,
                               Pageable pageable);
-
+  
     @Query("SELECT e FROM Event e ORDER BY e.id DESC")
     ArrayList<Event> findFeaturedEvents(Pageable pageable);
 
@@ -113,4 +130,12 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("SELECT u FROM User u JOIN u.acceptedEvents e WHERE e.id = :eventId")
     List<User> findAttendingUsersByEvent(@Param("eventId") Long eventId);
+  
+    @Query("SELECT e FROM User u " +
+           "JOIN u.acceptedEvents e " +
+           "LEFT JOIN Review r ON r.event = e AND r.grader.id = :userId " +
+           "WHERE u.id = :userId " + "AND r.id IS NULL " +
+           "AND e.date < :dateTime ")
+    ArrayList<Event> findUnreviewedAcceptedEvents(@Param("userId") Long userId,
+                                                  @Param("dateTime") LocalDateTime dateTime);
 }
