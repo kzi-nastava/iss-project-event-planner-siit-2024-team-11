@@ -52,7 +52,8 @@ INSERT INTO categories (id, name, description, status, is_deleted)
 VALUES
     (DEFAULT, 'Decorations', 'Items for event lighting and venue decoration.', 0, false),
     (DEFAULT, 'Photography', 'Services for capturing memories of events.', 0, false),
-    (DEFAULT, 'Catering', 'Food and drink services for events.', 0, false);
+    (DEFAULT, 'Catering', 'Food and drink services for events.', 0, false),
+    (DEFAULT, 'Birthday', 'For best birthdays ever!', 1, false);
 
 -- Solutions
 INSERT INTO solutions(
@@ -60,16 +61,16 @@ INSERT INTO solutions(
     reservation_deadline, reservation_type, category_id, id, product_history_id, provider_id, service_history_id, type, description, name, specifics)
 VALUES
     -- Products
-    (NULL, 10, TRUE, FALSE, TRUE, NULL, NULL, 19.99, NULL, NULL, 1, DEFAULT, NULL, 2, NULL, 'Product', 'High-quality gym dumbbell', 'Dumbbell', NULL),
-    (NULL, 5, FALSE, FALSE, TRUE, NULL, NULL, 49.99, NULL, NULL, 2, DEFAULT, NULL, 3, NULL, 'Product', 'Ergonomic office chair', 'Office Chair', NULL),
-    (NULL, 15, TRUE, FALSE, TRUE, NULL, NULL, 29.99, NULL, NULL, 3, DEFAULT, NULL, 2, NULL, 'Product', 'Stylish table lamp', 'Table Lamp', NULL),
-    (NULL, 20, TRUE, FALSE, TRUE, NULL, NULL, 99.99, NULL, NULL, 1, DEFAULT, NULL, 3, NULL, 'Product', 'Gaming keyboard with RGB', 'Gaming Keyboard', NULL),
+    (NULL, 10, TRUE, FALSE, TRUE, NULL, NULL, 19.99, NULL, NULL, 1, DEFAULT, NULL, 3, NULL, 'Product', 'High-quality gym dumbbell', 'Dumbbell', NULL),
+    (NULL, 5, FALSE, FALSE, TRUE, NULL, NULL, 49.99, NULL, NULL, 2, DEFAULT, NULL, 4, NULL, 'Product', 'Ergonomic office chair', 'Office Chair', NULL),
+    (NULL, 15, TRUE, FALSE, TRUE, NULL, NULL, 29.99, NULL, NULL, 3, DEFAULT, NULL, 3, NULL, 'Product', 'Stylish table lamp', 'Table Lamp', NULL),
+    (NULL, 20, TRUE, FALSE, TRUE, NULL, NULL, 99.99, NULL, NULL, 1, DEFAULT, NULL, 4, NULL, 'Product', 'Gaming keyboard with RGB', 'Gaming Keyboard', NULL),
 
     -- Services
-    (15, 15, FALSE, FALSE, TRUE, 240, 60, 99.99, 7, 0, 2, DEFAULT, NULL, 3, NULL, 'Service', 'Wedding photography package', 'Photography', 'Includes editing and delivery in 2 weeks'),
-    (12, 20, TRUE, FALSE, TRUE, 180, 30, 149.99, 7, 1, 3, DEFAULT, NULL, 3, NULL, 'Service', 'Personal training session', 'Training', 'One-on-one session with certified trainer'),
-    (7, 10, TRUE, FALSE, TRUE, 300, 90, 199.99, 14, 1, 2, DEFAULT, NULL, 3, NULL, 'Service', 'Event planning service', 'Event Planning', 'Full-service planning and coordination'),
-    (17, 25, TRUE, FALSE, TRUE, 120, 30, 79.99, 14, 0, 1, DEFAULT, NULL, 2, NULL, 'Service', 'House cleaning service', 'Cleaning', 'Deep cleaning for apartments and houses');
+    (15, 15, FALSE, FALSE, TRUE, 240, 60, 99.99, 7, 0, 2, DEFAULT, NULL, 4, NULL, 'Service', 'Wedding photography package', 'Photography', 'Includes editing and delivery in 2 weeks'),
+    (12, 20, TRUE, FALSE, TRUE, 180, 30, 149.99, 0, 1, 3, DEFAULT, NULL, 4, NULL, 'Service', 'Personal training session', 'Training', 'One-on-one session with certified trainer'),
+    (7, 10, TRUE, FALSE, TRUE, 300, 90, 199.99, 14, 1, 2, DEFAULT, NULL, 4, NULL, 'Service', 'Event planning service', 'Event Planning', 'Full-service planning and coordination'),
+    (17, 25, TRUE, FALSE, TRUE, 120, 30, 79.99, 14, 0, 4, DEFAULT, NULL, 3, NULL, 'Service', 'House cleaning service', 'Cleaning', 'Deep cleaning for apartments and houses');
 
 -- Pictures
 INSERT INTO pictures

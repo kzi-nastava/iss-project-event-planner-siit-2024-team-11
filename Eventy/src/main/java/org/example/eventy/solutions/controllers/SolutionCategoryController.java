@@ -2,34 +2,42 @@ package org.example.eventy.solutions.controllers;
 
 import org.example.eventy.common.models.PagedResponse;
 import org.example.eventy.common.models.Status;
+import org.example.eventy.interactions.model.Notification;
+import org.example.eventy.interactions.model.NotificationType;
+import org.example.eventy.interactions.services.NotificationService;
 import org.example.eventy.solutions.dtos.categories.CreateCategoryDTO;
 import org.example.eventy.solutions.dtos.categories.CategoryWithIDDTO;
 import org.example.eventy.solutions.models.Category;
+import org.example.eventy.solutions.models.Service;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.services.SolutionCategoryService;
 import org.example.eventy.solutions.services.SolutionService;
-import org.example.eventy.users.models.Admin;
+import org.example.eventy.users.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
 @RequestMapping("api/categories")
 
 public class SolutionCategoryController {
-
     @Autowired
     private SolutionCategoryService service;
-
     @Autowired
     private SolutionService solutionService;
+    @Autowired
+    private NotificationService notificationService;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @PreAuthorize("hasRole('Admin') or hasRole('Provider')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -69,13 +77,17 @@ public class SolutionCategoryController {
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CategoryWithIDDTO> updateCategory(@RequestBody CategoryWithIDDTO updateCategory) {
         Category categoryToChange = service.getCategory(updateCategory.getId());
+        String oldCategoryName = categoryToChange.getName();
+        String newCategoryName = updateCategory.getName();
+
         List<Solution> changedSolutions = solutionService.findAllByCategory(categoryToChange);
         if (!changedSolutions.isEmpty()) {
             Set<Long> providersToNotify = new HashSet<Long>();
             changedSolutions.forEach(changedSolution -> providersToNotify.add(changedSolution.getProvider().getId()));
-            // notify
+            for (Long providerId : providersToNotify) {
+                sendNotification(providerId, oldCategoryName, newCategoryName);
+            }
         }
-
 
         Category updatedCategory = service.updateCategory(updateCategory);
         if (updatedCategory == null) {
@@ -84,20 +96,38 @@ public class SolutionCategoryController {
         return new ResponseEntity<>(new CategoryWithIDDTO(updatedCategory), HttpStatus.OK);
     }
 
+    private void sendNotification(Long providerId, String oldCategoryName, String newCategoryName) {
+        NotificationType type = NotificationType.CATEGORY_UPDATED;
+        Long redirectionId = providerId;
+        String title = "Category name UPDATED!";
+        Long ownerId = providerId;
+        User grader = null;
+        Integer grade = null;
+        String message = "The category \"" + oldCategoryName + "\" was changed to \"" + newCategoryName + "\".";
+
+        LocalDateTime timestamp = LocalDateTime.now();
+        Notification notification = new Notification(type, redirectionId, title, message, grader, grade, timestamp);
+
+        notificationService.saveNotification(ownerId, notification);
+        sendNotificationToWeb(ownerId, notification);
+        sendNotificationToMobile(ownerId, notification);
+    }
+
     @PreAuthorize("hasRole('Admin')")
     @PutMapping(value = "/requests/accept/{requestId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CategoryWithIDDTO> acceptRequest(@PathVariable long requestId) {
-        Solution changedSolution = solutionService.findSolutionWithPendingCategory(service.getCategory(requestId));
-        if (changedSolution != null) {
-            Long providerIdToNotify = changedSolution.getProvider().getId();
-            // notify
-        }
-
+        Category pendingCategory = service.getCategory(requestId);
+        Solution changedSolution = solutionService.findSolutionWithPendingCategory(pendingCategory);
 
         Category acceptedCategory = service.acceptCategory(requestId);
         if (acceptedCategory == null) {
             // not found or isn't already pending
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        if (changedSolution != null) {
+            Long providerIdToNotify = changedSolution.getProvider().getId();
+            sendNotification(providerIdToNotify, pendingCategory, changedSolution, 1);
         }
         return new ResponseEntity<>(new CategoryWithIDDTO(acceptedCategory), HttpStatus.OK);
     }
@@ -105,16 +135,18 @@ public class SolutionCategoryController {
     @PreAuthorize("hasRole('Admin')")
     @PutMapping(value="/requests/change",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CategoryWithIDDTO> changeRequest(@RequestBody CategoryWithIDDTO changedCategory) {
-        Solution changedSolution = solutionService.findSolutionWithPendingCategory(service.getCategory(changedCategory.getId()));
-        if (changedSolution != null) {
-            Long providerIdToNotify = changedSolution.getProvider().getId();
-            // notify
-        }
+        Category pendingCategory = service.getCategory(changedCategory.getId());
+        Solution changedSolution = solutionService.findSolutionWithPendingCategory(pendingCategory);
 
         Category updatedCategory = service.changeCategory(changedCategory);
         if (updatedCategory == null) {
             // not found or isn't already pending
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        if (changedSolution != null) {
+            Long providerIdToNotify = changedSolution.getProvider().getId();
+            sendNotification(providerIdToNotify, pendingCategory, changedSolution, 2);
         }
         return new ResponseEntity<>(new CategoryWithIDDTO(updatedCategory), HttpStatus.OK);
     }
@@ -127,19 +159,76 @@ public class SolutionCategoryController {
         if (replacedCategory == null || replacedCategory.getStatus() != Status.PENDING) {
             return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
         }
-
         Solution changedSolution = solutionService.findSolutionWithPendingCategory(replacedCategory);
-        if (changedSolution != null) {
-            Long providerIdToNotify = changedSolution.getProvider().getId();
-            // notify
-        }
 
         Category newCategory = service.getCategory(newlyUsedCategoryId);
         boolean successfullyReplaced = solutionService.replaceCategoryForSolutionsWithOldCategory(replacedCategory, newCategory);
 
+        if (successfullyReplaced && changedSolution != null) {
+            Long providerIdToNotify = changedSolution.getProvider().getId();
+            sendNotification(providerIdToNotify, replacedCategory, changedSolution, 3);
+        }
+
         service.deleteCategory(replacedCategoryId);
 
         return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+    }
+
+    private void sendNotification(Long providerIdToNotify, Category pendingCategory, Solution changedSolution, int decision) {
+        NotificationType type = null;
+        String title = null;
+        String message = null;
+        Long redirectionId = changedSolution.getId();
+        Long ownerId = providerIdToNotify;
+        User grader = null;
+        Integer grade = null;
+
+        if (decision == 1) {
+            // accepted
+            type = NotificationType.CATEGORY_SUGGESTION_ACCEPTED;
+            if (changedSolution instanceof Service) {
+                title = "Service Category Suggestion ACCEPTED!";
+                message = "Your request for the new service category \"" + pendingCategory.getName() + "\" is ACCEPTED. " +
+                          "Your service is now active! Tap to see more!";
+            } else {
+                title = "Product Category Suggestion ACCEPTED!";
+                message = "Your request for the new product category \"" + pendingCategory.getName() + "\" is ACCEPTED. " +
+                          "Your product is now active! Tap to see more!";
+            }
+
+        } else if (decision == 2) {
+            // changed
+            type = NotificationType.CATEGORY_SUGGESTION_CHANGED;
+            if (changedSolution instanceof Service) {
+                title = "Service Category Suggestion UPDATED!";
+                message = "Your request for the new service category \"" + pendingCategory.getName() + "\" was not accepted " +
+                          "but has instead been UPDATED with new values. Your service is now active! Tap to see more!";
+            } else {
+                title = "Product Category Suggestion UPDATED!";
+                message = "Your request for the new product category \"" + pendingCategory.getName() + "\" was not accepted " +
+                          "but has instead been UPDATED with new values. Your product is now active! Tap to see more!";
+            }
+
+        } else {
+            // replaced
+            type = NotificationType.CATEGORY_SUGGESTION_REPLACED;
+            if (changedSolution instanceof Service) {
+                title = "Service Category Suggestion REPLACED!";
+                message = "Your request for the new service category \"" + pendingCategory.getName() + "\" was not accepted " +
+                          "but has instead been REPLACED with an existing category. Your service is now active! Tap to see more!";
+            } else {
+                title = "Product Category Suggestion REPLACED!";
+                message = "Your request for the new product category \"" + pendingCategory.getName() + "\" was not accepted " +
+                          "but has instead been REPLACED with an existing category. Your product is now active! Tap to see more!";
+            }
+        }
+
+        LocalDateTime timestamp = LocalDateTime.now();
+        Notification notification = new Notification(type, redirectionId, title, message, grader, grade, timestamp);
+
+        notificationService.saveNotification(ownerId, notification);
+        sendNotificationToWeb(ownerId, notification);
+        sendNotificationToMobile(ownerId, notification);
     }
 
     @PreAuthorize("hasRole('Admin')")
@@ -150,5 +239,13 @@ public class SolutionCategoryController {
             return new ResponseEntity<>(HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    private void sendNotificationToWeb(Long userId, Notification notification) {
+        messagingTemplate.convertAndSend("/topic/web/" + userId, notification);
+    }
+
+    private void sendNotificationToMobile(Long userId, Notification notification) {
+        messagingTemplate.convertAndSend("/topic/mobile/" + userId, notification);
     }
 }

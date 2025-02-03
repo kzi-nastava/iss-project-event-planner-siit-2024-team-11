@@ -346,11 +346,10 @@ public class EventController {
         }
         Page<Event> events = eventService.getEvents(userId, search, eventTypes, maxParticipants, location, startDate, endDate, pageable);
 
-        User user = userService.get(userId);
-
+        User loggedInUser = userService.get(userId);
         List<EventCardDTO> eventsDTO = new ArrayList<>();
         for (Event event : events) {
-            eventsDTO.add(new EventCardDTO(event, user));
+            eventsDTO.add(new EventCardDTO(event, loggedInUser));
         }
         long count = events.getTotalElements();
 
