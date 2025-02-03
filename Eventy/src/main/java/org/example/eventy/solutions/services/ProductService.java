@@ -17,4 +17,15 @@ public class ProductService {
     public Product save(Product product) {
         return solutionRepository.save(product);
     }
+
+    public Product delete(Long productId) {
+        try {
+            Product product = (Product) getProduct(productId);
+            product.setDeleted(true);
+            return solutionRepository.save(product);
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
 }

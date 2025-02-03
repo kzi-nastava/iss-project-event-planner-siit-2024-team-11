@@ -122,6 +122,8 @@ public class ProductController {
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 */
+
+    // not mine actually, feel free to override
     @GetMapping(value = "/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ProductDTO> getProduct(@PathVariable Long productId) {
         ProductDTO productDTO = new ProductDTO();
@@ -142,6 +144,7 @@ public class ProductController {
     }
 
     @PutMapping(value = "/{productId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Provider')")
     public ResponseEntity<ProductDTO> updateProduct(@RequestBody ProductDTO productDTO, @PathVariable Long productId) {
         ProductDTO updatedProductDTO = new ProductDTO();
         if(productDTO.getId() == 5L && productId == 5L) {
@@ -165,12 +168,13 @@ public class ProductController {
     }
 
     @DeleteMapping(value = "/{productId}")
+    @PreAuthorize("hasRole('Provider')")
     public ResponseEntity<?> deleteProduct(@PathVariable Long productId) {
-        if(productId == 5) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        if(productService.delete(productId) == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping(value = "/purchase", consumes = MediaType.APPLICATION_JSON_VALUE)
