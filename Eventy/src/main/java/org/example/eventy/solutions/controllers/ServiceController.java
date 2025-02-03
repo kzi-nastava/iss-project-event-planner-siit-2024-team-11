@@ -4,6 +4,9 @@ import org.example.eventy.solutions.dtos.services.*;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.services.ServiceService;
+import org.example.eventy.users.models.User;
+import org.example.eventy.users.services.UserService;
+import org.example.eventy.util.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +21,10 @@ public class ServiceController {
 
     @Autowired
     private ServiceService serviceService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private TokenUtils tokenUtils;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CreatedServiceDTO> createService(@RequestBody CreateServiceDTO service) {
@@ -67,11 +74,22 @@ public class ServiceController {
 
     // GET "/api/services/cards/5"
     @GetMapping(value = "/cards/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SolutionCardDTO> getServiceCard(@PathVariable Long serviceId) {
+    public ResponseEntity<SolutionCardDTO> getServiceCard(@PathVariable Long serviceId, @RequestHeader(value = "Authorization", required = false) String token) {
         Solution service = serviceService.getService(serviceId);
 
+        User user = null;
+        if(token != null) {
+            token = token.substring(7);
+
+            try {
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
+        }
+
         if (service != null) {
-            SolutionCardDTO serviceCardDTO = new SolutionCardDTO(service);
+            SolutionCardDTO serviceCardDTO = new SolutionCardDTO(service, user);
             return new ResponseEntity<SolutionCardDTO>(serviceCardDTO, HttpStatus.OK);
         }
 

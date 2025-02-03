@@ -1,6 +1,7 @@
 package org.example.eventy.events.repositories;
 
 import org.example.eventy.events.models.Event;
+import org.example.eventy.users.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -67,7 +68,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                         @Param("endDate") LocalDateTime endDate,
                         Pageable pageable);
 
-    @Query("SELECT e FROM Event e " +
+  @Query("SELECT e FROM Event e " +
             "WHERE ((:search IS NULL OR :search = '' OR e.name ILIKE ('%' || :search || '%')) " +
             "   OR (:search IS NULL OR :search = '' OR e.description ILIKE ('%' || :search || '%'))) " +
             "AND (:maxParticipants IS NULL OR e.maxNumberParticipants <= :maxParticipants) " +
@@ -83,7 +84,41 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                         @Param("startDate") LocalDateTime startDate,
                         @Param("endDate") LocalDateTime endDate,
                         Pageable pageable);
+  
+    @Query("SELECT e FROM Event e " +
+           "WHERE ((:search IS NULL OR :search = '' OR e.name ILIKE ('%' || :search || '%')) " +
+           "   OR (:search IS NULL OR :search = '' OR e.description ILIKE ('%' || :search || '%'))) " +
+           "AND (:maxParticipants IS NULL OR e.maxNumberParticipants <= :maxParticipants) " +
+           "AND (:location IS NULL OR :location = '' OR LOWER(e.location.name) = LOWER(:location)) " +
+           "AND (CAST(:startDate AS timestamp) IS NULL OR CAST(:endDate AS timestamp) IS NULL OR e.date BETWEEN CAST(:startDate AS timestamp) AND CAST(:endDate AS timestamp)) " +
+           "AND (:eventTypes IS NULL OR e.type.name IN :eventTypes)" +
+           "AND e.privacy = org.example.eventy.events.models.PrivacyType.PUBLIC")
+    Page<Event> findAllPublic(@Param("search") String search,
+                        @Param("eventTypes") ArrayList<String> eventTypes,
+                        @Param("maxParticipants") Integer maxParticipants,
+                        @Param("location") String location,
+                        @Param("startDate") LocalDateTime startDate,
+                        @Param("endDate") LocalDateTime endDate,
+                        Pageable pageable);
 
+    @Query("SELECT e FROM Event e " +
+           "WHERE ((:search IS NULL OR :search = '' OR e.name ILIKE ('%' || :search || '%')) " +
+           "   OR (:search IS NULL OR :search = '' OR e.description ILIKE ('%' || :search || '%'))) " +
+           "AND (:maxParticipants IS NULL OR e.maxNumberParticipants <= :maxParticipants) " +
+           "AND (:location IS NULL OR :location = '' OR LOWER(e.location.name) = LOWER(:location)) " +
+           "AND (CAST(:startDate AS timestamp) IS NULL OR CAST(:endDate AS timestamp) IS NULL OR e.date BETWEEN CAST(:startDate AS timestamp) AND CAST(:endDate AS timestamp)) " +
+           "AND (:eventTypes IS NULL OR e.type.name IN :eventTypes)" +
+           "AND e.privacy = org.example.eventy.events.models.PrivacyType.PUBLIC " +
+           "AND e.organiser = :user")
+    Page<Event> findAllPublicForUser(@Param("search") String search,
+                              @Param("eventTypes") ArrayList<String> eventTypes,
+                              @Param("maxParticipants") Integer maxParticipants,
+                              @Param("location") String location,
+                              @Param("startDate") LocalDateTime startDate,
+                              @Param("endDate") LocalDateTime endDate,
+                              @Param("user") User user,
+                              Pageable pageable);
+  
     @Query("SELECT e FROM Event e ORDER BY e.id DESC")
     ArrayList<Event> findFeaturedEvents(Pageable pageable);
 
@@ -93,6 +128,9 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("SELECT DISTINCT l.name FROM Location l JOIN Event e ON l.id = e.location.id ORDER BY l.name ASC")
     ArrayList<String> findAllUniqueLocationNamesForEvents();
 
+    @Query("SELECT u FROM User u JOIN u.acceptedEvents e WHERE e.id = :eventId")
+    List<User> findAttendingUsersByEvent(@Param("eventId") Long eventId);
+  
     @Query("SELECT e FROM User u " +
            "JOIN u.acceptedEvents e " +
            "LEFT JOIN Review r ON r.event = e AND r.grader.id = :userId " +

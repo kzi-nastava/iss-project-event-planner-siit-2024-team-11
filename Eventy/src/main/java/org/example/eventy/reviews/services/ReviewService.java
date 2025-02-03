@@ -16,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReviewService {
@@ -23,12 +25,10 @@ public class ReviewService {
     private ReviewRepository reviewRepository;
 
     public Page<Review> getPendingReviews(Pageable pageable) {
-        //Pageable pageable = PageRequest.of(page, size, Sort.by("criteria").descending());
         return reviewRepository.findAllByStatusOrderByIdDesc(pageable, Status.PENDING);
     }
 
     public Page<Review> getAcceptedReviews(Pageable pageable) {
-        //Pageable pageable = PageRequest.of(page, size, Sort.by("criteria").descending());
         return reviewRepository.findAllByStatusOrderByIdDesc(pageable, Status.ACCEPTED);
     }
 
@@ -60,6 +60,10 @@ public class ReviewService {
         }
     }
 
+    public List<Integer> getGradesForEvent(Long eventId) {
+        return reviewRepository.findAllGradesForEvent(eventId);
+    }
+  
     public Boolean isSolutionReviewedByUser(Long userId, Long solutionId) {
         return reviewRepository.existsByGraderIdAndSolutionId(userId, solutionId);
     }

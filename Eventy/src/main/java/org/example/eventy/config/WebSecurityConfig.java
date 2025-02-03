@@ -85,8 +85,10 @@ public class WebSecurityConfig {
              request.requestMatchers(new AntPathRequestMatcher("/api/authentication/**")).permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/api/events")).permitAll()
                      .requestMatchers(new AntPathRequestMatcher("/api/events/featured")).permitAll()
-                    .requestMatchers(new AntPathRequestMatcher("/api/solutions")).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/api/solutions/**")).permitAll()
                      .requestMatchers(new AntPathRequestMatcher("/api/solutions/featured")).permitAll()
+                     .requestMatchers(new AntPathRequestMatcher("/api/events/pdfs/**")).permitAll()
+                     .requestMatchers(new AntPathRequestMatcher("/api/events/{eventId}")).permitAll()
                   //.requestMatchers(new AntPathRequestMatcher("/api/whoami")).hasRole("USER")
              .anyRequest().authenticated();
          });

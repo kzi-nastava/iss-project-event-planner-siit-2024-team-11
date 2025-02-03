@@ -1,12 +1,16 @@
 package org.example.eventy.solutions.controllers;
 
 import org.example.eventy.common.models.PagedResponse;
+import org.example.eventy.events.models.Event;
 import org.example.eventy.solutions.dtos.PriceListDTO;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.services.ProductService;
 import org.example.eventy.solutions.services.ServiceService;
 import org.example.eventy.solutions.services.SolutionService;
+import org.example.eventy.users.models.User;
+import org.example.eventy.users.services.UserService;
+import org.example.eventy.util.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -29,28 +33,84 @@ public class SolutionController {
 
     @Autowired
     private SolutionService solutionService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private TokenUtils tokenUtils;
+
     private ServiceService serviceService;
     private ProductService productService;
 
     @GetMapping(value = "/favorite/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PagedResponse<SolutionCardDTO>> getFavoriteSolutions(@PathVariable Long userId, @RequestParam(required = false) String search,
-                                                                        Pageable pageable) {
+                                                                               @RequestHeader(value = "Authorization", required = false) String token, Pageable pageable) {
         List<Solution> providerSolutions = solutionService.getFavoriteSolutionsByUser(userId, search, pageable);
+        User user = null;
+        if(token != null) {
+            token = token.substring(7);
 
-        List<SolutionCardDTO> solutionCards = providerSolutions.stream().map(SolutionCardDTO::new).collect(Collectors.toList());
+            try {
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
+        }
+        User finalUser = user;
+        List<SolutionCardDTO> solutionCards = providerSolutions.stream().map(solution -> new SolutionCardDTO(solution, finalUser)).collect(Collectors.toList());
         long count = solutionService.getFavoriteSolutionsByUserCount(userId);
         PagedResponse<SolutionCardDTO> response = new PagedResponse<>(solutionCards, (int) Math.ceil((double) count / pageable.getPageSize()), count);
         return new ResponseEntity<PagedResponse<SolutionCardDTO>>(response, HttpStatus.OK);
     }
 
+    @PutMapping(value = "/favorite/{solutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Boolean> toggleFavorite(@PathVariable Long solutionId, @RequestHeader(value = "Authorization", required = false) String token) {
+        Solution solution = solutionService.getSolution(solutionId);
+
+        if(solution == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        if (token == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        User user;
+        try {
+            token = token.substring(7);
+            user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+
+            if(user == null) {
+                throw new Exception();
+            }
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        userService.toggleFavoriteSolution(user, solution);
+
+        return new ResponseEntity<>(true, HttpStatus.OK);
+    }
+
     @GetMapping(value = "/catalog/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PagedResponse<SolutionCardDTO>> getProviderCatalog(@PathVariable Long userId, @RequestParam(required = false) String search,
-                                                                             Pageable pageable) {
+                                                                             @RequestHeader(value = "Authorization", required = false) String token, Pageable pageable) {
         List<Solution> providerSolutions = solutionService.getSolutionsByProvider(userId, search, pageable);
+        User user = null;
+        if(token != null) {
+            token = token.substring(7);
 
-        List<SolutionCardDTO> solutionCards = providerSolutions.stream().map(SolutionCardDTO::new).collect(Collectors.toList());
+            try {
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
+        }
+        User finalUser = user;
+        List<SolutionCardDTO> solutionCards = providerSolutions.stream().map(solution -> new SolutionCardDTO(solution, finalUser)).collect(Collectors.toList());
         long count = solutionService.getSolutionsByProviderCount(userId);
         PagedResponse<SolutionCardDTO> response = new PagedResponse<>(solutionCards, (int) Math.ceil((double) count / pageable.getPageSize()), count);
         return new ResponseEntity<PagedResponse<SolutionCardDTO>>(response, HttpStatus.OK);
@@ -72,6 +132,7 @@ public class SolutionController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
             @RequestParam(required = false, defaultValue = "true") Boolean isAvailable,
+            @RequestHeader(value = "Authorization", required = false) String token,
             Pageable pageable) {
         // Pageable - page, size, sort
         // sort by: "category", "name", "price,asc", "price,desc"
@@ -101,9 +162,20 @@ public class SolutionController {
         Page<Solution> solutions = solutionService.getSolutions(
             search, type, categories2.toString(), eventTypesConcatenated.toString(), company, minPrice, maxPrice, startDate, endDate, isAvailable, pageable);
 
+        User user = null;
+        if(token != null) {
+            token = token.substring(7);
+
+            try {
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
+        }
+
         List<SolutionCardDTO> solutionCardsDTO = new ArrayList<>();
         for (Solution solution : solutions) {
-            solutionCardsDTO.add(new SolutionCardDTO(solution));
+            solutionCardsDTO.add(new SolutionCardDTO(solution, user));
         }
         long count = solutions.getTotalElements();
 
@@ -113,11 +185,21 @@ public class SolutionController {
 
     // GET "/api/solutions/cards/5"
     @GetMapping(value = "/cards/{solutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SolutionCardDTO> getSolutionCard(@PathVariable Long solutionId) {
+    public ResponseEntity<SolutionCardDTO> getSolutionCard(@PathVariable Long solutionId, @RequestHeader(value = "Authorization", required = false) String token) {
         Solution solution = solutionService.getSolution(solutionId);
 
+        User user = null;
+        if(token != null) {
+            token = token.substring(7);
+
+            try {
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
+        }
         if (solution != null) {
-            SolutionCardDTO solutionCard = new SolutionCardDTO(solution);
+            SolutionCardDTO solutionCard = new SolutionCardDTO(solution, user);
             return new ResponseEntity<SolutionCardDTO>(solutionCard, HttpStatus.OK);
         }
 
@@ -126,12 +208,23 @@ public class SolutionController {
 
     // GET "/api/solutions/featured"
     @GetMapping(value = "/featured", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<SolutionCardDTO>> getFeaturedSolutions() {
+    public ResponseEntity<Collection<SolutionCardDTO>> getFeaturedSolutions(@RequestHeader(value = "Authorization", required = false) String token) {
         ArrayList<Solution> featuredSolutions = solutionService.getFeaturedSolutions();
+
+        User user = null;
+        if(token != null) {
+            token = token.substring(7);
+
+            try {
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
+        }
 
         ArrayList<SolutionCardDTO> featuredSolutionsDTO = new ArrayList<>();
         for (Solution solution : featuredSolutions) {
-            featuredSolutionsDTO.add(new SolutionCardDTO(solution));
+            featuredSolutionsDTO.add(new SolutionCardDTO(solution, user));
         }
 
         return new ResponseEntity<Collection<SolutionCardDTO>>(featuredSolutionsDTO, HttpStatus.OK);
@@ -139,18 +232,7 @@ public class SolutionController {
 
     @GetMapping(value = "/pricelist/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<SolutionCardDTO>> getProviderPrices(@PathVariable Long userId) {
-        if(userId == 5) {
-            // prices are shown in cards like the cards on the homepage
-            Page<Solution> solutionModels = solutionService.getSolutions(null, null, null, null, null, 0, 99999999, null, null, null, Pageable.unpaged());
-
-            List<SolutionCardDTO> solutions = new ArrayList<>();
-            for (Solution solution : solutionModels) {
-                solutions.add(new SolutionCardDTO(solution));
-            }
-
-            return new ResponseEntity<Collection<SolutionCardDTO>>(solutions, HttpStatus.OK);
-        }
-
+        // TO-DO: deleted because unused and not part of this feature
         return new ResponseEntity<Collection<SolutionCardDTO>>(HttpStatus.NOT_FOUND);
     }
 

@@ -2,12 +2,17 @@ package org.example.eventy.events.controllers;
 
 import jakarta.validation.Valid;
 import org.example.eventy.common.models.PagedResponse;
+import org.example.eventy.common.models.Status;
 import org.example.eventy.common.services.EmailService;
 import org.example.eventy.events.dtos.*;
 import org.example.eventy.events.models.*;
 import org.example.eventy.events.services.*;
+import org.example.eventy.reviews.models.Review;
+import org.example.eventy.reviews.services.ReviewService;
 import org.example.eventy.users.models.EventOrganizer;
+import org.example.eventy.users.models.User;
 import org.example.eventy.users.services.UserService;
+import org.example.eventy.util.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,18 +48,34 @@ public class EventController {
     UserService userService;
     @Autowired
     EmailService emailService;
+    @Autowired
+    private TokenUtils tokenUtils;
+    @Autowired
+    private ReviewService reviewService;
 
     @GetMapping(value = "/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EventDTO> getEvent(@PathVariable Long eventId) {
-        if(eventId == 5) {
-            return new ResponseEntity<EventDTO>(new EventDTO(), HttpStatus.OK);
+    public ResponseEntity<EventDetailsDTO> getEvent(@PathVariable Long eventId, @RequestHeader(value = "Authorization", required = false) String token) {
+        Event event = eventService.getEvent(eventId);
+        User user = null;
+        if(token != null) {
+            token = token.substring(7);
+
+            try {
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
         }
 
-        return new ResponseEntity<EventDTO>(HttpStatus.NOT_FOUND);
+        if(event != null) {
+            return new ResponseEntity<EventDetailsDTO>(new EventDetailsDTO(event, user), HttpStatus.OK);
+        }
+
+        return new ResponseEntity<EventDetailsDTO>(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    //@PreAuthorize("hasRole('Organizer')")
+    @PreAuthorize("hasRole('Organizer')")
     public ResponseEntity<EventDTO> organizeEvent(@Valid @RequestBody OrganizeEventDTO organizeEventDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             // if there are validation errors, we return a 400 Bad Request response
@@ -111,27 +132,121 @@ public class EventController {
     }
 
     @GetMapping(value = "/stats", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<EventStatsDTO>> getEventsWithStats() {
-        List<EventStatsDTO> eventStatsDTOs = new ArrayList<EventStatsDTO>();
-        return new ResponseEntity<Collection<EventStatsDTO>>(eventStatsDTOs, HttpStatus.OK);
-    }
+    @PreAuthorize("hasRole('Organizer') OR hasRole('Admin')")
+    public ResponseEntity<PagedResponse<EventStatsDTO>> getEventsWithStats(
+            @RequestParam(required = false, defaultValue = "") String search,
+            @RequestParam(required = false) ArrayList<String> eventTypes,
+            @RequestParam(required = false, defaultValue = "") String location,
+            @RequestParam(required = false, defaultValue = "9999") Integer maxParticipants,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            Pageable pageable, @RequestHeader(value = "Authorization", required = false) String token) {
+        // Pageable - page, size, sort
+        // sort by: "type", "name", "maxNumberParticipants,asc", "maxNumberParticipants,desc", "location", "date,asc", "date,desc"
 
-    @PutMapping(value = "/favorite", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EventDTO> favoriteEvent(@RequestBody EventDTO eventDTO) {
-        if(eventDTO.getName().equals("event")) {
-            // here we call service function that will make this a favorite of the currently logged-in user
-            return new ResponseEntity<EventDTO>(HttpStatus.OK);
+        // Set default values for startDate and endDate
+        if (startDate == null) {
+            startDate = LocalDateTime.of(1970, 1, 1, 0, 0); // Very small date
+        }
+        if (endDate == null) {
+            endDate = LocalDateTime.of(2099, 12, 31, 23, 59); // Very large date
         }
 
-        return new ResponseEntity<EventDTO>(HttpStatus.NOT_FOUND);
+        User user = null;
+        if(token != null) {
+            try {
+                token = token.substring(7);
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
+        }
+
+        if (user == null) {
+            return new ResponseEntity<PagedResponse<EventStatsDTO>>(HttpStatus.FORBIDDEN);
+        }
+
+        Page<Event> events;
+
+        if(user.getRole().getName().equals("ROLE_Organizer")) {
+            events = eventService.getPublicEventsForUser(search, eventTypes, maxParticipants, location, startDate, endDate, pageable, user);
+        }
+        else {
+            events = eventService.getPublicEvents(search, eventTypes, maxParticipants, location, startDate, endDate, pageable);
+        }
+
+        User finalUser = user;
+        List<EventStatsDTO> eventStatsDTOs = new ArrayList<>();
+        for (Event event : events) {
+            int visitors = (int) event.getInvitations().stream().filter(inv -> inv.getStatus() == Status.ACCEPTED).count();
+            java.util.List<Integer> grades = reviewService.getGradesForEvent(event.getId());
+
+            int[] gradeDistribution = new int[5];
+            double gradesSum = 0;
+
+            for(int grade : grades) {
+                gradeDistribution[grade - 1]++;
+                gradesSum += grade;
+            }
+
+            eventStatsDTOs.add(new EventStatsDTO(new EventCardDTO(event, finalUser), visitors, !grades.isEmpty() ? (double) (gradesSum / (double) grades.size()) : 0, gradeDistribution));
+        }
+        long count = events.getTotalElements();
+
+        PagedResponse<EventStatsDTO> eventStats = new PagedResponse<EventStatsDTO>(eventStatsDTOs, (int) Math.ceil((double) count / pageable.getPageSize()), count);
+        return new ResponseEntity<PagedResponse<EventStatsDTO>>(eventStats, HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/favorite/{eventId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> toggleFavoriteEvent(@PathVariable Long eventId, @RequestHeader(value = "Authorization", required = false) String token) {
+        Event event = eventService.getEvent(eventId);
+
+        if(event == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        if (token == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        User user;
+        try {
+            token = token.substring(7);
+            user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+
+            if(user == null) {
+                throw new Exception();
+            }
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        userService.toggleFavoriteEvent(user, event);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping(value = "/favorite/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PagedResponse<EventCardDTO>> getFavoriteEvents(@PathVariable Long userId, @RequestParam(required = false) String search,
-                                                                  Pageable pageable) {
+                                                                  Pageable pageable, @RequestHeader(value = "Authorization", required = false) String token) {
         List<Event> favoriteEvents = eventService.getFavoriteEventsByUser(userId, search, pageable);
 
-        List<EventCardDTO> eventCards = favoriteEvents.stream().map(EventCardDTO::new).collect(Collectors.toList());
+        User user = null;
+        if(token != null) {
+            try {
+                token = token.substring(7);
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
+        }
+
+        User finalUser = user;
+        List<EventCardDTO> eventCards = favoriteEvents.stream()
+                .map(event -> new EventCardDTO(event, finalUser))
+                .collect(Collectors.toList());
         long count = eventService.getFavoriteEventsByUserCount(userId);
         PagedResponse<EventCardDTO> response = new PagedResponse<>(eventCards, (int) Math.ceil((double) count / pageable.getPageSize()), count);
         return new ResponseEntity<PagedResponse<EventCardDTO>>(response, HttpStatus.OK);
@@ -140,10 +255,23 @@ public class EventController {
     @GetMapping(value = "/organized/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PagedResponse<EventCardDTO>> getEventsOrganizedByUser(@PathVariable Long userId, @RequestParam(required = false) String search,
-                                                                                Pageable pageable) {
+                                                                                Pageable pageable, @RequestHeader(value = "Authorization", required = false) String token) {
         List<Event> organizersEvents = eventService.getEventsByEventOrganizer(userId, search, pageable);
 
-        List<EventCardDTO> eventCards = organizersEvents.stream().map(EventCardDTO::new).collect(Collectors.toList());
+        User user = null;
+        if(token != null) {
+            try {
+                token = token.substring(7);
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
+        }
+
+        User finalUser = user;
+        List<EventCardDTO> eventCards = organizersEvents.stream()
+                .map(event -> new EventCardDTO(event, finalUser))
+                .collect(Collectors.toList());
         long count = eventService.getEventsByEventOrganizerCount(userId);
         PagedResponse<EventCardDTO> response = new PagedResponse<>(eventCards, (int) Math.ceil((double) count / pageable.getPageSize()), count);
         return new ResponseEntity<PagedResponse<EventCardDTO>>(response, HttpStatus.OK);
@@ -162,7 +290,7 @@ public class EventController {
             @RequestParam(required = false, defaultValue = "9999") Integer maxParticipants,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
-            Pageable pageable) {
+            Pageable pageable, @RequestHeader(value = "Authorization", required = false) String token) {
         // Pageable - page, size, sort
         // sort by: "type", "name", "maxNumberParticipants,asc", "maxNumberParticipants,desc", "location", "date,asc", "date,desc"
 
@@ -175,9 +303,20 @@ public class EventController {
         }
         Page<Event> events = eventService.getEvents(search, eventTypes, maxParticipants, location, startDate, endDate, pageable);
 
+        User user = null;
+        if(token != null) {
+            try {
+                token = token.substring(7);
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
+        }
+
+        User finalUser = user;
         List<EventCardDTO> eventsDTO = new ArrayList<>();
         for (Event event : events) {
-            eventsDTO.add(new EventCardDTO(event));
+            eventsDTO.add(new EventCardDTO(event, finalUser));
         }
         long count = events.getTotalElements();
 
@@ -235,11 +374,22 @@ public class EventController {
 
     // GET "/api/events/cards/5"
     @GetMapping(value = "/cards/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EventCardDTO> getEventCard(@PathVariable Long eventId) {
+    public ResponseEntity<EventCardDTO> getEventCard(@PathVariable Long eventId, @RequestHeader(value = "Authorization", required = false) String token) {
         Event event = eventService.getEvent(eventId);
 
         if (event != null) {
-            EventCardDTO eventCardDTO = new EventCardDTO(event);
+            User user = null;
+            if(token != null) {
+                try {
+                    token = token.substring(7);
+                    user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+                }
+                catch (Exception ignored) {
+                }
+            }
+
+            User finalUser = user;
+            EventCardDTO eventCardDTO = new EventCardDTO(event, finalUser);
             return new ResponseEntity<EventCardDTO>(eventCardDTO, HttpStatus.OK);
         }
 
@@ -267,12 +417,23 @@ public class EventController {
       2) they are NOT in card shapes (they always will be if we are getting all featured events) */
     // GET "/api/events/featured"
     @GetMapping(value = "/featured", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<EventCardDTO>> getFeaturedEvents() {
+    public ResponseEntity<Collection<EventCardDTO>> getFeaturedEvents(@RequestHeader(value = "Authorization", required = false) String token) {
         ArrayList<Event> featuredEvents = eventService.getFeaturedEvents();
 
+        User user = null;
+        if(token != null) {
+            try {
+                token = token.substring(7);
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
+        }
+
+        User finalUser = user;
         ArrayList<EventCardDTO> featuredEventsDTO = new ArrayList<>();
         for (Event event : featuredEvents) {
-            featuredEventsDTO.add(new EventCardDTO(event));
+            featuredEventsDTO.add(new EventCardDTO(event, finalUser));
         }
 
         return new ResponseEntity<Collection<EventCardDTO>>(featuredEventsDTO, HttpStatus.OK);

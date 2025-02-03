@@ -7,6 +7,9 @@ import org.example.eventy.solutions.dtos.ProductPurchaseDTO;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.services.ProductService;
+import org.example.eventy.users.models.User;
+import org.example.eventy.users.services.UserService;
+import org.example.eventy.util.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,14 +26,28 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private TokenUtils tokenUtils;
 
     // GET "/api/products/cards/5"
     @GetMapping(value = "/cards/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SolutionCardDTO> getProductCard(@PathVariable Long productId) {
+    public ResponseEntity<SolutionCardDTO> getProductCard(@PathVariable Long productId, @RequestHeader(value = "Authorization", required = false) String token) {
         Solution product = productService.getProduct(productId);
 
+        User user = null;
+        if(token != null) {
+            token = token.substring(7);
+
+            try {
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
+        }
         if (product != null) {
-            SolutionCardDTO productCardDTO = new SolutionCardDTO(product);
+            SolutionCardDTO productCardDTO = new SolutionCardDTO(product, user);
             return new ResponseEntity<SolutionCardDTO>(productCardDTO, HttpStatus.OK);
         }
 

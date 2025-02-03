@@ -1,5 +1,7 @@
 package org.example.eventy.users.services;
 
+import org.example.eventy.events.models.Event;
+import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.users.dtos.UserDTO;
 import org.example.eventy.users.dtos.UserType;
 import org.example.eventy.users.models.Admin;
@@ -86,5 +88,19 @@ public class UserService {
         User upgradedUser = get(userId);
 
         return save(upgradedUser, false);
+    }
+
+    @Transactional
+    public void toggleFavoriteEvent(User user, Event event) {
+        if (!user.getFavoriteEvents().remove(event)) {
+            user.getFavoriteEvents().add(event);
+        }
+    }
+
+    @Transactional
+    public void toggleFavoriteSolution(User user, Solution solution) {
+        if (!user.getFavoriteSolutions().remove(solution)) {
+            user.getFavoriteSolutions().add(solution);
+        }
     }
 }
