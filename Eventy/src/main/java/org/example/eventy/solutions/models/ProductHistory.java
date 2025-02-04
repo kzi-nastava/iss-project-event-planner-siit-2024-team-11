@@ -21,24 +21,23 @@ public class ProductHistory  {
     @Column(nullable = false)
     private int discount;
 
-    @Column(nullable = false)
-    private boolean isVisible;
-
-    @Column(nullable = false)
-    private boolean isAvailable;
-
     public ProductHistory() {
 
     }
 
-    public ProductHistory(Long id, String name, String description, double price, int discount, boolean isVisible, boolean isAvailable) {
+    public ProductHistory(Long id, String name, String description, double price, int discount) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.discount = discount;
-        this.isVisible = isVisible;
-        this.isAvailable = isAvailable;
+    }
+
+    public ProductHistory(Product product) {
+        this.name = product.getName();
+        this.description = product.getDescription();
+        this.price = product.getPrice();
+        this.discount = product.getDiscount();
     }
 
     public Long getId() {
@@ -79,21 +78,5 @@ public class ProductHistory  {
 
     public void setDiscount(int discount) {
         this.discount = discount;
-    }
-
-    public boolean isVisible() {
-        return isVisible;
-    }
-
-    public void setVisible(boolean visible) {
-        isVisible = visible;
-    }
-
-    public boolean isAvailable() {
-        return isAvailable;
-    }
-
-    public void setAvailable(boolean available) {
-        isAvailable = available;
     }
 }
