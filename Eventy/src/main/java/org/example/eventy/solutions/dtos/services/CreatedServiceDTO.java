@@ -39,7 +39,7 @@ public class CreatedServiceDTO {
         this.description = service.getDescription();
         this.price = service.getPrice();
         this.discount = service.getDiscount();
-        this.imageUrls = service.getImageUrls().stream().map(PicturePath::getPath).collect(Collectors.toList());
+        this.imageUrls = service.getImageUrls() == null ? null : service.getImageUrls().stream().map(PicturePath::getPath).collect(Collectors.toList());
         this.isVisible = service.isVisible();
         this.isAvailable = service.isAvailable();
         this.category = new CategoryDTO(service.getCategory());
