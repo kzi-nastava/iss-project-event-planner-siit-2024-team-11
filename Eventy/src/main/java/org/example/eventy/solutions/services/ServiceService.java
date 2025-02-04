@@ -4,10 +4,15 @@ import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.common.models.ReservationConfirmationType;
 import org.example.eventy.common.models.Status;
 import org.example.eventy.events.models.EventType;
+import org.example.eventy.events.services.EventService;
+import org.example.eventy.events.services.EventTypeService;
 import org.example.eventy.solutions.dtos.services.*;
 import org.example.eventy.solutions.models.Category;
+import org.example.eventy.solutions.models.Service;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.repositories.SolutionRepository;
+import org.example.eventy.users.models.SolutionProvider;
+import org.example.eventy.users.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
@@ -17,85 +22,38 @@ public class ServiceService {
     @Autowired
     private SolutionRepository solutionRepository;
 
+    @Autowired
+    private SolutionCategoryService solutionCategoryService;
+
+    @Autowired
+    private EventTypeService eventTypeService;
+
+    @Autowired
+    private UserService userService;
+
     private Collection<org.example.eventy.solutions.models.Service> allServices = new ArrayList<>();
 
-    private void setTestData() {
-        Category category1 = new Category(1L, "Category 1", "Description for Category 1", Status.ACCEPTED);
-        Category category2 = new Category(2L, "Category 2", "Description for Category 2", Status.ACCEPTED);
-
-        Set<Category> recommendedCategoriesForEventType1 = new HashSet<>();
-        recommendedCategoriesForEventType1.add(category1);
-
-        Set<Category> recommendedCategoriesForEventType2 = new HashSet<>();
-        recommendedCategoriesForEventType2.add(category2);
-
-        EventType eventType1 = new EventType(1L, "Event Type 1", "Description for Event Type 1", true, recommendedCategoriesForEventType1);
-        EventType eventType2 = new EventType(2L, "Event Type 2", "Description for Event Type 2", true, recommendedCategoriesForEventType2);
-
-        List<EventType> eventTypeList1 = new ArrayList<>();
-        eventTypeList1.add(eventType1);  // List with first EventType
-
-        List<EventType> eventTypeList2 = new ArrayList<>();
-        eventTypeList2.add(eventType2);
-
-        org.example.eventy.solutions.models.Service service1 = new org.example.eventy.solutions.models.Service(
-                1L, "Service 1", "Description for Service 1", 100.0, 10, new ArrayList<>(Arrays.asList(new PicturePath(4L, "https://example.com/images/wedding_catering.jpg"))),
-                true, true, false, category1, eventTypeList1,
-                null, "Specifics for Service 1", 10, 120, 30, 15, ReservationConfirmationType.AUTOMATIC, null
-        );
-
-        org.example.eventy.solutions.models.Service service2 = new org.example.eventy.solutions.models.Service(
-                2L, "Service 2", "Description for Service 2", 200.0, 20, new ArrayList<>(Arrays.asList(new PicturePath(6L, "https://example.com/images/wedding_catering.jpg"))),
-                true, true, false, category2, eventTypeList2,
-                null, "Specifics for Service 2", 15, 90, 45, 20, ReservationConfirmationType.MANUAL, null
-        );
-
-        org.example.eventy.solutions.models.Service service3 = new org.example.eventy.solutions.models.Service(
-                3L, "Service 3", "Description for Service 3", 150.0, 15, new ArrayList<>(Arrays.asList(new PicturePath(7L, "https://example.com/images/wedding_catering.jpg"))),
-                true, true, false, category1, eventTypeList2,
-                null, "Specifics for Service 3", 20, 100, 60, 30, ReservationConfirmationType.AUTOMATIC, null
-        );
-
-        org.example.eventy.solutions.models.Service service4 = new org.example.eventy.solutions.models.Service(
-                4L, "Service 4", "Description for Service 4", 250.0, 25, new ArrayList<>(Arrays.asList(new PicturePath(8L, "https://example.com/images/wedding_catering.jpg"))),
-                true, true, false, category2, eventTypeList1,
-                null, "Specifics for Service 4", 30, 150, 90, 45, ReservationConfirmationType.MANUAL, null
-        );
-
-        org.example.eventy.solutions.models.Service service5 = new org.example.eventy.solutions.models.Service(
-                5L, "Service 5", "Description for Service 5", 180.0, 18, new ArrayList<>(Arrays.asList(new PicturePath(9L, "https://example.com/images/wedding_catering.jpg"))),
-                true, true, false, category1, eventTypeList2,
-                null, "Specifics for Service 5", 25, 110, 75, 35, ReservationConfirmationType.AUTOMATIC, null
-        );
-
-        allServices.add(service1);
-        allServices.add(service2);
-        allServices.add(service3);
-        allServices.add(service4);
-        allServices.add(service5);
-    }
-
-    public ServiceService() {
-        setTestData();
-    }
-
-    public CreatedServiceDTO createService(CreateServiceDTO createServiceDTO) {
-        CreatedServiceDTO createdServiceDTO = new CreatedServiceDTO();
-        createdServiceDTO.setId(1337L);
-        createdServiceDTO.setName(createServiceDTO.getName());
-        createdServiceDTO.setDescription(createServiceDTO.getDescription());
-        createdServiceDTO.setPrice(createServiceDTO.getPrice());
-        createdServiceDTO.setDiscount(createServiceDTO.getDiscount());
-        createdServiceDTO.setImageUrls(createServiceDTO.getImageUrls());
-        createdServiceDTO.setCategory(createServiceDTO.getCategory());
-        createdServiceDTO.setRelatedEventTypes(createServiceDTO.getRelatedEventTypes());
-        createdServiceDTO.setSpecifics(createServiceDTO.getSpecifics());
-        createdServiceDTO.setMinReservationTime(createServiceDTO.getMinReservationTime());
-        createdServiceDTO.setMaxReservationTime(createServiceDTO.getMaxReservationTime());
-        createdServiceDTO.setReservationDeadline(createServiceDTO.getReservationDeadline());
-        createdServiceDTO.setCancellationDeadline(createServiceDTO.getCancellationDeadline());
-        createdServiceDTO.setAutomaticReservationAcceptance(createServiceDTO.getAutomaticReservationAcceptance());
-        return createdServiceDTO;
+    public Service createService(CreateServiceDTO createServiceDTO) {
+        Service service = new Service();
+        service.setName(createServiceDTO.getName());
+        service.setDescription(createServiceDTO.getDescription());
+        service.setPrice(createServiceDTO.getPrice());
+        service.setDiscount((int) createServiceDTO.getDiscount());
+        service.setImageUrls(null); // TO-DO
+        service.setProvider((SolutionProvider) userService.get(createServiceDTO.getProviderId()));
+        service.setCategory(solutionCategoryService.getCategory(createServiceDTO.getCategoryId()));
+        List<EventType> eventTypes = new ArrayList<>();
+        for (Long eid: createServiceDTO.getRelatedEventTypeIds()) {
+            eventTypes.add(eventTypeService.get(eid));
+        }
+        service.setEventTypes(eventTypes);
+        service.setSpecifics(createServiceDTO.getSpecifics());
+        service.setMinReservationTime(createServiceDTO.getMinReservationTime());
+        service.setMaxReservationTime(createServiceDTO.getMaxReservationTime());
+        service.setReservationDeadline(createServiceDTO.getReservationDeadline());
+        service.setCancellationDeadline(createServiceDTO.getCancellationDeadline());
+        service.setReservationType(createServiceDTO.isAutomaticReservationAcceptance() ? ReservationConfirmationType.AUTOMATIC : ReservationConfirmationType.MANUAL);
+        return solutionRepository.save(service);
     }
 
     /*public Collection<GetServiceDTO> getServices(String name, CategoryDTO category, EventTypeDTO eventType, double minPrice, double maxPrice, boolean available) {

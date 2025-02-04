@@ -5,16 +5,18 @@ import org.example.eventy.solutions.dtos.CategoryDTO;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class CreateServiceDTO {
 
     private String name;
     private String description;
     private double price;
-    private int discount;
+    private double discount;
     private ArrayList<String> imageUrls;
-    private CategoryDTO category;
-    private Collection<EventTypeDTO> relatedEventTypes;
+    private Long providerId;
+    private Long categoryId;
+    private List<Long> relatedEventTypeIds;
     private String specifics;
     private int minReservationTime;
     private int maxReservationTime;
@@ -48,11 +50,11 @@ public class CreateServiceDTO {
         this.price = price;
     }
 
-    public int getDiscount() {
+    public double getDiscount() {
         return discount;
     }
 
-    public void setDiscount(int discount) {
+    public void setDiscount(double discount) {
         this.discount = discount;
     }
 
@@ -64,20 +66,20 @@ public class CreateServiceDTO {
         this.imageUrls = imageUrls;
     }
 
-    public CategoryDTO getCategory() {
-        return category;
+    public Long getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategory(CategoryDTO category) {
-        this.category = category;
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 
-    public Collection<EventTypeDTO> getRelatedEventTypes() {
-        return relatedEventTypes;
+    public List<Long> getRelatedEventTypeIds() {
+        return relatedEventTypeIds;
     }
 
-    public void setRelatedEventTypes(Collection<EventTypeDTO> relatedEventTypes) {
-        this.relatedEventTypes = relatedEventTypes;
+    public void setRelatedEventTypeIds(List<Long> relatedEventTypeIds) {
+        this.relatedEventTypeIds = relatedEventTypeIds;
     }
 
     public String getSpecifics() {
@@ -126,5 +128,17 @@ public class CreateServiceDTO {
 
     public void setAutomaticReservationAcceptance(boolean automaticReservationAcceptance) {
         this.automaticReservationAcceptance = automaticReservationAcceptance;
+    }
+
+    public Long getProviderId() {
+        return providerId;
+    }
+
+    public void setProviderId(Long providerId) {
+        this.providerId = providerId;
+    }
+
+    public boolean isAutomaticReservationAcceptance() {
+        return automaticReservationAcceptance;
     }
 }
