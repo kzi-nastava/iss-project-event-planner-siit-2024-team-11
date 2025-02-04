@@ -153,6 +153,7 @@ public class SolutionCategoryController {
     @PutMapping(value = "/requests/accept/{requestId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CategoryWithIDDTO> acceptRequest(@PathVariable long requestId) {
         Category pendingCategory = service.getCategory(requestId);
+        String oldName = pendingCategory.getName();
         Solution changedSolution = solutionService.findSolutionWithPendingCategory(pendingCategory);
 
         Category acceptedCategory = service.acceptCategory(requestId);
@@ -163,7 +164,7 @@ public class SolutionCategoryController {
 
         if (changedSolution != null) {
             Long providerIdToNotify = changedSolution.getProvider().getId();
-            sendNotification(providerIdToNotify, pendingCategory, changedSolution, 1);
+            sendNotification(providerIdToNotify, oldName, changedSolution, 1);
         }
         return new ResponseEntity<>(new CategoryWithIDDTO(acceptedCategory), HttpStatus.OK);
     }
@@ -172,6 +173,7 @@ public class SolutionCategoryController {
     @PutMapping(value="/requests/change",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CategoryWithIDDTO> changeRequest(@RequestBody CategoryWithIDDTO changedCategory) {
         Category pendingCategory = service.getCategory(changedCategory.getId());
+        String oldName = pendingCategory.getName();
         Solution changedSolution = solutionService.findSolutionWithPendingCategory(pendingCategory);
 
         Category updatedCategory = service.changeCategory(changedCategory);
@@ -182,7 +184,7 @@ public class SolutionCategoryController {
 
         if (changedSolution != null) {
             Long providerIdToNotify = changedSolution.getProvider().getId();
-            sendNotification(providerIdToNotify, pendingCategory, changedSolution, 2);
+            sendNotification(providerIdToNotify, oldName, changedSolution, 2);
         }
         return new ResponseEntity<>(new CategoryWithIDDTO(updatedCategory), HttpStatus.OK);
     }
@@ -192,6 +194,7 @@ public class SolutionCategoryController {
     public ResponseEntity<Boolean> replaceRequest(@RequestParam (required = true) Long replacedCategoryId,
                                                            @RequestParam (required = true) Long newlyUsedCategoryId) {
         Category replacedCategory = service.getCategory(replacedCategoryId);
+        String oldName = replacedCategory.getName();
         if (replacedCategory == null || replacedCategory.getStatus() != Status.PENDING) {
             return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
         }
@@ -202,7 +205,7 @@ public class SolutionCategoryController {
 
         if (successfullyReplaced && changedSolution != null) {
             Long providerIdToNotify = changedSolution.getProvider().getId();
-            sendNotification(providerIdToNotify, replacedCategory, changedSolution, 3);
+            sendNotification(providerIdToNotify, oldName, changedSolution, 3);
         }
 
         service.deleteCategory(replacedCategoryId);
@@ -210,7 +213,7 @@ public class SolutionCategoryController {
         return new ResponseEntity<Boolean>(true, HttpStatus.OK);
     }
 
-    private void sendNotification(Long providerIdToNotify, Category pendingCategory, Solution changedSolution, int decision) {
+    private void sendNotification(Long providerIdToNotify, String oldCategoryName, Solution changedSolution, int decision) {
         NotificationType type = null;
         String title = null;
         String message = null;
@@ -224,11 +227,11 @@ public class SolutionCategoryController {
             type = NotificationType.CATEGORY_SUGGESTION_ACCEPTED;
             if (changedSolution instanceof Service) {
                 title = "Service Category Suggestion ACCEPTED!";
-                message = "Your request for the new service category \"" + pendingCategory.getName() + "\" is ACCEPTED. " +
+                message = "Your request for the new service category \"" + oldCategoryName + "\" is ACCEPTED. " +
                           "Your service is now active! Tap to see more!";
             } else {
                 title = "Product Category Suggestion ACCEPTED!";
-                message = "Your request for the new product category \"" + pendingCategory.getName() + "\" is ACCEPTED. " +
+                message = "Your request for the new product category \"" + oldCategoryName + "\" is ACCEPTED. " +
                           "Your product is now active! Tap to see more!";
             }
 
@@ -237,11 +240,11 @@ public class SolutionCategoryController {
             type = NotificationType.CATEGORY_SUGGESTION_CHANGED;
             if (changedSolution instanceof Service) {
                 title = "Service Category Suggestion UPDATED!";
-                message = "Your request for the new service category \"" + pendingCategory.getName() + "\" was not accepted " +
+                message = "Your request for the new service category \"" + oldCategoryName + "\" was not accepted " +
                           "but has instead been UPDATED with new values. Your service is now active! Tap to see more!";
             } else {
                 title = "Product Category Suggestion UPDATED!";
-                message = "Your request for the new product category \"" + pendingCategory.getName() + "\" was not accepted " +
+                message = "Your request for the new product category \"" + oldCategoryName + "\" was not accepted " +
                           "but has instead been UPDATED with new values. Your product is now active! Tap to see more!";
             }
 
@@ -250,11 +253,11 @@ public class SolutionCategoryController {
             type = NotificationType.CATEGORY_SUGGESTION_REPLACED;
             if (changedSolution instanceof Service) {
                 title = "Service Category Suggestion REPLACED!";
-                message = "Your request for the new service category \"" + pendingCategory.getName() + "\" was not accepted " +
+                message = "Your request for the new service category \"" + oldCategoryName + "\" was not accepted " +
                           "but has instead been REPLACED with an existing category. Your service is now active! Tap to see more!";
             } else {
                 title = "Product Category Suggestion REPLACED!";
-                message = "Your request for the new product category \"" + pendingCategory.getName() + "\" was not accepted " +
+                message = "Your request for the new product category \"" + oldCategoryName + "\" was not accepted " +
                           "but has instead been REPLACED with an existing category. Your product is now active! Tap to see more!";
             }
         }
