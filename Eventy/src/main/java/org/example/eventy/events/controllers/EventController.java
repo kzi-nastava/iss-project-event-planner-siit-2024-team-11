@@ -131,6 +131,69 @@ public class EventController {
         return new ResponseEntity<EventDTO>(HttpStatus.BAD_REQUEST);
     }
 
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Organizer')")
+    public ResponseEntity<EventDTO> editEvent(@Valid @RequestBody UpdateEventDTO updateEventDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // if there are validation errors, we return a 400 Bad Request response
+            List<String> errorMessages = bindingResult.getFieldErrors().stream()
+                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                    .collect(Collectors.toList());
+            return new ResponseEntity(errorMessages, HttpStatus.BAD_REQUEST);
+        }
+
+        Event event = eventService.getEvent(updateEventDTO.getId());
+
+        if(event == null) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+
+        event.setName(updateEventDTO.getName());
+        event.setDescription(updateEventDTO.getDescription());
+        event.setMaxNumberParticipants(updateEventDTO.getMaxNumberParticipants());
+        event.setPrivacy(updateEventDTO.getIsPublic() ? PrivacyType.PUBLIC : PrivacyType.PRIVATE);
+        event.setDate(updateEventDTO.getDate());
+        event.setType(eventTypeService.get(updateEventDTO.getEventTypeId()));
+        event.setOrganiser((EventOrganizer) userService.get(updateEventDTO.getOrganizerId()));
+
+        if(event.getLocation().getLatitude() != updateEventDTO.getLocation().getLatitude() || event.getLocation().getLongitude() != updateEventDTO.getLocation().getLongitude()) {
+            Location location = new Location();
+            location.setName(updateEventDTO.getLocation().getName());
+            location.setAddress(updateEventDTO.getLocation().getAddress());
+            location.setLatitude(updateEventDTO.getLocation().getLatitude());
+            location.setLongitude(updateEventDTO.getLocation().getLongitude());
+
+            //locationService.save(location); // is this even necessary with CascadeType.ALL
+            event.setLocation(location);
+        }
+
+        List<Activity> agenda = new ArrayList<>();
+        for(CreateActivityDTO activityDTO : updateEventDTO.getAgenda()) {
+            Activity activity = new Activity();
+            activity.setName(activityDTO.getName());
+            activity.setDescription(activityDTO.getDescription());
+            activity.setLocation(activityDTO.getLocation());
+            activity.setStartTime(activityDTO.getStartTime());
+            activity.setEndTime(activityDTO.getEndTime());
+            //activityService.save(activity);
+            agenda.add(activity);
+        }
+
+        event.getAgenda().clear();
+        event.setAgenda(agenda);
+
+        event = eventService.save(event);
+
+        if(event != null) {
+            EventDTO eventDTO = new EventDTO(event);
+            // needs to be this ---> // EventDTO eventDTO = new EventDTO(event);
+            // but there are right now errors while converting to DTO (getOrganizer().getId()... <=> null.getId()...)
+            return new ResponseEntity<EventDTO>(eventDTO, HttpStatus.CREATED);
+        }
+
+        return new ResponseEntity<EventDTO>(HttpStatus.BAD_REQUEST);
+    }
+
     @GetMapping(value = "/stats", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('Organizer') OR hasRole('Admin')")
     public ResponseEntity<PagedResponse<EventStatsDTO>> getEventsWithStats(
