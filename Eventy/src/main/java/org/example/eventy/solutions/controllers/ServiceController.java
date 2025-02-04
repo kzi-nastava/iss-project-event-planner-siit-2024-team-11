@@ -28,7 +28,7 @@ public class ServiceController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CreatedServiceDTO> createService(@RequestBody CreateServiceDTO service) {
-        CreatedServiceDTO response = serviceService.createService(service);
+        CreatedServiceDTO response = new CreatedServiceDTO(serviceService.createService(service));
 
         return new ResponseEntity<CreatedServiceDTO>(response, HttpStatus.CREATED);
     }
