@@ -93,9 +93,10 @@ INSERT INTO users_profile_pictures(picture_id, user_id)
 VALUES (1, 1),
        (2, 2),
        (4, 3),
-       (3, 4),
-       (5, 5),
-       (5, 6);
+       (2, 4),
+       (3, 5),
+       (5, 6),
+       (6, 7);
 
 -- Suggested Event Types for Solutions
 INSERT INTO suggested_event_types(solution_id, event_type_id)

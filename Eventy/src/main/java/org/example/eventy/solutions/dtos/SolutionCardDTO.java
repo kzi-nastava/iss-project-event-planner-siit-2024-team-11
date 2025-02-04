@@ -93,11 +93,19 @@ public class SolutionCardDTO {
         }
         this.price = solution.getPrice();
         this.discount = solution.getDiscount();
-        this.firstImageUrl = PictureService.getImage(solution.getImageUrls().get(0).getPath());
+        if (solution.getImageUrls() == null || solution.getImageUrls().isEmpty()) {
+            this.firstImageUrl = "none";
+        } else {
+            this.firstImageUrl = PictureService.getImage(solution.getImageUrls().get(0).getPath());
+        }
         this.isAvailable = solution.isAvailable();
         this.providerId = solution.getProvider().getId();
         this.providerName = solution.getProvider().getName();
-        this.providerImageUrl = PictureService.getImage(solution.getProvider().getImageUrls().get(0).getPath());
+        if (solution.getProvider().getImageUrls() == null || solution.getProvider().getImageUrls().isEmpty()) {
+            this.providerImageUrl = "none";
+        } else {
+            this.providerImageUrl = PictureService.getImage(solution.getProvider().getImageUrls().get(0).getPath());
+        }
         this.isFavorite = loggedInUser != null && loggedInUser.getFavoriteSolutions().contains(solution);
     }
 
