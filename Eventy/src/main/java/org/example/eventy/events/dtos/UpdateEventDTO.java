@@ -2,12 +2,12 @@ package org.example.eventy.events.dtos;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
-import org.example.eventy.events.validation.annotation.ValidOrganizedEvent;
+import org.example.eventy.events.validation.annotation.ValidUpdateEvent;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@ValidOrganizedEvent // trigger the custom validation
+@ValidUpdateEvent // trigger the custom validation
 public class UpdateEventDTO {
     @NotNull(message = "Id cannot be null")
     private Long id;

@@ -7,7 +7,9 @@ import org.example.eventy.common.services.EmailService;
 import org.example.eventy.events.dtos.*;
 import org.example.eventy.events.models.*;
 import org.example.eventy.events.services.*;
-import org.example.eventy.reviews.models.Review;
+import org.example.eventy.interactions.model.Notification;
+import org.example.eventy.interactions.model.NotificationType;
+import org.example.eventy.interactions.services.NotificationService;
 import org.example.eventy.reviews.services.ReviewService;
 import org.example.eventy.users.models.EventOrganizer;
 import org.example.eventy.users.models.User;
@@ -21,15 +23,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -52,6 +53,10 @@ public class EventController {
     private TokenUtils tokenUtils;
     @Autowired
     private ReviewService reviewService;
+    @Autowired
+    private NotificationService notificationService;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @GetMapping(value = "/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EventDetailsDTO> getEvent(@PathVariable Long eventId, @RequestHeader(value = "Authorization", required = false) String token) {
@@ -143,6 +148,7 @@ public class EventController {
         }
 
         Event event = eventService.getEvent(updateEventDTO.getId());
+        String oldEventName = event.getName();
 
         if(event == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
@@ -185,12 +191,32 @@ public class EventController {
 
         if(event != null) {
             EventDTO eventDTO = new EventDTO(event);
-            // needs to be this ---> // EventDTO eventDTO = new EventDTO(event);
-            // but there are right now errors while converting to DTO (getOrganizer().getId()... <=> null.getId()...)
+            List<Long> userIdsToNotify = userService.findUserIdsByAcceptedEventId(event.getId());
+
+            for (Long userId : userIdsToNotify) {
+                sendNotification(userId, event, oldEventName);
+            }
             return new ResponseEntity<EventDTO>(eventDTO, HttpStatus.CREATED);
         }
 
         return new ResponseEntity<EventDTO>(HttpStatus.BAD_REQUEST);
+    }
+
+    private void sendNotification(Long userId, Event event, String oldEventName) {
+        NotificationType type = NotificationType.EVENT_CHANGE;
+        Long redirectionId = event.getId();
+        String title = "\"" + oldEventName + "\"";
+        Long ownerId = userId;
+        User grader = null;
+        Integer grade = null;
+        String message = "NOTICE: The event has been changed! Tap to see more!";
+
+        LocalDateTime timestamp = LocalDateTime.now();
+        Notification notification = new Notification(type, redirectionId, title, message, grader, grade, timestamp);
+
+        notificationService.saveNotification(ownerId, notification);
+        sendNotificationToWeb(ownerId, notification);
+        sendNotificationToMobile(ownerId, notification);
     }
 
     @GetMapping(value = "/stats", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -524,6 +550,14 @@ public class EventController {
         }
 
         return new ResponseEntity<Collection<UnreviewedEventDTO>>(unreviewedEventDTO, HttpStatus.OK);
+    }
+
+    private void sendNotificationToWeb(Long userId, Notification notification) {
+        messagingTemplate.convertAndSend("/topic/web/" + userId, notification);
+    }
+
+    private void sendNotificationToMobile(Long userId, Notification notification) {
+        messagingTemplate.convertAndSend("/topic/mobile/" + userId, notification);
     }
 }
 

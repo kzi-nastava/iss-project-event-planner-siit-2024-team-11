@@ -15,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 public class UserService {
@@ -102,5 +104,9 @@ public class UserService {
         if (!user.getFavoriteSolutions().remove(solution)) {
             user.getFavoriteSolutions().add(solution);
         }
+    }
+
+    public List<Long> findUserIdsByAcceptedEventId(Long id) {
+        return userRepository.findUserIdsByAcceptedEventId(id);
     }
 }

@@ -11,6 +11,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByEmail(String email);
@@ -39,4 +41,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT COUNT(n) > 0 FROM User u JOIN u.notifications n WHERE u.id = :userId AND n.timestamp > u.lastReadNotifications")
     boolean hasNewNotifications(@Param("userId") Long userId);
+
+    @Query("SELECT u.id FROM User u JOIN u.acceptedEvents e WHERE e.id = :eventId")
+    List<Long> findUserIdsByAcceptedEventId(@Param("eventId") Long eventId);
 }

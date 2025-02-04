@@ -39,13 +39,14 @@ INSERT INTO events(
     max_number_participants, privacy, date, event_type_id, id, location_id, organizer_id, description, name
 )
 VALUES
-    (50, 'PUBLIC', '2024-12-25 15:00:00', 1, DEFAULT, 1, 1, 'This is a birthday party for our friend John, I hope he does not know we are organizing this!', 'Birthday Party for John'),
+    (50, 'PUBLIC', '2025-12-25 15:00:00', 1, DEFAULT, 1, 1, 'This is a birthday party for our friend John, I hope he does not know we are organizing this!', 'Birthday Party for John'),
     (100, 'PUBLIC', '2024-12-26 15:00:00', 2, DEFAULT, 2, 1, 'High school students of prestigious high school "Jonny Smith" are graduating this month!', 'High School Graduation'),
     (150, 'PUBLIC', '2024-12-27 15:00:00', 1, DEFAULT, 3, 2, 'Lunch in our best office ever! See you there! Big thanks to Eventy for being such a cool platform! #sponsored', 'Office Lunch');
 
 -- Accepted Events
 INSERT INTO users_attending_events (event_id, user_id) VALUES
-(3, 1);
+(1, 1),
+(1, 7);
 
 -- Categories
 INSERT INTO categories (id, name, description, status, is_deleted)
@@ -55,7 +56,7 @@ VALUES
     (DEFAULT, 'Catering', 'Food and drink services for events.', 0, false);
 
 -- Solutions
-INSERT INTO solutions(
+INSERT INTO solutions (
     cancellation_deadline, discount, is_available, is_deleted, is_visible, max_reservation_time, min_reservation_time, price,
     reservation_deadline, reservation_type, category_id, id, product_history_id, provider_id, service_history_id, type, description, name, specifics)
 VALUES
@@ -129,6 +130,6 @@ INSERT INTO user_notifications (user_id, notification_id) VALUES
     (1, 2);
 
 -- Reviews
-INSERT INTO Reviews (user_id, event_id, solution_id, comment, grade, status, is_deleted)
+INSERT INTO reviews (user_id, event_id, solution_id, comment, grade, status, is_deleted)
 VALUES
     (1, 2, NULL, 'Great event, really enjoyed it!', 5, 'ACCEPTED', false);
