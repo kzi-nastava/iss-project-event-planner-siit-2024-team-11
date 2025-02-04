@@ -21,9 +21,6 @@ public class UpdateEventDTO {
     @NotNull(message = "Number of participants cannot be null")
     private int maxNumberParticipants;
 
-    @NotNull(message = "Privacy type cannot be null")
-    private boolean isPublic;
-
     @NotNull(message = "Event type cannot be null")
     private Long eventTypeId;
 
@@ -46,12 +43,11 @@ public class UpdateEventDTO {
 
     }
 
-    public UpdateEventDTO(Long id, String name, String description, int maxNumberParticipants, boolean isPublic, Long eventType, CreateLocationDTO location, LocalDateTime date, List<CreateActivityDTO> agenda, List<String> emails, Long organizerId) {
+    public UpdateEventDTO(Long id, String name, String description, int maxNumberParticipants, Long eventType, CreateLocationDTO location, LocalDateTime date, List<CreateActivityDTO> agenda, List<String> emails, Long organizerId) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.maxNumberParticipants = maxNumberParticipants;
-        this.isPublic = isPublic;
         this.eventTypeId = eventType;
         this.location = location;
         this.date = date;
@@ -65,14 +61,6 @@ public class UpdateEventDTO {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public boolean isPublic() {
-        return isPublic;
-    }
-
-    public void setPublic(boolean aPublic) {
-        isPublic = aPublic;
     }
 
     public String getName() {
@@ -97,14 +85,6 @@ public class UpdateEventDTO {
 
     public void setMaxNumberParticipants(int maxNumberParticipants) {
         this.maxNumberParticipants = maxNumberParticipants;
-    }
-
-    public boolean getIsPublic() {
-        return isPublic;
-    }
-
-    public void setIsPublic(boolean aPublic) {
-        isPublic = aPublic;
     }
 
     public Long getEventTypeId() {

@@ -151,7 +151,6 @@ public class EventController {
         event.setName(updateEventDTO.getName());
         event.setDescription(updateEventDTO.getDescription());
         event.setMaxNumberParticipants(updateEventDTO.getMaxNumberParticipants());
-        event.setPrivacy(updateEventDTO.getIsPublic() ? PrivacyType.PUBLIC : PrivacyType.PRIVATE);
         event.setDate(updateEventDTO.getDate());
         event.setType(eventTypeService.get(updateEventDTO.getEventTypeId()));
         event.setOrganiser((EventOrganizer) userService.get(updateEventDTO.getOrganizerId()));
