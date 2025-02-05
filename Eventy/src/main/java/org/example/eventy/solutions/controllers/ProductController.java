@@ -96,8 +96,8 @@ public class ProductController {
         product.setImageUrls(pictureService.save(createProductDTO.getImageUrls()));
         product.setCategory(solutionCategoryService.getCategory(createProductDTO.getCategory().getId()));
         product.setEventTypes(createProductDTO.getRelatedEventTypes().stream().map(eventType -> eventTypeService.get(eventType.getId())).collect(Collectors.toList()));
-        product.setVisible(createProductDTO.isVisible());
-        product.setAvailable(createProductDTO.isAvailable());
+        product.setVisible(createProductDTO.getIsVisible());
+        product.setAvailable(createProductDTO.getIsAvailable());
         product.setDeleted(false);
         product.setProvider((SolutionProvider) user);
         product.setCurrentProduct(productHistoryService.save(new ProductHistory(product)));
@@ -133,8 +133,8 @@ public class ProductController {
             productDTO.setPrice(5.0);
             productDTO.setDiscount(7.0);
             productDTO.setDescription("Product 5 Description");
-            productDTO.setAvailable(true);
-            productDTO.setVisible(true);
+            productDTO.setIsAvailable(true);
+            productDTO.setIsVisible(true);
             productDTO.setImages(new ArrayList<String>());
             productDTO.setRelatedEventTypes(new ArrayList<EventTypeDTO>());
             return new ResponseEntity<>(productDTO, HttpStatus.OK);
@@ -158,8 +158,8 @@ public class ProductController {
         product.setDiscount((int) productDTO.getDiscount());
         product.setImageUrls(pictureService.save(productDTO.getImages()));
         product.setEventTypes(productDTO.getRelatedEventTypes().stream().map(eventType -> eventTypeService.get(eventType.getId())).collect(Collectors.toList()));
-        product.setVisible(productDTO.isVisible());
-        product.setAvailable(productDTO.isAvailable());
+        product.setVisible(productDTO.getIsVisible());
+        product.setAvailable(productDTO.getIsAvailable());
         product.setCurrentProduct(productHistoryService.save(new ProductHistory(product)));
 
         product = productService.save(product);
@@ -169,16 +169,6 @@ public class ProductController {
         }
 
         return new ResponseEntity<ProductDTO>(new ProductDTO(product), HttpStatus.OK);
-    }
-
-    @DeleteMapping(value = "/{productId}")
-    @PreAuthorize("hasRole('Provider')")
-    public ResponseEntity<?> deleteProduct(@PathVariable Long productId) {
-        if(productService.delete(productId) == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping(value = "/purchase", consumes = MediaType.APPLICATION_JSON_VALUE)

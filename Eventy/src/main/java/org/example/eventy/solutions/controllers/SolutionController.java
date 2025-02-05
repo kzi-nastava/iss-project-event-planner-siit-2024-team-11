@@ -262,4 +262,34 @@ public class SolutionController {
         ArrayList<String> companyNames = solutionService.getAllUniqueCompaniesForSolutions();
         return new ResponseEntity<Collection<String>>(companyNames, HttpStatus.OK);
     }
+
+    @PutMapping(value = "/{solutionId}/availability")
+    @PreAuthorize("hasRole('Provider')")
+    public ResponseEntity<?> toggleAvailability(@PathVariable Long solutionId) {
+        if(solutionService.toggleAvailability(solutionId) == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping(value = "/{solutionId}/visibility")
+    @PreAuthorize("hasRole('Provider')")
+    public ResponseEntity<?> toggleVisibility(@PathVariable Long solutionId) {
+        if(solutionService.toggleVisible(solutionId) == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping(value = "/{solutionId}")
+    @PreAuthorize("hasRole('Provider')")
+    public ResponseEntity<?> deleteSolution(@PathVariable Long solutionId) {
+        if(solutionService.delete(solutionId) == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

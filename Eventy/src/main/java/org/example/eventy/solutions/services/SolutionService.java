@@ -1,6 +1,7 @@
 package org.example.eventy.solutions.services;
 
 import org.example.eventy.solutions.models.Category;
+import org.example.eventy.solutions.models.Product;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.repositories.SolutionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,5 +85,38 @@ public class SolutionService {
 
     public List<Solution> findAllByCategory(Category category) {
         return solutionRepository.findByCategory(category);
+    }
+
+    public Solution toggleAvailability(Long solutionId) {
+        try {
+            Solution solution = getSolution(solutionId);
+            solution.setAvailable(!solution.isAvailable());
+            return solutionRepository.save(solution);
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
+    public Solution toggleVisible(Long solutionId) {
+        try {
+            Solution solution = getSolution(solutionId);
+            solution.setVisible(!solution.isVisible());
+            return solutionRepository.save(solution);
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
+    public Solution delete(Long solutionId) {
+        try {
+            Solution solution = getSolution(solutionId);
+            solution.setDeleted(true);
+            return solutionRepository.save(solution);
+        }
+        catch (Exception e) {
+            return null;
+        }
     }
 }

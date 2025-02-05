@@ -1,5 +1,6 @@
 package org.example.eventy.solutions.dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.example.eventy.events.dtos.EventTypeCardDTO;
 import org.example.eventy.solutions.dtos.categories.CategoryWithIDDTO;
 
@@ -14,7 +15,9 @@ public class CreateProductDTO {
     private ArrayList<String> imageUrls;
     private CategoryWithIDDTO category;
     private Collection<EventTypeCardDTO> relatedEventTypes;
+    @JsonProperty("isVisible")
     private boolean isVisible;
+    @JsonProperty("isAvailable")
     private boolean isAvailable;
 
     public CreateProductDTO() {
@@ -89,19 +92,19 @@ public class CreateProductDTO {
         this.relatedEventTypes = relatedEventTypes;
     }
 
-    public boolean isVisible() {
+    public boolean getIsVisible() {
         return isVisible;
     }
 
-    public void setVisible(boolean visible) {
+    public void setIsVisible(boolean visible) {
         this.isVisible = visible;
     }
 
-    public boolean isAvailable() {
+    public boolean getIsAvailable() {
         return isAvailable;
     }
 
-    public void setAvailable(boolean available) {
+    public void setIsAvailable(boolean available) {
         this.isAvailable = available;
     }
 }
