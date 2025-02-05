@@ -3,6 +3,7 @@ package org.example.eventy.solutions.dtos.services;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.common.models.ReservationConfirmationType;
+import org.example.eventy.common.services.PictureService;
 import org.example.eventy.events.dtos.EventTypeDTO;
 import org.example.eventy.solutions.dtos.CategoryDTO;
 import org.example.eventy.solutions.dtos.categories.CategoryWithIDDTO;
@@ -43,7 +44,7 @@ public class ServiceDTO {
         this.description = service.getDescription();
         this.price = service.getPrice();
         this.discount = service.getDiscount();
-        this.imageUrls = service.getImageUrls() == null ? null : service.getImageUrls().stream().map(PicturePath::getPath).collect(Collectors.toList());
+        this.imageUrls = service.getImageUrls() == null ? null : service.getImageUrls().stream().map(PicturePath::getPath).map(PictureService::getImage).collect(Collectors.toList());
         this.isVisible = service.isVisible();
         this.isAvailable = service.isAvailable();
         this.category = new CategoryDTO(service.getCategory());
