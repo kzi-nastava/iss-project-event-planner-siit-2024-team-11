@@ -3,11 +3,13 @@ package org.example.eventy.solutions.services;
 import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.common.models.ReservationConfirmationType;
 import org.example.eventy.common.models.Status;
+import org.example.eventy.common.services.PictureService;
 import org.example.eventy.events.models.EventType;
 import org.example.eventy.events.services.EventService;
 import org.example.eventy.events.services.EventTypeService;
 import org.example.eventy.solutions.dtos.services.*;
 import org.example.eventy.solutions.models.Category;
+import org.example.eventy.solutions.models.Product;
 import org.example.eventy.solutions.models.Service;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.repositories.SolutionRepository;
@@ -31,7 +33,8 @@ public class ServiceService {
     @Autowired
     private UserService userService;
 
-    private Collection<org.example.eventy.solutions.models.Service> allServices = new ArrayList<>();
+    @Autowired
+    private PictureService pictureService;
 
     public Service createService(CreateServiceDTO createServiceDTO) {
         Service service = new Service();
@@ -39,7 +42,7 @@ public class ServiceService {
         service.setDescription(createServiceDTO.getDescription());
         service.setPrice(createServiceDTO.getPrice());
         service.setDiscount((int) createServiceDTO.getDiscount());
-        service.setImageUrls(null); // TO-DO
+        service.setImageUrls(pictureService.save(createServiceDTO.getImageUrls()));
         service.setProvider((SolutionProvider) userService.get(createServiceDTO.getProviderId()));
         service.setCategory(solutionCategoryService.getCategory(createServiceDTO.getCategoryId()));
         List<EventType> eventTypes = new ArrayList<>();
@@ -56,44 +59,48 @@ public class ServiceService {
         return solutionRepository.save(service);
     }
 
-    /*public Collection<GetServiceDTO> getServices(String name, CategoryDTO category, EventTypeDTO eventType, double minPrice, double maxPrice, boolean available) {
-        Collection<GetServiceDTO> getServiceDTOs = new ArrayList<>();
-        allServices.forEach(s -> getServiceDTOs.add(new GetServiceDTO(s)));
-        return getServiceDTOs;
-    }*/
-
-    /*
-    public Optional<GetServiceDTO> getService(long id) {
-        return Optional.of(new GetServiceDTO(allServices.stream().filter(s -> s.getId() == id).findFirst().get()));
-    }*/
-
-    public Optional<UpdatedServiceDTO> updateService(UpdateServiceDTO updateServiceDTO) {
-        Optional<org.example.eventy.solutions.models.Service> oldService = allServices.stream().filter(s -> s.getId() == updateServiceDTO.getId()).findFirst();
-        if (!oldService.isPresent()) {
-            return Optional.empty();
+    public Service updateService(UpdateServiceDTO updateServiceDTO) {
+        Service service;
+        try {
+            service = (Service) solutionRepository.findById(updateServiceDTO.getId()).orElse(null);
+        } catch (Exception e) {
+            return null;
         }
-        UpdatedServiceDTO updatedServiceDTO = new UpdatedServiceDTO();
-        updatedServiceDTO.setId(updateServiceDTO.getId());
-        updatedServiceDTO.setName(updateServiceDTO.getName());
-        updatedServiceDTO.setDescription(updateServiceDTO.getDescription());
-        updatedServiceDTO.setPrice(updateServiceDTO.getPrice());
-        updatedServiceDTO.setDiscount(updateServiceDTO.getDiscount());
-        updatedServiceDTO.setImageUrls(updateServiceDTO.getImageUrls());
-        updatedServiceDTO.setVisible(updateServiceDTO.isVisible());
-        updatedServiceDTO.setAvailable(updateServiceDTO.isAvailable());
-        updatedServiceDTO.setCategory(updateServiceDTO.getCategory());
-        updatedServiceDTO.setRelatedEventTypes(updateServiceDTO.getRelatedEventTypes());
-        updatedServiceDTO.setSpecifics(updateServiceDTO.getSpecifics());
-        updatedServiceDTO.setMinReservationTime(updateServiceDTO.getMinReservationTime());
-        updatedServiceDTO.setMaxReservationTime(updateServiceDTO.getMaxReservationTime());
-        updatedServiceDTO.setReservationDeadline(updateServiceDTO.getReservationDeadline());
-        updatedServiceDTO.setCancellationDeadline(updateServiceDTO.getCancellationDeadline());
-        updatedServiceDTO.setAutomaticReservationAcceptance(updateServiceDTO.getAutomaticReservationAcceptance());
-        return Optional.of(updatedServiceDTO);
+
+        if (service == null) {
+            return null;
+        }
+
+        service.setName(updateServiceDTO.getName());
+        service.setDescription(updateServiceDTO.getDescription());
+        service.setPrice(updateServiceDTO.getPrice());
+        service.setDiscount(updateServiceDTO.getDiscount());
+        service.setImageUrls(pictureService.save(updateServiceDTO.getImageUrls())); // TO-DO
+        service.setVisible(updateServiceDTO.isVisible());
+        service.setAvailable(updateServiceDTO.isAvailable());
+        List<EventType> eventTypes = new ArrayList<>();
+        for (Long eid: updateServiceDTO.getRelatedEventTypeIds()) {
+            eventTypes.add(eventTypeService.get(eid));
+        }
+        service.setEventTypes(eventTypes);
+        service.setSpecifics(updateServiceDTO.getSpecifics());
+        service.setMinReservationTime(updateServiceDTO.getMinReservationTime());
+        service.setMaxReservationTime(updateServiceDTO.getMaxReservationTime());
+        service.setReservationDeadline(updateServiceDTO.getReservationDeadline());
+        service.setCancellationDeadline(updateServiceDTO.getCancellationDeadline());
+        service.setReservationType(updateServiceDTO.getAutomaticReservationAcceptance() ? ReservationConfirmationType.AUTOMATIC : ReservationConfirmationType.MANUAL);
+        return solutionRepository.save(service);
     }
 
-    public void deleteService(long id) {
-        allServices.removeIf(s -> s.getId() == id);
+    public Service deleteService(long id) {
+        try {
+            Service service = (Service) solutionRepository.findById(id).orElse(null);
+            service.setDeleted(true);
+            return solutionRepository.save(service);
+        }
+        catch (Exception e) {
+            return null;
+        }
     }
 
     public Solution getService(Long serviceId) {

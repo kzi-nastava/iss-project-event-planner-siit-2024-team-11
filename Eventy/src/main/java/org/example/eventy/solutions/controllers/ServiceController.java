@@ -2,6 +2,7 @@ package org.example.eventy.solutions.controllers;
 
 import org.example.eventy.solutions.dtos.services.*;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
+import org.example.eventy.solutions.models.Service;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.services.ServiceService;
 import org.example.eventy.users.models.User;
@@ -56,19 +57,21 @@ public class ServiceController {
         return new ResponseEntity<>(service, HttpStatus.OK);
     }
 
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UpdatedServiceDTO> updateService(@RequestBody UpdateServiceDTO service, @PathVariable("id") long id) {
-        service.setId(id);
-        Optional<UpdatedServiceDTO> updatedService = serviceService.updateService(service);
-        if (!updatedService.isPresent()) {
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UpdatedServiceDTO> updateService(@RequestBody UpdateServiceDTO service) {
+        Service updatedService = serviceService.updateService(service);
+        if (updatedService == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(updatedService.get(), HttpStatus.OK);
+        return new ResponseEntity<>(new UpdatedServiceDTO(updatedService), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<?> deleteService(@PathVariable("id") long id) {
-        serviceService.deleteService(id);
+        Service service = serviceService.deleteService(id);
+        if (service == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
