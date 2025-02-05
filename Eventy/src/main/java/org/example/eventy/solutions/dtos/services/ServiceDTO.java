@@ -2,7 +2,6 @@ package org.example.eventy.solutions.dtos.services;
 
 import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.common.models.ReservationConfirmationType;
-import org.example.eventy.common.services.PictureService;
 import org.example.eventy.events.dtos.EventTypeDTO;
 import org.example.eventy.solutions.dtos.CategoryDTO;
 import org.example.eventy.solutions.dtos.categories.CategoryWithIDDTO;
@@ -13,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class UpdatedServiceDTO {
+public class ServiceDTO {
 
     private long id;
     private String name;
@@ -32,19 +31,21 @@ public class UpdatedServiceDTO {
     private int cancellationDeadline;
     private boolean automaticReservationAcceptance;
 
-    public UpdatedServiceDTO() { super(); }
+    public ServiceDTO() { super(); }
 
-    public UpdatedServiceDTO(Service service) {
+    public ServiceDTO(Service service) {
         this.id = service.getId();
         this.name = service.getName();
         this.description = service.getDescription();
         this.price = service.getPrice();
         this.discount = service.getDiscount();
-        this.imageUrls = service.getImageUrls().stream().map(PicturePath::getPath).map(PictureService::getImage).collect(Collectors.toList());
+        this.imageUrls = service.getImageUrls() == null ? null : service.getImageUrls().stream().map(PicturePath::getPath).collect(Collectors.toList());
         this.isVisible = service.isVisible();
         this.isAvailable = service.isAvailable();
         this.category = new CategoryDTO(service.getCategory());
-        this.relatedEventTypes = service.getEventTypes().stream().map(EventTypeDTO::new).collect(Collectors.toList());
+        this.relatedEventTypes = new ArrayList<>();
+        // this may be too complicated, maybe there is an easier way
+        service.getEventTypes().forEach(et -> this.relatedEventTypes.add(new EventTypeDTO(et.getId(), et.getName(), et.getDescription(), et.getRecommendedSolutionCategories().stream().map(CategoryWithIDDTO::new).toList())));
         this.specifics = service.getSpecifics();
         this.minReservationTime = service.getMinReservationTime();
         this.maxReservationTime = service.getMaxReservationTime();
