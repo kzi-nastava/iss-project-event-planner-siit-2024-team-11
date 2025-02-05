@@ -4,6 +4,7 @@ import org.example.eventy.common.models.PagedResponse;
 import org.example.eventy.events.models.Event;
 import org.example.eventy.solutions.dtos.PriceListDTO;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
+import org.example.eventy.solutions.dtos.SolutionDetailsDTO;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.services.ProductService;
 import org.example.eventy.solutions.services.ServiceService;
@@ -291,5 +292,26 @@ public class SolutionController {
         }
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SolutionDetailsDTO> getSolution(@PathVariable Long id, @RequestHeader(value = "Authorization", required = false) String token) {
+        Solution solution = solutionService.getSolution(id);
+        if (solution == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        User user = null;
+        if(token != null) {
+            token = token.substring(7);
+
+            try {
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
+        }
+
+        return new ResponseEntity<>(new SolutionDetailsDTO(solution, user), HttpStatus.OK);
     }
 }
