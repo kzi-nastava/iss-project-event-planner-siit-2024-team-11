@@ -1,5 +1,6 @@
 package org.example.eventy.solutions.dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.common.services.PictureService;
 import org.example.eventy.events.dtos.EventTypeDTO;
@@ -16,7 +17,9 @@ public class ProductDTO {
     private double discount;
     private List<EventTypeDTO> relatedEventTypes;
     private List<String> images;
+    @JsonProperty("isVisible")
     private boolean isVisible;
+    @JsonProperty("isAvailable")
     private boolean isAvailable;
 
     public ProductDTO() {
@@ -43,8 +46,8 @@ public class ProductDTO {
         this.setDiscount(product.getDiscount());
         this.setRelatedEventTypes(product.getEventTypes().stream().map(EventTypeDTO::new).collect(Collectors.toList()));
         this.setImages(product.getImageUrls().stream().map(PicturePath::getPath).map(PictureService::getImage).collect(Collectors.toList()));
-        this.setAvailable(product.isAvailable());
-        this.setVisible(product.isVisible());
+        this.setIsAvailable(product.isAvailable());
+        this.setIsVisible(product.isVisible());
     }
 
     public Long getId() {
@@ -103,19 +106,19 @@ public class ProductDTO {
         this.images = images;
     }
 
-    public boolean isVisible() {
+    public boolean getIsVisible() {
         return isVisible;
     }
 
-    public void setVisible(boolean visible) {
+    public void setIsVisible(boolean visible) {
         this.isVisible = visible;
     }
 
-    public boolean isAvailable() {
+    public boolean getIsAvailable() {
         return isAvailable;
     }
 
-    public void setAvailable(boolean available) {
+    public void setIsAvailable(boolean available) {
         this.isAvailable = available;
     }
 }
