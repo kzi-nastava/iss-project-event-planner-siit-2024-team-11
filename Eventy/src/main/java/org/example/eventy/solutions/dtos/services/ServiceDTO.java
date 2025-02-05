@@ -1,5 +1,6 @@
 package org.example.eventy.solutions.dtos.services;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.common.models.ReservationConfirmationType;
 import org.example.eventy.events.dtos.EventTypeDTO;
@@ -20,7 +21,9 @@ public class ServiceDTO {
     private double price;
     private int discount;
     private List<String> imageUrls;
+    @JsonProperty("isVisible")
     private boolean isVisible;
+    @JsonProperty("isAvailable")
     private boolean isAvailable;
     private CategoryDTO category;
     private Collection<EventTypeDTO> relatedEventTypes;
@@ -29,6 +32,7 @@ public class ServiceDTO {
     private int maxReservationTime;
     private int reservationDeadline;
     private int cancellationDeadline;
+    @JsonProperty("automaticReservationAcceptance")
     private boolean automaticReservationAcceptance;
 
     public ServiceDTO() { super(); }
