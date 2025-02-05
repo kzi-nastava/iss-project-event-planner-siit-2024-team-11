@@ -89,18 +89,7 @@ public class ServiceService {
         service.setReservationType(updateServiceDTO.getAutomaticReservationAcceptance() ? ReservationConfirmationType.AUTOMATIC : ReservationConfirmationType.MANUAL);
         return solutionRepository.save(service);
     }
-
-    public Service deleteService(long id) {
-        try {
-            Service service = (Service) solutionRepository.findById(id).orElse(null);
-            service.setDeleted(true);
-            return solutionRepository.save(service);
-        }
-        catch (Exception e) {
-            return null;
-        }
-    }
-
+    
     public Solution getService(Long serviceId) {
         return solutionRepository.findById(serviceId).orElse(null);
     }

@@ -52,15 +52,6 @@ public class ServiceController {
         return new ResponseEntity<>(new ServiceDTO(updatedService), HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<?> deleteService(@PathVariable("id") long id) {
-        Service service = serviceService.deleteService(id);
-        if (service == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
     // GET "/api/services/cards/5"
     @GetMapping(value = "/cards/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SolutionCardDTO> getServiceCard(@PathVariable Long serviceId, @RequestHeader(value = "Authorization", required = false) String token) {
