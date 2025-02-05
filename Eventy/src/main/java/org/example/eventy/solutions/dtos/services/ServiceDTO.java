@@ -1,6 +1,9 @@
 package org.example.eventy.solutions.dtos.services;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.common.models.ReservationConfirmationType;
+import org.example.eventy.common.services.PictureService;
 import org.example.eventy.events.dtos.EventTypeDTO;
 import org.example.eventy.solutions.dtos.CategoryDTO;
 import org.example.eventy.solutions.dtos.categories.CategoryWithIDDTO;
@@ -11,7 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GetServiceDTO {
+public class ServiceDTO {
 
     private long id;
     private String name;
@@ -19,7 +22,9 @@ public class GetServiceDTO {
     private double price;
     private int discount;
     private List<String> imageUrls;
+    @JsonProperty("isVisible")
     private boolean isVisible;
+    @JsonProperty("isAvailable")
     private boolean isAvailable;
     private CategoryDTO category;
     private Collection<EventTypeDTO> relatedEventTypes;
@@ -28,17 +33,18 @@ public class GetServiceDTO {
     private int maxReservationTime;
     private int reservationDeadline;
     private int cancellationDeadline;
+    @JsonProperty("automaticReservationAcceptance")
     private boolean automaticReservationAcceptance;
 
-    public GetServiceDTO() { super(); }
+    public ServiceDTO() { super(); }
 
-    public GetServiceDTO(Service service) {
+    public ServiceDTO(Service service) {
         this.id = service.getId();
         this.name = service.getName();
         this.description = service.getDescription();
         this.price = service.getPrice();
         this.discount = service.getDiscount();
-        this.imageUrls = service.getImageUrls().stream().map(picturePath -> picturePath.getPath()).collect(Collectors.toList());
+        this.imageUrls = service.getImageUrls() == null ? null : service.getImageUrls().stream().map(PicturePath::getPath).map(PictureService::getImage).collect(Collectors.toList());
         this.isVisible = service.isVisible();
         this.isAvailable = service.isAvailable();
         this.category = new CategoryDTO(service.getCategory());

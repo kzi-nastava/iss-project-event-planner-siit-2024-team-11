@@ -16,8 +16,7 @@ public class UpdateServiceDTO {
     private ArrayList<String> imageUrls;
     private boolean isVisible;
     private boolean isAvailable;
-    private CategoryDTO category;
-    private Collection<EventTypeDTO> relatedEventTypes;
+    private Collection<Long> relatedEventTypeIds;
     private String specifics;
     private int minReservationTime;
     private int maxReservationTime;
@@ -83,20 +82,12 @@ public class UpdateServiceDTO {
         isAvailable = available;
     }
 
-    public CategoryDTO getCategory() {
-        return category;
+    public Collection<Long> getRelatedEventTypeIds() {
+        return relatedEventTypeIds;
     }
 
-    public void setCategory(CategoryDTO category) {
-        this.category = category;
-    }
-
-    public Collection<EventTypeDTO> getRelatedEventTypes() {
-        return relatedEventTypes;
-    }
-
-    public void setRelatedEventTypes(Collection<EventTypeDTO> relatedEventTypes) {
-        this.relatedEventTypes = relatedEventTypes;
+    public void setRelatedEventTypeIds(Collection<Long> relatedEventTypeIds) {
+        this.relatedEventTypeIds = relatedEventTypeIds;
     }
 
     public String getSpecifics() {
