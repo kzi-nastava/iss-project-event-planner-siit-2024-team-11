@@ -1,15 +1,11 @@
 package org.example.eventy.solutions.services;
 
-import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.common.models.ReservationConfirmationType;
 import org.example.eventy.common.models.Status;
 import org.example.eventy.common.services.PictureService;
 import org.example.eventy.events.models.EventType;
-import org.example.eventy.events.services.EventService;
 import org.example.eventy.events.services.EventTypeService;
 import org.example.eventy.solutions.dtos.services.*;
-import org.example.eventy.solutions.models.Category;
-import org.example.eventy.solutions.models.Product;
 import org.example.eventy.solutions.models.Service;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.repositories.SolutionRepository;
@@ -49,6 +45,8 @@ public class ServiceService {
         for (Long eid: createServiceDTO.getRelatedEventTypeIds()) {
             eventTypes.add(eventTypeService.get(eid));
         }
+        service.setAvailable(true);
+        service.setVisible(service.getCategory().getStatus() == Status.ACCEPTED ? true : false);
         service.setEventTypes(eventTypes);
         service.setSpecifics(createServiceDTO.getSpecifics());
         service.setMinReservationTime(createServiceDTO.getMinReservationTime());

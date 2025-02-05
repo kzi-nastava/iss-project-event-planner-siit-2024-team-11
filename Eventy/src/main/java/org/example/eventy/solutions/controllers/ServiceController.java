@@ -28,42 +28,28 @@ public class ServiceController {
     private TokenUtils tokenUtils;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CreatedServiceDTO> createService(@RequestBody CreateServiceDTO service) {
-        CreatedServiceDTO response = new CreatedServiceDTO(serviceService.createService(service));
+    public ResponseEntity<ServiceDTO> createService(@RequestBody CreateServiceDTO service) {
+        ServiceDTO response = new ServiceDTO(serviceService.createService(service));
 
-        return new ResponseEntity<CreatedServiceDTO>(response, HttpStatus.CREATED);
+        return new ResponseEntity<ServiceDTO>(response, HttpStatus.CREATED);
     }
 
-    // NOTE: Add extra RequestParams as necessary if more filters are needed
-    /*@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<GetServiceDTO>> getServices(@RequestParam (required = false) String name,
-                                                            @RequestParam (required = false) CategoryDTO category,
-                                                            @RequestParam (required = false) EventTypeDTO eventType,
-                                                            @RequestParam (required = false) double minPrice,
-                                                            @RequestParam (required = false) double maxPrice,
-                                                            @RequestParam (required = false) boolean available) {
-        Collection<GetServiceDTO> services = serviceService.getServices(name, category, eventType, minPrice, maxPrice, available);
-
-        return new ResponseEntity<>(services, HttpStatus.OK);
-    }*/
-
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GetServiceDTO> getService(@PathVariable("id") long id) {
-        /*Optional<GetServiceDTO> service = serviceService.getService(id);
-        if (!service.isPresent()) {
+    public ResponseEntity<ServiceDTO> getService(@PathVariable("id") long id) {
+        Service service = (Service) serviceService.getService(id);
+        if (service == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }*/
-        GetServiceDTO service = new GetServiceDTO();
-        return new ResponseEntity<>(service, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(new ServiceDTO(service), HttpStatus.OK);
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UpdatedServiceDTO> updateService(@RequestBody UpdateServiceDTO service) {
+    public ResponseEntity<ServiceDTO> updateService(@RequestBody UpdateServiceDTO service) {
         Service updatedService = serviceService.updateService(service);
         if (updatedService == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(new UpdatedServiceDTO(updatedService), HttpStatus.OK);
+        return new ResponseEntity<>(new ServiceDTO(updatedService), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}")
