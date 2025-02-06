@@ -1,5 +1,6 @@
 package org.example.eventy.solutions.dtos.services;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.example.eventy.events.dtos.EventTypeDTO;
 import org.example.eventy.solutions.dtos.CategoryDTO;
 
@@ -14,7 +15,9 @@ public class UpdateServiceDTO {
     private double price;
     private int discount;
     private ArrayList<String> imageUrls;
+    @JsonProperty("isVisible")
     private boolean isVisible;
+    @JsonProperty("isAvailable")
     private boolean isAvailable;
     private Collection<Long> relatedEventTypeIds;
     private String specifics;
