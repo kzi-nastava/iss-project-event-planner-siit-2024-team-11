@@ -11,18 +11,18 @@ public class CreateServiceDTO {
 
     private String name;
     private String description;
-    private double price;
-    private double discount;
+    private Double price;
+    private Double discount;
     private ArrayList<String> imageUrls;
     private Long providerId;
     private Long categoryId;
     private List<Long> relatedEventTypeIds;
     private String specifics;
-    private int minReservationTime;
-    private int maxReservationTime;
-    private int reservationDeadline;
-    private int cancellationDeadline;
-    private boolean automaticReservationAcceptance;
+    private Integer minReservationTime;
+    private Integer maxReservationTime;
+    private Integer reservationDeadline;
+    private Integer cancellationDeadline;
+    private Boolean automaticReservationAcceptance;
 
     public CreateServiceDTO() { super(); }
 
@@ -42,19 +42,19 @@ public class CreateServiceDTO {
         this.description = description;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
-    public double getDiscount() {
+    public Double getDiscount() {
         return discount;
     }
 
-    public void setDiscount(double discount) {
+    public void setDiscount(Double discount) {
         this.discount = discount;
     }
 
@@ -64,6 +64,14 @@ public class CreateServiceDTO {
 
     public void setImageUrls(ArrayList<String> imageUrls) {
         this.imageUrls = imageUrls;
+    }
+
+    public Long getProviderId() {
+        return providerId;
+    }
+
+    public void setProviderId(Long providerId) {
+        this.providerId = providerId;
     }
 
     public Long getCategoryId() {
@@ -90,55 +98,43 @@ public class CreateServiceDTO {
         this.specifics = specifics;
     }
 
-    public int getMinReservationTime() {
+    public Integer getMinReservationTime() {
         return minReservationTime;
     }
 
-    public void setMinReservationTime(int minReservationTime) {
+    public void setMinReservationTime(Integer minReservationTime) {
         this.minReservationTime = minReservationTime;
     }
 
-    public int getMaxReservationTime() {
+    public Integer getMaxReservationTime() {
         return maxReservationTime;
     }
 
-    public void setMaxReservationTime(int maxReservationTime) {
+    public void setMaxReservationTime(Integer maxReservationTime) {
         this.maxReservationTime = maxReservationTime;
     }
 
-    public int getReservationDeadline() {
+    public Integer getReservationDeadline() {
         return reservationDeadline;
     }
 
-    public void setReservationDeadline(int reservationDeadline) {
+    public void setReservationDeadline(Integer reservationDeadline) {
         this.reservationDeadline = reservationDeadline;
     }
 
-    public int getCancellationDeadline() {
+    public Integer getCancellationDeadline() {
         return cancellationDeadline;
     }
 
-    public void setCancellationDeadline(int cancellationDeadline) {
+    public void setCancellationDeadline(Integer cancellationDeadline) {
         this.cancellationDeadline = cancellationDeadline;
     }
 
-    public boolean getAutomaticReservationAcceptance() {
+    public Boolean getAutomaticReservationAcceptance() {
         return automaticReservationAcceptance;
     }
 
-    public void setAutomaticReservationAcceptance(boolean automaticReservationAcceptance) {
+    public void setAutomaticReservationAcceptance(Boolean automaticReservationAcceptance) {
         this.automaticReservationAcceptance = automaticReservationAcceptance;
-    }
-
-    public Long getProviderId() {
-        return providerId;
-    }
-
-    public void setProviderId(Long providerId) {
-        this.providerId = providerId;
-    }
-
-    public boolean isAutomaticReservationAcceptance() {
-        return automaticReservationAcceptance;
     }
 }

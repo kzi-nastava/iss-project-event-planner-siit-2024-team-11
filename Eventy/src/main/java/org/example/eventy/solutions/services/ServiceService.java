@@ -37,7 +37,7 @@ public class ServiceService {
         service.setName(createServiceDTO.getName());
         service.setDescription(createServiceDTO.getDescription());
         service.setPrice(createServiceDTO.getPrice());
-        service.setDiscount((int) createServiceDTO.getDiscount());
+        service.setDiscount(createServiceDTO.getDiscount().intValue());
         service.setImageUrls(pictureService.save(createServiceDTO.getImageUrls()));
         service.setProvider((SolutionProvider) userService.get(createServiceDTO.getProviderId()));
         service.setCategory(solutionCategoryService.getCategory(createServiceDTO.getCategoryId()));
@@ -53,7 +53,7 @@ public class ServiceService {
         service.setMaxReservationTime(createServiceDTO.getMaxReservationTime());
         service.setReservationDeadline(createServiceDTO.getReservationDeadline());
         service.setCancellationDeadline(createServiceDTO.getCancellationDeadline());
-        service.setReservationType(createServiceDTO.isAutomaticReservationAcceptance() ? ReservationConfirmationType.AUTOMATIC : ReservationConfirmationType.MANUAL);
+        service.setReservationType(createServiceDTO.getAutomaticReservationAcceptance() ? ReservationConfirmationType.AUTOMATIC : ReservationConfirmationType.MANUAL);
         return solutionRepository.save(service);
     }
 
@@ -74,8 +74,8 @@ public class ServiceService {
         service.setPrice(updateServiceDTO.getPrice());
         service.setDiscount(updateServiceDTO.getDiscount());
         service.setImageUrls(pictureService.save(updateServiceDTO.getImageUrls())); // TO-DO
-        service.setVisible(updateServiceDTO.isVisible());
-        service.setAvailable(updateServiceDTO.isAvailable());
+        service.setVisible(updateServiceDTO.getVisible());
+        service.setAvailable(updateServiceDTO.getAvailable());
         List<EventType> eventTypes = new ArrayList<>();
         for (Long eid: updateServiceDTO.getRelatedEventTypeIds()) {
             eventTypes.add(eventTypeService.get(eid));

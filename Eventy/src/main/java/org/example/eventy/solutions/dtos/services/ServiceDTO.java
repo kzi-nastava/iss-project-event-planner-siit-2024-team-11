@@ -16,25 +16,25 @@ import java.util.stream.Collectors;
 
 public class ServiceDTO {
 
-    private long id;
+    private Long id;
     private String name;
     private String description;
-    private double price;
-    private int discount;
+    private Double price;
+    private Integer discount;
     private List<String> imageUrls;
     @JsonProperty("isVisible")
-    private boolean isVisible;
+    private Boolean isVisible;
     @JsonProperty("isAvailable")
-    private boolean isAvailable;
+    private Boolean isAvailable;
     private CategoryDTO category;
     private Collection<EventTypeDTO> relatedEventTypes;
     private String specifics;
-    private int minReservationTime;
-    private int maxReservationTime;
-    private int reservationDeadline;
-    private int cancellationDeadline;
+    private Integer minReservationTime;
+    private Integer maxReservationTime;
+    private Integer reservationDeadline;
+    private Integer cancellationDeadline;
     @JsonProperty("automaticReservationAcceptance")
-    private boolean automaticReservationAcceptance;
+    private Boolean automaticReservationAcceptance;
 
     public ServiceDTO() { super(); }
 
@@ -59,6 +59,14 @@ public class ServiceDTO {
         this.automaticReservationAcceptance = service.getReservationType() == ReservationConfirmationType.AUTOMATIC;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
@@ -75,19 +83,19 @@ public class ServiceDTO {
         this.description = description;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
-    public int getDiscount() {
+    public Integer getDiscount() {
         return discount;
     }
 
-    public void setDiscount(int discount) {
+    public void setDiscount(Integer discount) {
         this.discount = discount;
     }
 
@@ -99,19 +107,19 @@ public class ServiceDTO {
         this.imageUrls = imageUrls;
     }
 
-    public boolean isVisible() {
+    public Boolean getVisible() {
         return isVisible;
     }
 
-    public void setVisible(boolean visible) {
+    public void setVisible(Boolean visible) {
         isVisible = visible;
     }
 
-    public boolean isAvailable() {
+    public Boolean getAvailable() {
         return isAvailable;
     }
 
-    public void setAvailable(boolean available) {
+    public void setAvailable(Boolean available) {
         isAvailable = available;
     }
 
@@ -139,51 +147,43 @@ public class ServiceDTO {
         this.specifics = specifics;
     }
 
-    public int getMinReservationTime() {
+    public Integer getMinReservationTime() {
         return minReservationTime;
     }
 
-    public void setMinReservationTime(int minReservationTime) {
+    public void setMinReservationTime(Integer minReservationTime) {
         this.minReservationTime = minReservationTime;
     }
 
-    public int getMaxReservationTime() {
+    public Integer getMaxReservationTime() {
         return maxReservationTime;
     }
 
-    public void setMaxReservationTime(int maxReservationTime) {
+    public void setMaxReservationTime(Integer maxReservationTime) {
         this.maxReservationTime = maxReservationTime;
     }
 
-    public int getReservationDeadline() {
+    public Integer getReservationDeadline() {
         return reservationDeadline;
     }
 
-    public void setReservationDeadline(int reservationDeadline) {
+    public void setReservationDeadline(Integer reservationDeadline) {
         this.reservationDeadline = reservationDeadline;
     }
 
-    public int getCancellationDeadline() {
+    public Integer getCancellationDeadline() {
         return cancellationDeadline;
     }
 
-    public void setCancellationDeadline(int cancellationDeadline) {
+    public void setCancellationDeadline(Integer cancellationDeadline) {
         this.cancellationDeadline = cancellationDeadline;
     }
 
-    public boolean getAutomaticReservationAcceptance() {
+    public Boolean getAutomaticReservationAcceptance() {
         return automaticReservationAcceptance;
     }
 
-    public void setAutomaticReservationAcceptance(boolean automaticReservationAcceptance) {
+    public void setAutomaticReservationAcceptance(Boolean automaticReservationAcceptance) {
         this.automaticReservationAcceptance = automaticReservationAcceptance;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 }
