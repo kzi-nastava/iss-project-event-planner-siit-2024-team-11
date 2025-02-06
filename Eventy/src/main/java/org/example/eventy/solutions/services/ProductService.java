@@ -10,8 +10,8 @@ public class ProductService {
     @Autowired
     private SolutionRepository solutionRepository;
 
-    public Solution getProduct(Long productId) {
-        return solutionRepository.findById(productId).orElse(null);
+    public Product getProduct(Long productId) {
+        return (Product) solutionRepository.findById(productId).orElse(null);
     }
 
     public Product save(Product product) {

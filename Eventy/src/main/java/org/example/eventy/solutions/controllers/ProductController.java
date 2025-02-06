@@ -146,7 +146,7 @@ public class ProductController {
     @PutMapping(value = "/{productId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('Provider')")
     public ResponseEntity<ProductDTO> updateProduct(@RequestBody ProductDTO productDTO, @PathVariable Long productId) {
-        Product product = (Product) productService.getProduct(productId);
+        Product product = productService.getProduct(productId);
 
         if (product == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
