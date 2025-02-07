@@ -10,7 +10,7 @@ INSERT INTO users (
     id, user_type, email, password, address, phone_number, is_active, is_deactivated, enabled, has_silenced_notifications, suspension_deadline, role_id, last_password_reset_date, last_read_notifications, description, first_name, last_name, name
 )
 VALUES
-    (DEFAULT, 'Organizer', 'tac@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 3, NOW(), '2024-10-30 00:00:00', NULL, 'Tac Tac', 'Jezickovic', NULL),
+    (DEFAULT, 'Organizer', 'tac@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 3, NOW(), '2023-10-30 00:00:00', NULL, 'Tac Tac', 'Jezickovic', NULL),
     (DEFAULT, 'Organizer', 'ves@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3815361', TRUE, FALSE, TRUE, FALSE, NULL, 3, NOW(), '2024-10-30 00:00:00', NULL, 'Ves Ves', 'Jezickovic', NULL),
     (DEFAULT, 'Provider', 'provider@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), '2000-01-01 00:00:00', 'Description', NULL, NULL, 'VIT DOO'),
     (DEFAULT, 'Provider', 'provider2@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), '2000-01-01 00:00:00', 'Description', NULL, NULL, 'Lidl'),
@@ -123,12 +123,22 @@ INSERT INTO notifications (id, type, redirection_id, title, message, grader_id, 
 VALUES
        -- 1
        (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2023-11-01 00:00:00'),
-       (DEFAULT, 'RATING_EVENT', 201, 'New Event Rating', 'Your event "Charity Run" received a new rating.', 3, 5, '2023-11-03 00:00:00');
+       (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2023-11-01 00:00:00'),
+       (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2022-11-01 00:00:00'),
+       (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2022-11-01 00:00:00'),
+       (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2022-11-01 00:00:00'),
+       (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2022-11-01 00:00:00'),
+       (DEFAULT, 'RATING_EVENT', 201, 'New Event Rating', 'Your event "Charity Run" received a new rating.', 3, 5, '2022-11-03 00:00:00');
 
 -- Assign Notifications to Users
 INSERT INTO user_notifications (user_id, notification_id) VALUES
     (1, 1),
-    (1, 2);
+    (1, 2),
+    (1, 3),
+    (1, 4),
+    (1, 5),
+    (1, 6),
+    (1, 7);
 
 -- Reviews
 INSERT INTO reviews (user_id, event_id, solution_id, comment, grade, status, is_deleted)
