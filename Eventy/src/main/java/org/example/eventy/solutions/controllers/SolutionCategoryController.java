@@ -2,6 +2,7 @@ package org.example.eventy.solutions.controllers;
 
 import org.example.eventy.common.models.PagedResponse;
 import org.example.eventy.common.models.Status;
+import org.example.eventy.interactions.dtos.NotificationDTO;
 import org.example.eventy.interactions.model.Notification;
 import org.example.eventy.interactions.model.NotificationType;
 import org.example.eventy.interactions.services.NotificationService;
@@ -281,10 +282,10 @@ public class SolutionCategoryController {
     }
 
     private void sendNotificationToWeb(Long userId, Notification notification) {
-        messagingTemplate.convertAndSend("/topic/web/" + userId, notification);
+        messagingTemplate.convertAndSend("/topic/web/" + userId, new NotificationDTO(notification));
     }
 
     private void sendNotificationToMobile(Long userId, Notification notification) {
-        messagingTemplate.convertAndSend("/topic/mobile/" + userId, notification);
+        messagingTemplate.convertAndSend("/topic/mobile/" + userId, new NotificationDTO(notification));
     }
 }

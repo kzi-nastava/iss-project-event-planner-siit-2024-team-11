@@ -140,7 +140,3 @@ INSERT INTO user_notifications (user_id, notification_id) VALUES
     (1, 6),
     (1, 7);
 
--- Reviews
-INSERT INTO reviews (user_id, event_id, solution_id, comment, grade, status, is_deleted)
-VALUES
-    (1, 2, NULL, 'Great event, really enjoyed it!', 5, 'ACCEPTED', false);

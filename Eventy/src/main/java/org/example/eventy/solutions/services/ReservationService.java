@@ -2,6 +2,7 @@ package org.example.eventy.solutions.services;
 
 import org.example.eventy.events.models.Event;
 import org.example.eventy.events.services.EventService;
+import org.example.eventy.interactions.dtos.NotificationDTO;
 import org.example.eventy.interactions.model.Notification;
 import org.example.eventy.interactions.model.NotificationType;
 import org.example.eventy.interactions.services.NotificationService;
@@ -19,10 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -114,10 +112,10 @@ public class ReservationService {
     }
 
     private void sendNotificationToWeb(Long userId, Notification notification) {
-        messagingTemplate.convertAndSend("/topic/web/" + userId, notification);
+        messagingTemplate.convertAndSend("/topic/web/" + userId, new NotificationDTO(notification));
     }
 
     private void sendNotificationToMobile(Long userId, Notification notification) {
-        messagingTemplate.convertAndSend("/topic/mobile/" + userId, notification);
+        messagingTemplate.convertAndSend("/topic/mobile/" + userId, new NotificationDTO(notification));
     }
 }

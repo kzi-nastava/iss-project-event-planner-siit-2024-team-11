@@ -7,6 +7,7 @@ import org.example.eventy.common.services.EmailService;
 import org.example.eventy.events.dtos.*;
 import org.example.eventy.events.models.*;
 import org.example.eventy.events.services.*;
+import org.example.eventy.interactions.dtos.NotificationDTO;
 import org.example.eventy.interactions.model.Notification;
 import org.example.eventy.interactions.model.NotificationType;
 import org.example.eventy.interactions.services.NotificationService;
@@ -553,11 +554,11 @@ public class EventController {
     }
 
     private void sendNotificationToWeb(Long userId, Notification notification) {
-        messagingTemplate.convertAndSend("/topic/web/" + userId, notification);
+        messagingTemplate.convertAndSend("/topic/web/" + userId, new NotificationDTO(notification));
     }
 
     private void sendNotificationToMobile(Long userId, Notification notification) {
-        messagingTemplate.convertAndSend("/topic/mobile/" + userId, notification);
+        messagingTemplate.convertAndSend("/topic/mobile/" + userId, new NotificationDTO(notification));
     }
 }
 

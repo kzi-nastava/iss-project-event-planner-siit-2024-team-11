@@ -1,5 +1,6 @@
 package org.example.eventy.interactions.controllers;
 
+import org.example.eventy.interactions.dtos.NotificationDTO;
 import org.example.eventy.interactions.model.Notification;
 import org.example.eventy.interactions.services.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,17 +19,19 @@ public class NotificationWebSocketController {
 
     @MessageMapping("/sendNotificationToWeb/{userId}")
     @SendTo("/topic/web/{userId}")
-    public Notification sendNotificationToWeb(@DestinationVariable Long userId, Notification notification) {
+    public NotificationDTO sendNotificationToWeb(@DestinationVariable Long userId, Notification notification) {
         notification = notificationService.saveNotification(userId, notification);
-        messagingTemplate.convertAndSend("/topic/web/" + userId, notification);
-        return notification;
+        NotificationDTO notificationDTO = new NotificationDTO(notification);
+        messagingTemplate.convertAndSend("/topic/web/" + userId, notificationDTO);
+        return notificationDTO;
     }
 
     @MessageMapping("/sendNotificationToMobile/{userId}")
     @SendTo("/topic/mobile/{userId}")
-    public Notification sendNotificationToMobile(@DestinationVariable Long userId, Notification notification) {
+    public NotificationDTO sendNotificationToMobile(@DestinationVariable Long userId, Notification notification) {
         notification = notificationService.saveNotification(userId, notification);
-        messagingTemplate.convertAndSend("/topic/mobile/" + userId, notification);
-        return notification;
+        NotificationDTO notificationDTO = new NotificationDTO(notification);
+        messagingTemplate.convertAndSend("/topic/mobile/" + userId, notificationDTO);
+        return notificationDTO;
     }
 }
