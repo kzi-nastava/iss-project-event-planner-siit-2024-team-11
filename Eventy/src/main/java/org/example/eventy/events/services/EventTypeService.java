@@ -1,17 +1,25 @@
 package org.example.eventy.events.services;
 
+import org.example.eventy.events.models.Event;
 import org.example.eventy.events.models.EventType;
 import org.example.eventy.events.repositories.EventTypeRepository;
+import org.example.eventy.solutions.models.Solution;
+import org.example.eventy.solutions.services.SolutionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class EventTypeService {
     @Autowired
     private EventTypeRepository eventTypeRepository;
+    @Autowired
+    private EventService eventService;
+    @Autowired
+    private SolutionService solutionService;
 
     public List<EventType> getTypes(String search, Pageable pageable) {
         if (search == null || search.isBlank()) {
@@ -42,6 +50,20 @@ public class EventTypeService {
         EventType eventType = eventTypeRepository.findById(eventTypeId).orElse(null);
 
         if(eventType != null) {
+            if (eventType.isActive()) {
+                for(Event event : eventService.getAllEvents()) {
+                    if (event.getType().equals(eventType) && event.getDate().isAfter(LocalDateTime.now())) {
+                        return null;
+                    }
+                }
+
+                for(Solution solution : solutionService.getAllSolutions()) {
+                    if(solution.getEventTypes().contains(eventType)) {
+                        return null;
+                    }
+                }
+            }
+
             eventType.setActive(!eventType.isActive());
             eventTypeRepository.save(eventType);
         }

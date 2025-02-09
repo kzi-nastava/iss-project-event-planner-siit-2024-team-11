@@ -209,4 +209,6 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
 
     @Query("SELECT DISTINCT sp.name FROM SolutionProvider sp JOIN Solution s ON sp.id = s.provider.id ORDER BY sp.name ASC")
     ArrayList<String> findAllUniqueCompanyNamesForSolutions();
+
+    List<Solution> findByIsDeletedFalse();
 }

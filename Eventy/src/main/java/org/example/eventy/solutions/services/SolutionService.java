@@ -119,4 +119,8 @@ public class SolutionService {
             return null;
         }
     }
+
+    public List<Solution> getAllSolutions() {
+        return solutionRepository.findByIsDeletedFalse();
+    }
 }
