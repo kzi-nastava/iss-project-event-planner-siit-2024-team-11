@@ -94,4 +94,8 @@ public class EventService {
         LocalDateTime dateNowMinusOne = LocalDateTime.now().minusDays(1);
         return eventRepository.findUnreviewedAcceptedEvents(userId, dateNowMinusOne);
     }
+
+    public List<Event> getAllEvents() {
+        return eventRepository.findAll();
+    }
 }
