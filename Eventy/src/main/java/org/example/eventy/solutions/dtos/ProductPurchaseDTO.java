@@ -2,7 +2,7 @@ package org.example.eventy.solutions.dtos;
 
 public class ProductPurchaseDTO {
     private Long productId;
-    private Long organizerId;
+    private Long eventId;
 
     public ProductPurchaseDTO() {}
 
@@ -14,11 +14,11 @@ public class ProductPurchaseDTO {
         this.productId = productId;
     }
 
-    public Long getOrganizerId() {
-        return organizerId;
+    public Long getEventId() {
+        return eventId;
     }
 
-    public void setOrganizerId(Long organizerId) {
-        this.organizerId = organizerId;
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
     }
 }
