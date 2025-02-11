@@ -173,6 +173,24 @@ public class ProductController {
 
     @PostMapping(value = "/purchase", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> purchaseProduct(@RequestBody ProductPurchaseDTO productPurchaseDTO) {
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        // TO-DO: BudgetService get budget by event id
+        Product product = productService.getProduct(productPurchaseDTO.getProductId());
+        if (product == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (!product.isAvailable()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        ProductHistory productToBuy = product.getCurrentProduct();
+        if (productToBuy == null) {
+            productToBuy = productHistoryService.save(new ProductHistory(product));
+            product.setCurrentProduct(productToBuy);
+            productService.save(product);
+        }
+
+        // TO-DO: add productToBuy to the corresponding budget item in the budget
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
