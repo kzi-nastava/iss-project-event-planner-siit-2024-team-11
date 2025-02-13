@@ -36,11 +36,14 @@ public class ReviewService {
         return reviewRepository.findById(reviewId).orElse(null);
     }
 
-    public Review updateReview(Review review, UpdateReviewDTO updateReviewDTO) {
-        review.setComment(updateReviewDTO.getComment());
-        review.setGrade(updateReviewDTO.getGrade());
-        review.setStatus(updateReviewDTO.getStatus());
+    public Review acceptReview(Review review) {
+        review.setStatus(Status.ACCEPTED);
+        return saveReview(review);
+    }
 
+    public Review declineReview(Review review) {
+        review.setStatus(Status.DENIED);
+        review.setDeleted(true);
         return saveReview(review);
     }
 

@@ -11,7 +11,6 @@ import org.example.eventy.interactions.model.NotificationType;
 import org.example.eventy.interactions.services.NotificationService;
 import org.example.eventy.reviews.dtos.CreateReviewDTO;
 import org.example.eventy.reviews.dtos.ReviewDTO;
-import org.example.eventy.reviews.dtos.UpdateReviewDTO;
 import org.example.eventy.reviews.models.Review;
 import org.example.eventy.reviews.services.ReviewService;
 import org.example.eventy.solutions.models.Service;
@@ -92,28 +91,37 @@ public class ReviewController {
         return new ResponseEntity<ReviewDTO>(HttpStatus.NOT_FOUND);
     }
 
-    /*
-    {
-        "id": 5,
-        "comment": "Updated review comment",
-        "grade": 4,
-        "status": "PENDING"
-    }
-    */
-    // PUT "/api/reviews"
-    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ReviewDTO> updateReview(@RequestBody UpdateReviewDTO updateReviewDTO) {
-        Review review = reviewService.getReview(updateReviewDTO.getId());
+    // PUT "/api/reviews/{reviewId}/accept"
+    @PutMapping(value = "/{reviewId}/accept", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ReviewDTO> acceptReview(@PathVariable Long reviewId) {
+        Review review = reviewService.getReview(reviewId);
         if(review == null) {
             return new ResponseEntity<ReviewDTO>(HttpStatus.NOT_FOUND);
         }
 
-        review = reviewService.updateReview(review, updateReviewDTO);
+        review = reviewService.acceptReview(review);
         if(review == null) {
             return new ResponseEntity<ReviewDTO>(HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<ReviewDTO>(new ReviewDTO(review), HttpStatus.CREATED);
+        sendNotification(review);
+        return new ResponseEntity<ReviewDTO>(new ReviewDTO(review), HttpStatus.OK);
+    }
+
+    // PUT "/api/reviews/{reviewId}/decline"
+    @PutMapping(value = "/{reviewId}/decline", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ReviewDTO> declineReview(@PathVariable Long reviewId) {
+        Review review = reviewService.getReview(reviewId);
+        if(review == null) {
+            return new ResponseEntity<ReviewDTO>(HttpStatus.NOT_FOUND);
+        }
+
+        review = reviewService.declineReview(review);
+        if(review == null) {
+            return new ResponseEntity<ReviewDTO>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<ReviewDTO>(new ReviewDTO(review), HttpStatus.OK);
     }
 
     // DELETE "/api/reviews/5"
@@ -170,7 +178,6 @@ public class ReviewController {
             return new ResponseEntity<CreateReviewDTO>(HttpStatus.BAD_REQUEST);
         }
 
-        sendNotification(review);
         return new ResponseEntity<CreateReviewDTO>(new CreateReviewDTO(review), HttpStatus.CREATED);
     }
 
