@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -82,37 +83,39 @@ public class ReportController {
         return new ResponseEntity<CreateReportDTO>(new CreateReportDTO(report), HttpStatus.CREATED);
     }
 
-    // PUT "/api/reports/5/accept"
-    @PutMapping(value = "/{reportId}/accept", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> acceptReport(@PathVariable Long reportId) {
-        if (reportId == 5) {
-            ReportDTO report = reportService.getReport(reportId);
-
-            User user = userService.suspendUser(report.getReportedUserEmail(), 3); // Assumes userService exists
-            boolean isSuspended = user.getSuspensionDeadline() != null; // neka logika ovde
-            if (!isSuspended) {
-                return new ResponseEntity<>("Failed to suspend offender", HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-
-            // delete the report after suspending
-            Boolean isDeleted = reportService.deleteReport(reportId);
-            return new ResponseEntity<>("Report accepted, offender suspended for 3 days", HttpStatus.OK);
+    // PUT "/api/reports/{reportId}/accept"
+    @PutMapping(value = "/{reportId}/accept", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ReportDTO> acceptReview(@PathVariable Long reportId) {
+        Report report = reportService.getReport(reportId);
+        if(report == null) {
+            return new ResponseEntity<ReportDTO>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+        report = reportService.acceptReport(report);
+        if(report == null) {
+            return new ResponseEntity<ReportDTO>(HttpStatus.BAD_REQUEST);
+        }
+
+        User reportedUser = userService.get(report.getReportedUser().getId());
+        reportedUser.setSuspensionDeadline(LocalDateTime.now());
+        userService.save(reportedUser, false);
+
+        return new ResponseEntity<ReportDTO>(new ReportDTO(report), HttpStatus.OK);
     }
 
-    // DELETE "/api/reports/5"
-    @DeleteMapping("/{reportId}")
-    public ResponseEntity<ReportDTO> deleteReport(@PathVariable Long reportId) {
-        if(reportId == 5) {
-            ReportDTO report = reportService.getReport(reportId);
-            reportService.deleteReport(reportId);
-            report.setReason("DELETED in repo!!");
-
-            return new ResponseEntity<ReportDTO>(report, HttpStatus.OK);
+    // PUT "/api/reports/{reportId}/decline"
+    @PutMapping(value = "/{reportId}/decline", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ReportDTO> declineReview(@PathVariable Long reportId) {
+        Report report = reportService.getReport(reportId);
+        if(report == null) {
+            return new ResponseEntity<ReportDTO>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<ReportDTO>(HttpStatus.NO_CONTENT);
+        report = reportService.declineReport(report);
+        if(report == null) {
+            return new ResponseEntity<ReportDTO>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<ReportDTO>(new ReportDTO(report), HttpStatus.OK);
     }
 }
