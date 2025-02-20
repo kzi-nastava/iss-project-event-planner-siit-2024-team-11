@@ -31,7 +31,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -57,18 +62,36 @@ public class AuthenticationController {
     private ActiveUserManager activeUserManager;
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserTokenState> login(@RequestBody LoginDTO authenticationRequest, HttpServletResponse response) {
+    public ResponseEntity<?> login(@RequestBody LoginDTO authenticationRequest, HttpServletResponse response) {
         // Ukoliko kredencijali nisu ispravni, logovanje nece biti uspesno, desice se
         // AuthenticationException
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 authenticationRequest.getEmail(), authenticationRequest.getPassword()));
+
+        // if user is reported / suspended for 3 days
+        User user = userService.getUserByEmail(authenticationRequest.getEmail());
+        if (user.getSuspensionDeadline()!= null && user.getSuspensionDeadline().plusDays(3).isAfter(LocalDateTime.now())) {
+            LocalDateTime suspensionEnd = user.getSuspensionDeadline().plusDays(3);
+            Duration remaining = Duration.between(LocalDateTime.now(), suspensionEnd);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy. HH:mm");
+            String formattedSuspensionEnd = suspensionEnd.format(formatter);
+
+            Map<String, Object> res = new HashMap<>();
+            res.put("message", "Your account has been suspended.");
+            res.put("suspensionEndsAt", formattedSuspensionEnd + "h");
+            res.put("timeLeft", String.format("%d hours, %d minutes",
+                    remaining.toHours(), remaining.toMinutesPart()));
+
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
+        }
 
         // Ukoliko je autentifikacija uspesna, ubaci korisnika u trenutni security
         // kontekst
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // Kreiraj token za tog korisnika
-        User user = (User) authentication.getPrincipal();
+        user = (User) authentication.getPrincipal();
 
         if(!user.isActive() || user.isDeactivated()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
