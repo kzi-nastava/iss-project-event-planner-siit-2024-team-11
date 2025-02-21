@@ -160,7 +160,6 @@ public class EventController {
         event.setMaxNumberParticipants(updateEventDTO.getMaxNumberParticipants());
         event.setDate(updateEventDTO.getDate());
         event.setType(eventTypeService.get(updateEventDTO.getEventTypeId()));
-        event.setOrganiser((EventOrganizer) userService.get(updateEventDTO.getOrganizerId()));
 
         if(event.getLocation().getLatitude() != updateEventDTO.getLocation().getLatitude() || event.getLocation().getLongitude() != updateEventDTO.getLocation().getLongitude()) {
             Location location = new Location();
@@ -186,7 +185,7 @@ public class EventController {
         }
 
         event.getAgenda().clear();
-        event.setAgenda(agenda);
+        event.getAgenda().addAll(agenda);
 
         event = eventService.save(event);
 
@@ -559,6 +558,17 @@ public class EventController {
 
     private void sendNotificationToMobile(Long userId, Notification notification) {
         messagingTemplate.convertAndSend("/topic/mobile/" + userId, new NotificationDTO(notification));
+    }
+
+    @GetMapping(value = "/{eventId}/update", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UpdateEventDTO> getEventForUpdate(@PathVariable Long eventId) {
+        Event event = eventService.getEvent(eventId);
+
+        if(event != null) {
+            return new ResponseEntity<UpdateEventDTO>(new UpdateEventDTO(event), HttpStatus.OK);
+        }
+
+        return new ResponseEntity<UpdateEventDTO>(HttpStatus.NOT_FOUND);
     }
 }
 

@@ -2,10 +2,13 @@ package org.example.eventy.events.dtos;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
+import org.example.eventy.events.models.Event;
 import org.example.eventy.events.validation.annotation.ValidUpdateEvent;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ValidUpdateEvent // trigger the custom validation
 public class UpdateEventDTO {
@@ -34,16 +37,13 @@ public class UpdateEventDTO {
     @NotNull(message = "Agenda cannot be null")
     private List<CreateActivityDTO> agenda;
 
-    @NotNull(message = "Organizer cannot be null")
-    private Long organizerId;
-
     ///////////////////////////////
 
     public UpdateEventDTO() {
 
     }
 
-    public UpdateEventDTO(Long id, String name, String description, int maxNumberParticipants, Long eventType, CreateLocationDTO location, LocalDateTime date, List<CreateActivityDTO> agenda, List<String> emails, Long organizerId) {
+    public UpdateEventDTO(Long id, String name, String description, int maxNumberParticipants, Long eventType, CreateLocationDTO location, LocalDateTime date, List<CreateActivityDTO> agenda) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -52,7 +52,18 @@ public class UpdateEventDTO {
         this.location = location;
         this.date = date;
         this.agenda = agenda;
-        this.organizerId = organizerId;
+    }
+
+    public UpdateEventDTO(Event event) {
+        this.id = event.getId();
+        this.name = event.getName();
+        this.description = event.getDescription();
+        this.maxNumberParticipants = event.getMaxNumberParticipants();
+        this.eventTypeId = event.getType().getId();
+        this.location = new CreateLocationDTO(event.getLocation().getName(), event.getLocation().getAddress(),
+                event.getLocation().getLatitude(), event.getLocation().getLongitude());
+        this.date = event.getDate();
+        this.agenda = event.getAgenda().stream().map(CreateActivityDTO::new).collect(Collectors.toList());
     }
 
     public Long getId() {
@@ -117,13 +128,5 @@ public class UpdateEventDTO {
 
     public void setAgenda(List<CreateActivityDTO> agenda) {
         this.agenda = agenda;
-    }
-
-    public Long getOrganizerId() {
-        return organizerId;
-    }
-
-    public void setOrganizerId(Long organizerId) {
-        this.organizerId = organizerId;
     }
 }
