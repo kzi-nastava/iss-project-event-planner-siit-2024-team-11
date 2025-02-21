@@ -1,5 +1,7 @@
 package org.example.eventy.users.dtos;
 
+import org.example.eventy.users.models.Report;
+
 public class ReportDTO {
     private Long id;
     private String reason;
@@ -14,6 +16,13 @@ public class ReportDTO {
         this.reason = reason;
         this.senderEmail = senderEmail;
         this.reportedUserEmail = reportedUserEmail;
+    }
+
+    public ReportDTO(Report report) {
+        this.id = report.getId();
+        this.reason = report.getReason();
+        this.senderEmail = report.getSender().getEmail();
+        this.reportedUserEmail = report.getReportedUser().getEmail();
     }
 
     public Long getId() {
