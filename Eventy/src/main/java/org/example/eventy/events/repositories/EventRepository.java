@@ -1,6 +1,7 @@
 package org.example.eventy.events.repositories;
 
 import org.example.eventy.events.models.Event;
+import org.example.eventy.events.models.PrivacyType;
 import org.example.eventy.users.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -59,31 +60,35 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "AND (:maxParticipants IS NULL OR e.maxNumberParticipants <= :maxParticipants) " +
             "AND (:location IS NULL OR :location = '' OR LOWER(e.location.name) = LOWER(:location)) " +
             "AND (CAST(:startDate AS timestamp) IS NULL OR CAST(:endDate AS timestamp) IS NULL OR e.date BETWEEN CAST(:startDate AS timestamp) AND CAST(:endDate AS timestamp)) " +
-            "AND (:eventTypes IS NULL OR e.type.name IN :eventTypes)")
+            "AND (:eventTypes IS NULL OR e.type.name IN :eventTypes) " +
+            "AND (e.privacy = :privacy) " +
+            "AND (:blocked IS NULL OR :blocked = '' OR NOT :blocked ILIKE ('%' || e.organiser.id || '%')) ")
     Page<Event> findAll(@Param("search") String search,
                         @Param("eventTypes") ArrayList<String> eventTypes,
                         @Param("maxParticipants") Integer maxParticipants,
                         @Param("location") String location,
                         @Param("startDate") LocalDateTime startDate,
                         @Param("endDate") LocalDateTime endDate,
+                        @Param("privacy") PrivacyType privacy,
+                        @Param("blocked") String blocked,
                         Pageable pageable);
 
   @Query("SELECT e FROM Event e " +
-            "WHERE ((:search IS NULL OR :search = '' OR e.name ILIKE ('%' || :search || '%')) " +
-            "   OR (:search IS NULL OR :search = '' OR e.description ILIKE ('%' || :search || '%'))) " +
-            "AND (:maxParticipants IS NULL OR e.maxNumberParticipants <= :maxParticipants) " +
-            "AND (:location IS NULL OR :location = '' OR LOWER(e.location.name) = LOWER(:location)) " +
-            "AND (CAST(:startDate AS timestamp) IS NULL OR CAST(:endDate AS timestamp) IS NULL OR e.date BETWEEN CAST(:startDate AS timestamp) AND CAST(:endDate AS timestamp)) " +
-            "AND (:eventTypes IS NULL OR e.type.name IN :eventTypes) " +
-            "AND (e.organiser.id = :userId) ")
-    Page<Event> findAll(@Param("userId") Long userId,
-                        @Param("search") String search,
-                        @Param("eventTypes") ArrayList<String> eventTypes,
-                        @Param("maxParticipants") Integer maxParticipants,
-                        @Param("location") String location,
-                        @Param("startDate") LocalDateTime startDate,
-                        @Param("endDate") LocalDateTime endDate,
-                        Pageable pageable);
+         "WHERE ((:search IS NULL OR :search = '' OR e.name ILIKE ('%' || :search || '%')) " +
+         "   OR (:search IS NULL OR :search = '' OR e.description ILIKE ('%' || :search || '%'))) " +
+         "AND (:maxParticipants IS NULL OR e.maxNumberParticipants <= :maxParticipants) " +
+         "AND (:location IS NULL OR :location = '' OR LOWER(e.location.name) = LOWER(:location)) " +
+         "AND (CAST(:startDate AS timestamp) IS NULL OR CAST(:endDate AS timestamp) IS NULL OR e.date BETWEEN CAST(:startDate AS timestamp) AND CAST(:endDate AS timestamp)) " +
+         "AND (:eventTypes IS NULL OR e.type.name IN :eventTypes) " +
+         "AND (e.organiser.id = :userId) ")
+    Page<Event> findAllByUserId(@Param("userId") Long userId,
+                                @Param("search") String search,
+                                @Param("eventTypes") ArrayList<String> eventTypes,
+                                @Param("maxParticipants") Integer maxParticipants,
+                                @Param("location") String location,
+                                @Param("startDate") LocalDateTime startDate,
+                                @Param("endDate") LocalDateTime endDate,
+                                Pageable pageable);
   
     @Query("SELECT e FROM Event e " +
            "WHERE ((:search IS NULL OR :search = '' OR e.name ILIKE ('%' || :search || '%')) " +
@@ -119,8 +124,13 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                               @Param("user") User user,
                               Pageable pageable);
   
-    @Query("SELECT e FROM Event e ORDER BY e.id DESC")
-    ArrayList<Event> findFeaturedEvents(Pageable pageable);
+    @Query("SELECT e FROM Event e " +
+           "WHERE e.privacy = :privacy " +
+           "AND (:blocked IS NULL OR :blocked = '' OR NOT :blocked ILIKE ('%' || e.organiser.id || '%')) " +
+           "ORDER BY e.id DESC ")
+    ArrayList<Event> findFeaturedEvents(@Param("privacy") PrivacyType privacy,
+                                        @Param("blocked") String blocked,
+                                        Pageable pageable);
 
     @Query("SELECT DISTINCT et.name FROM EventType et JOIN Event e ON et.id = e.type.id ORDER BY et.name ASC")
     ArrayList<String> findAllUniqueEventTypeNamesForEvents();
@@ -138,4 +148,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
            "AND e.date < :dateTime ")
     ArrayList<Event> findUnreviewedAcceptedEvents(@Param("userId") Long userId,
                                                   @Param("dateTime") LocalDateTime dateTime);
+
+    @Query("SELECT u.id FROM User u JOIN u.blocked b WHERE b.id = :userId AND u.role.name = 'ROLE_Organizer'")
+    List<Long> findAllOrganizerIdsWhoBlockedUserId(@Param("userId") Long userId);
 }

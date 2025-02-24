@@ -379,7 +379,8 @@ public class EventController {
             @RequestParam(required = false, defaultValue = "9999") Integer maxParticipants,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
-            Pageable pageable, @RequestHeader(value = "Authorization", required = false) String token) {
+            Pageable pageable,
+            @RequestHeader(value = "Authorization", required = false) String token) {
         // Pageable - page, size, sort
         // sort by: "type", "name", "maxNumberParticipants,asc", "maxNumberParticipants,desc", "location", "date,asc", "date,desc"
 
@@ -390,10 +391,9 @@ public class EventController {
         if (endDate == null) {
             endDate = LocalDateTime.of(2099, 12, 31, 23, 59); // Very large date
         }
-        Page<Event> events = eventService.getEvents(search, eventTypes, maxParticipants, location, startDate, endDate, pageable);
 
         User user = null;
-        if(token != null) {
+        if (token != null) {
             try {
                 token = token.substring(7);
                 user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
@@ -402,10 +402,12 @@ public class EventController {
             }
         }
 
-        User finalUser = user;
+        Page<Event> events = eventService.getEvents(search, eventTypes, maxParticipants, location, startDate, endDate, user, pageable);
+
         List<EventCardDTO> eventsDTO = new ArrayList<>();
         for (Event event : events) {
-            eventsDTO.add(new EventCardDTO(event, finalUser));
+            System.out.println(event.toString());
+            eventsDTO.add(new EventCardDTO(event, user));
         }
         long count = events.getTotalElements();
 
@@ -433,7 +435,7 @@ public class EventController {
         if (endDate == null) {
             endDate = LocalDateTime.of(2099, 12, 31, 23, 59); // Very large date
         }
-        Page<Event> events = eventService.getEvents(userId, search, eventTypes, maxParticipants, location, startDate, endDate, pageable);
+        Page<Event> events = eventService.getEventsByUserId(userId, search, eventTypes, maxParticipants, location, startDate, endDate, pageable);
 
         User loggedInUser = userService.get(userId);
         List<EventCardDTO> eventsDTO = new ArrayList<>();
@@ -508,8 +510,6 @@ public class EventController {
     // GET "/api/events/featured"
     @GetMapping(value = "/featured", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<EventCardDTO>> getFeaturedEvents(@RequestHeader(value = "Authorization", required = false) String token) {
-        ArrayList<Event> featuredEvents = eventService.getFeaturedEvents();
-
         User user = null;
         if(token != null) {
             try {
@@ -520,10 +520,11 @@ public class EventController {
             }
         }
 
-        User finalUser = user;
+        ArrayList<Event> featuredEvents = eventService.getFeaturedEvents(user);
+
         ArrayList<EventCardDTO> featuredEventsDTO = new ArrayList<>();
         for (Event event : featuredEvents) {
-            featuredEventsDTO.add(new EventCardDTO(event, finalUser));
+            featuredEventsDTO.add(new EventCardDTO(event, user));
         }
 
         return new ResponseEntity<Collection<EventCardDTO>>(featuredEventsDTO, HttpStatus.OK);

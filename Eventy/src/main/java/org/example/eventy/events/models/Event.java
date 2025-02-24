@@ -156,4 +156,21 @@ public class Event {
     public void setInvitations(List<Invitation> invitations) {
         this.invitations = invitations;
     }
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", maxNumberParticipants=" + maxNumberParticipants +
+                ", privacy=" + privacy +
+                ", date=" + date +
+                ", type=" + type +
+                ", location=" + location +
+                ", agenda=" + agenda +
+                ", organiser=" + organiser +
+                ", invitations=" + invitations +
+                '}';
+    }
 }

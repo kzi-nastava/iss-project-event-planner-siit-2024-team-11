@@ -19,12 +19,34 @@ public class EventService {
     @Autowired
     private EventRepository eventRepository;
 
-    public Page<Event> getEvents(String search, ArrayList<String> eventTypes, Integer maxParticipants, String location, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
-        return eventRepository.findAll(search, eventTypes, maxParticipants, location, startDate, endDate, pageable);
+    public Page<Event> getEvents(String search, ArrayList<String> eventTypes, Integer maxParticipants, String location, LocalDateTime startDate, LocalDateTime endDate, User user, Pageable pageable) {
+        StringBuilder blockedUsersConcatenated = new StringBuilder();
+
+        if (user != null) {
+            List<User> blockedUsers = user.getBlocked();
+            if (blockedUsers != null && !blockedUsers.isEmpty()) {
+                for (User blockedUser : blockedUsers) {
+                    blockedUsersConcatenated.append(blockedUser.getId()).append(",");
+                }
+                blockedUsersConcatenated.deleteCharAt(blockedUsersConcatenated.length() - 1);
+            }
+
+            if (user.getRole().getName().equals("ROLE_AuthenticatedUser")) {
+                List<Long> organizerIdsWhoBlockedUser = eventRepository.findAllOrganizerIdsWhoBlockedUserId(user.getId());
+                if (organizerIdsWhoBlockedUser != null && !organizerIdsWhoBlockedUser.isEmpty()) {
+                    for (Long id : organizerIdsWhoBlockedUser) {
+                        blockedUsersConcatenated.append(id).append(",");
+                    }
+                    blockedUsersConcatenated.deleteCharAt(blockedUsersConcatenated.length() - 1);
+                }
+            }
+        }
+
+        return eventRepository.findAll(search, eventTypes, maxParticipants, location, startDate, endDate, PrivacyType.PUBLIC, blockedUsersConcatenated.toString(), pageable);
     }
   
-    public Page<Event> getEvents(Long userId, String search, ArrayList<String> eventTypes, Integer maxParticipants, String location, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
-        return eventRepository.findAll(userId, search, eventTypes, maxParticipants, location, startDate, endDate, pageable);
+    public Page<Event> getEventsByUserId(Long userId, String search, ArrayList<String> eventTypes, Integer maxParticipants, String location, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+        return eventRepository.findAllByUserId(userId, search, eventTypes, maxParticipants, location, startDate, endDate, pageable);
     }
   
     public Page<Event> getPublicEvents(String search, ArrayList<String> eventTypes, Integer maxParticipants, String location, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
@@ -39,9 +61,32 @@ public class EventService {
         return eventRepository.findById(eventId).orElse(null);
     }
 
-    public ArrayList<Event> getFeaturedEvents() {
+    public ArrayList<Event> getFeaturedEvents(User user) {
         Pageable pageable = PageRequest.of(0, 5);
-        return eventRepository.findFeaturedEvents(pageable);
+
+        StringBuilder blockedUsersConcatenated = new StringBuilder();
+
+        if (user != null) {
+            List<User> blockedUsers = user.getBlocked();
+            if (blockedUsers != null && !blockedUsers.isEmpty()) {
+                for (User blockedUser : blockedUsers) {
+                    blockedUsersConcatenated.append(blockedUser.getId()).append(",");
+                }
+                blockedUsersConcatenated.deleteCharAt(blockedUsersConcatenated.length() - 1);
+            }
+
+            if (user.getRole().getName().equals("ROLE_AuthenticatedUser")) {
+                List<Long> organizerIdsWhoBlockedUser = eventRepository.findAllOrganizerIdsWhoBlockedUserId(user.getId());
+                if (organizerIdsWhoBlockedUser != null && !organizerIdsWhoBlockedUser.isEmpty()) {
+                    for (Long id : organizerIdsWhoBlockedUser) {
+                        blockedUsersConcatenated.append(id).append(",");
+                    }
+                    blockedUsersConcatenated.deleteCharAt(blockedUsersConcatenated.length() - 1);
+                }
+            }
+        }
+
+        return eventRepository.findFeaturedEvents(PrivacyType.PUBLIC, blockedUsersConcatenated.toString(), pageable);
     }
 
     public Event save(Event event) {

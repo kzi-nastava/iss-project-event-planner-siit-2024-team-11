@@ -85,7 +85,7 @@ public class ReportController {
 
     // PUT "/api/reports/{reportId}/accept"
     @PutMapping(value = "/{reportId}/accept", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ReportDTO> acceptReview(@PathVariable Long reportId) {
+    public ResponseEntity<ReportDTO> acceptReport(@PathVariable Long reportId) {
         Report report = reportService.getReport(reportId);
         if(report == null) {
             return new ResponseEntity<ReportDTO>(HttpStatus.NOT_FOUND);
@@ -105,7 +105,7 @@ public class ReportController {
 
     // PUT "/api/reports/{reportId}/decline"
     @PutMapping(value = "/{reportId}/decline", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ReportDTO> declineReview(@PathVariable Long reportId) {
+    public ResponseEntity<ReportDTO> declineReport(@PathVariable Long reportId) {
         Report report = reportService.getReport(reportId);
         if(report == null) {
             return new ResponseEntity<ReportDTO>(HttpStatus.NOT_FOUND);
