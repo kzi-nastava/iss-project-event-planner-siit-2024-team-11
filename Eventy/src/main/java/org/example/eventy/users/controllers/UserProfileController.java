@@ -1,5 +1,6 @@
 package org.example.eventy.users.controllers;
 
+import jakarta.validation.Valid;
 import org.example.eventy.common.services.PictureService;
 import org.example.eventy.events.models.Event;
 import org.example.eventy.events.services.EventService;
@@ -10,18 +11,21 @@ import org.example.eventy.solutions.services.ReservationService;
 import org.example.eventy.users.dtos.*;
 import org.example.eventy.users.models.*;
 import org.example.eventy.users.services.UserService;
+import org.example.eventy.util.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
@@ -39,6 +43,8 @@ public class UserProfileController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private TokenUtils tokenUtils;
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> updateProfile(@RequestBody UpdateUserProfileDTO updateUserProfileDTO) {
@@ -108,12 +114,38 @@ public class UserProfileController {
     }
 
     @GetMapping(value="/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDTO> getProfile(@PathVariable Long userId) {
-        User user = userService.get(userId);
+    public ResponseEntity<UserDTO> getProfile(@PathVariable Long userId,
+                                              @RequestHeader(value = "Authorization", required = false) String token) {
+        if (token == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
 
-        if(user != null && user.isEnabled() && user.isActive() && !user.isDeactivated()) {
-            return new ResponseEntity<UserDTO>(new UserDTO(user, userService.getUserType(user)),
-                    HttpStatus.OK);
+        User loggedInUser;
+        try {
+            token = token.substring(7);
+            loggedInUser = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+
+            if(loggedInUser == null) {
+                throw new Exception();
+            }
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        User user = userService.get(userId);
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        if (!user.getId().equals(loggedInUser.getId())) {
+            if (loggedInUser.getBlocked().contains(user)) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+        }
+
+        if (user.isEnabled() && user.isActive() && !user.isDeactivated()) {
+            return new ResponseEntity<UserDTO>(new UserDTO(user, userService.getUserType(user)), HttpStatus.OK);
         }
 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -199,5 +231,51 @@ public class UserProfileController {
         }
 
         return new ResponseEntity<LocalDateTime>(HttpStatus.NOT_FOUND);
+    }
+
+    // POST "/api/users/block"
+    @PostMapping(value = "/block", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<BlockUserDTO> blockUser(@Valid @RequestBody BlockUserDTO blockUserDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // if there are validation errors, we return a 400 Bad Request response
+            List<String> errorMessages = bindingResult.getFieldErrors().stream()
+                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                    .collect(Collectors.toList());
+            return new ResponseEntity(errorMessages, HttpStatus.BAD_REQUEST);
+        }
+
+        User blockedUser = userService.get(blockUserDTO.getBlockedId());
+        if (blockedUser == null) {
+            return new ResponseEntity<BlockUserDTO>(HttpStatus.BAD_REQUEST);
+        }
+
+        User blockerUser = userService.get(blockUserDTO.getBlockerId());
+        if (blockerUser == null) {
+            return new ResponseEntity<BlockUserDTO>(HttpStatus.BAD_REQUEST);
+        }
+
+        List<User> blockedUsers = blockerUser.getBlocked();
+        blockedUsers.add(blockedUser);
+
+        blockerUser = userService.save(blockerUser, false);
+        if (blockerUser == null) {
+            return new ResponseEntity<BlockUserDTO>(HttpStatus.BAD_REQUEST);
+        }
+
+        if ((blockerUser.getRole().getName().equals("ROLE_Organizer") && blockedUser.getRole().getName().equals("ROLE_AuthenticatedUser")) ||
+            (blockedUser.getRole().getName().equals("ROLE_Organizer") && blockerUser.getRole().getName().equals("ROLE_AuthenticatedUser"))) {
+
+            if (!blockedUser.getBlocked().contains(blockerUser)) {
+                blockedUsers = blockedUser.getBlocked();
+                blockedUsers.add(blockerUser);
+
+                blockedUser = userService.save(blockedUser, false);
+                if (blockedUser == null) {
+                    return new ResponseEntity<BlockUserDTO>(HttpStatus.BAD_REQUEST);
+                }
+            }
+        }
+
+        return new ResponseEntity<BlockUserDTO>(HttpStatus.OK);
     }
 }

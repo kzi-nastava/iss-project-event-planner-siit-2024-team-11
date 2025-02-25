@@ -1,9 +1,9 @@
 package org.example.eventy.solutions.services;
 
 import org.example.eventy.solutions.models.Category;
-import org.example.eventy.solutions.models.Product;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.repositories.SolutionRepository;
+import org.example.eventy.users.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -18,7 +18,7 @@ public class SolutionService {
     @Autowired
     private SolutionRepository solutionRepository;
 
-    public Page<Solution> getSolutions(String search, String type, String categories, String eventTypes, String company, double minPrice, double maxPrice, LocalDateTime startDate, LocalDateTime endDate, Boolean isAvailable, Pageable pageable) {
+    public Page<Solution> getSolutions(String search, String type, String categories, String eventTypes, String company, double minPrice, double maxPrice, LocalDateTime startDate, LocalDateTime endDate, Boolean isAvailable, User user, Pageable pageable) {
         int page = pageable.getPageNumber();
         if (page < 0) page = 0;
 
@@ -29,8 +29,20 @@ public class SolutionService {
         String sortDirection = pageable.getSort().isEmpty() ? "asc" : pageable.getSort().iterator().next().getDirection().name();
         String sort = (sortField + "," + sortDirection).toLowerCase();
 
-        List<Solution> solutions = solutionRepository.findAll(search, type, categories, eventTypes, company, minPrice, maxPrice, startDate, endDate, isAvailable, page, pageSize, sort);
-        int total = solutionRepository.findTotalCount(search, type, categories, eventTypes, company, minPrice, maxPrice, startDate, endDate, isAvailable);
+        StringBuilder blockedUsersConcatenated = new StringBuilder();
+
+        if (user != null) {
+            List<User> blockedUsers = user.getBlocked();
+            if (blockedUsers != null && !blockedUsers.isEmpty()) {
+                for (User blockedUser : blockedUsers) {
+                    blockedUsersConcatenated.append(blockedUser.getId()).append(",");
+                }
+                blockedUsersConcatenated.deleteCharAt(blockedUsersConcatenated.length() - 1);
+            }
+        }
+
+        List<Solution> solutions = solutionRepository.findAll(search, type, categories, eventTypes, company, minPrice, maxPrice, startDate, endDate, isAvailable, blockedUsersConcatenated.toString(), page, pageSize, sort);
+        int total = solutionRepository.findTotalCount(search, type, categories, eventTypes, company, minPrice, maxPrice, startDate, endDate, isAvailable, blockedUsersConcatenated.toString());
 
         return new PageImpl<>(solutions, PageRequest.of(page, pageSize), total);
 
@@ -40,9 +52,22 @@ public class SolutionService {
         return solutionRepository.findById(solutionId).orElse(null);
     }
 
-    public ArrayList<Solution> getFeaturedSolutions() {
+    public ArrayList<Solution> getFeaturedSolutions(User user) {
         Pageable pageable = PageRequest.of(0, 5);
-        return solutionRepository.findFeaturedSolutions(pageable);
+
+        StringBuilder blockedUsersConcatenated = new StringBuilder();
+
+        if (user != null) {
+            List<User> blockedUsers = user.getBlocked();
+            if (blockedUsers != null && !blockedUsers.isEmpty()) {
+                for (User blockedUser : blockedUsers) {
+                    blockedUsersConcatenated.append(blockedUser.getId()).append(",");
+                }
+                blockedUsersConcatenated.deleteCharAt(blockedUsersConcatenated.length() - 1);
+            }
+        }
+
+        return solutionRepository.findFeaturedSolutions(blockedUsersConcatenated.toString(), pageable);
     }
 
     public List<Solution> getSolutionsByProvider(Long providerId, String search, Pageable pageable) {

@@ -90,6 +90,7 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
             AND (b.is_available = :isAvailable)
             AND (b.is_visible = TRUE)
             AND (b.is_deleted = FALSE)
+            AND (:blocked IS NULL OR :blocked = '' OR NOT :blocked ILIKE ('%' || provider_id || '%')) 
             AND (CAST(:startDate AS timestamp) IS NULL OR CAST(:endDate AS timestamp) IS NULL
                  OR NOT EXISTS (
                     SELECT 1
@@ -118,6 +119,7 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
                            @Param("startDate") LocalDateTime startDate,
                            @Param("endDate") LocalDateTime endDate,
                            @Param("isAvailable") Boolean isAvailable,
+                           @Param("blocked") String blocked,
                            @Param("page") int page,
                            @Param("pageSize") int pageSize,
                            @Param("sort") String sort);
@@ -168,6 +170,7 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
                 AND (b.is_available = :isAvailable)
                 AND (b.is_visible = TRUE)
                 AND (b.is_deleted = FALSE)
+                AND (:blocked IS NULL OR :blocked = '' OR NOT :blocked ILIKE ('%' || provider_id || '%')) 
                 AND (CAST(:startDate AS timestamp) IS NULL OR CAST(:endDate AS timestamp) IS NULL
                      OR NOT EXISTS (
                         SELECT 1
@@ -189,10 +192,16 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
                        @Param("maxPrice") Double maxPrice,
                        @Param("startDate") LocalDateTime startDate,
                        @Param("endDate") LocalDateTime endDate,
-                       @Param("isAvailable") Boolean isAvailable);
+                       @Param("isAvailable") Boolean isAvailable,
+                       @Param("blocked") String blocked);
 
-    @Query("SELECT s FROM Solution s ORDER BY s.id DESC")
-    ArrayList<Solution> findFeaturedSolutions(Pageable pageable);
+    @Query("SELECT s FROM Solution s " +
+           "WHERE (:blocked IS NULL OR :blocked = '' OR NOT :blocked ILIKE ('%' || s.provider.id || '%')) " +
+           "AND (s.isVisible = TRUE) " +
+           "AND (s.isDeleted = FALSE) " +
+           "ORDER BY s.id DESC ")
+    ArrayList<Solution> findFeaturedSolutions(@Param("blocked") String blocked,
+                                              Pageable pageable);
 
     @Query(value = """
             SELECT name FROM (

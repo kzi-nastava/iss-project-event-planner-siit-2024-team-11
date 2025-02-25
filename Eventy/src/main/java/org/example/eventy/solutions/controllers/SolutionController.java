@@ -133,8 +133,8 @@ public class SolutionController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
             @RequestParam(required = false, defaultValue = "true") Boolean isAvailable,
-            @RequestHeader(value = "Authorization", required = false) String token,
-            Pageable pageable) {
+            Pageable pageable,
+            @RequestHeader(value = "Authorization", required = false) String token) {
         // Pageable - page, size, sort
         // sort by: "category", "name", "price,asc", "price,desc"
         if (startDate == null) {
@@ -160,9 +160,6 @@ public class SolutionController {
             categories2.deleteCharAt(categories2.length() - 1);
         }
 
-        Page<Solution> solutions = solutionService.getSolutions(
-            search, type, categories2.toString(), eventTypesConcatenated.toString(), company, minPrice, maxPrice, startDate, endDate, isAvailable, pageable);
-
         User user = null;
         if(token != null) {
             token = token.substring(7);
@@ -173,6 +170,8 @@ public class SolutionController {
             catch (Exception ignored) {
             }
         }
+
+        Page<Solution> solutions = solutionService.getSolutions(search, type, categories2.toString(), eventTypesConcatenated.toString(), company, minPrice, maxPrice, startDate, endDate, isAvailable, user, pageable);
 
         List<SolutionCardDTO> solutionCardsDTO = new ArrayList<>();
         for (Solution solution : solutions) {
@@ -210,8 +209,6 @@ public class SolutionController {
     // GET "/api/solutions/featured"
     @GetMapping(value = "/featured", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<SolutionCardDTO>> getFeaturedSolutions(@RequestHeader(value = "Authorization", required = false) String token) {
-        ArrayList<Solution> featuredSolutions = solutionService.getFeaturedSolutions();
-
         User user = null;
         if(token != null) {
             token = token.substring(7);
@@ -222,6 +219,8 @@ public class SolutionController {
             catch (Exception ignored) {
             }
         }
+
+        ArrayList<Solution> featuredSolutions = solutionService.getFeaturedSolutions(user);
 
         ArrayList<SolutionCardDTO> featuredSolutionsDTO = new ArrayList<>();
         for (Solution solution : featuredSolutions) {
@@ -310,6 +309,10 @@ public class SolutionController {
             }
             catch (Exception ignored) {
             }
+        }
+
+        if (user != null && user.getBlocked().contains(solution.getProvider())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         return new ResponseEntity<>(new SolutionDetailsDTO(solution, user), HttpStatus.OK);

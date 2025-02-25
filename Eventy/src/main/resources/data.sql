@@ -93,9 +93,9 @@ VALUES
 -- Users Profile Pictures
 INSERT INTO users_profile_pictures(picture_id, user_id)
 VALUES (1, 1),
-       (2, 2),
-       (4, 3),
-       (2, 4),
+       (6, 2),
+       (2, 3),
+       (8, 4),
        (3, 5),
        (5, 6),
        (6, 7);
