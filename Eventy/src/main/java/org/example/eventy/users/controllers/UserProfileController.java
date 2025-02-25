@@ -246,12 +246,12 @@ public class UserProfileController {
 
         User blockedUser = userService.get(blockUserDTO.getBlockedId());
         if (blockedUser == null) {
-            return new ResponseEntity<BlockUserDTO>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<BlockUserDTO>(blockUserDTO, HttpStatus.BAD_REQUEST);
         }
 
         User blockerUser = userService.get(blockUserDTO.getBlockerId());
         if (blockerUser == null) {
-            return new ResponseEntity<BlockUserDTO>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<BlockUserDTO>(blockUserDTO, HttpStatus.BAD_REQUEST);
         }
 
         List<User> blockedUsers = blockerUser.getBlocked();
@@ -259,7 +259,7 @@ public class UserProfileController {
 
         blockerUser = userService.save(blockerUser, false);
         if (blockerUser == null) {
-            return new ResponseEntity<BlockUserDTO>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<BlockUserDTO>(blockUserDTO, HttpStatus.BAD_REQUEST);
         }
 
         if ((blockerUser.getRole().getName().equals("ROLE_Organizer") && blockedUser.getRole().getName().equals("ROLE_AuthenticatedUser")) ||
@@ -271,11 +271,11 @@ public class UserProfileController {
 
                 blockedUser = userService.save(blockedUser, false);
                 if (blockedUser == null) {
-                    return new ResponseEntity<BlockUserDTO>(HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<BlockUserDTO>(blockUserDTO, HttpStatus.BAD_REQUEST);
                 }
             }
         }
 
-        return new ResponseEntity<BlockUserDTO>(HttpStatus.OK);
+        return new ResponseEntity<BlockUserDTO>(blockUserDTO, HttpStatus.OK);
     }
 }
