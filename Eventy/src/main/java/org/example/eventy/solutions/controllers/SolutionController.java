@@ -311,6 +311,10 @@ public class SolutionController {
             }
         }
 
+        if (user != null && user.getBlocked().contains(solution.getProvider())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
         return new ResponseEntity<>(new SolutionDetailsDTO(solution, user), HttpStatus.OK);
     }
 }

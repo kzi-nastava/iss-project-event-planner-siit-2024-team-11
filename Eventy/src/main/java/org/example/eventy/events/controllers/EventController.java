@@ -62,8 +62,9 @@ public class EventController {
     @GetMapping(value = "/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EventDetailsDTO> getEvent(@PathVariable Long eventId, @RequestHeader(value = "Authorization", required = false) String token) {
         Event event = eventService.getEvent(eventId);
+
         User user = null;
-        if(token != null) {
+        if (token != null) {
             token = token.substring(7);
 
             try {
@@ -73,7 +74,11 @@ public class EventController {
             }
         }
 
-        if(event != null) {
+        if (user != null && user.getBlocked().contains(event.getOrganiser())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        if (event != null) {
             return new ResponseEntity<EventDetailsDTO>(new EventDetailsDTO(event, user), HttpStatus.OK);
         }
 
