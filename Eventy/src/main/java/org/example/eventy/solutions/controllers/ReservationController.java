@@ -2,6 +2,7 @@ package org.example.eventy.solutions.controllers;
 
 import jakarta.validation.Valid;
 import org.example.eventy.common.models.PagedResponse;
+import org.example.eventy.common.services.EmailService;
 import org.example.eventy.solutions.dtos.ReservationDTO;
 import org.example.eventy.solutions.models.Reservation;
 import org.example.eventy.solutions.services.ReservationService;
@@ -24,6 +25,8 @@ import java.util.stream.Collectors;
 public class ReservationController {
     @Autowired
     private ReservationService reservationService;
+    @Autowired
+    private EmailService emailService;
 
     // GET "/api/reservations/5"
     @GetMapping(value = "/{reservationId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -114,7 +117,8 @@ public class ReservationController {
 
         Reservation reservation = reservationService.createReservation(reservationDTO);
 
-        if(reservation != null) {
+        if (reservation != null) {
+            emailService.sendReservationConfirmation(reservation);
             return new ResponseEntity<ReservationDTO>(new ReservationDTO(reservation), HttpStatus.CREATED);
         }
 

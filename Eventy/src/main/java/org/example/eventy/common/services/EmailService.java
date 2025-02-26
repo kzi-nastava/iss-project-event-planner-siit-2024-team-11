@@ -9,6 +9,7 @@ import org.example.eventy.events.models.Event;
 import org.example.eventy.events.models.Invitation;
 import org.example.eventy.events.models.Location;
 import org.example.eventy.events.services.InvitationService;
+import org.example.eventy.solutions.models.Reservation;
 import org.example.eventy.users.models.User;
 import org.example.eventy.users.services.UserService;
 import org.example.eventy.util.NetworkUtils;
@@ -251,7 +252,7 @@ public class EmailService {
                     </div>
            
                     <div class="footer">
-                       <p>&copy; 2024 Eventy. All rights reserved.</p>
+                       <p>&copy; 2025 Eventy. All rights reserved.</p>
                     </div>
                  </div>
               </body>
@@ -395,7 +396,7 @@ public class EmailService {
                      </div>
             
                      <div class="footer">
-                        <p>&copy; 2024 Eventy. All rights reserved.</p>
+                        <p>&copy; 2025 Eventy. All rights reserved.</p>
                      </div>
                   </div>
                </body>
@@ -410,4 +411,356 @@ public class EmailService {
             .replace("${eventyLogoSrc}", eventyLogoSrc);
         }
     }
+
+    public void sendReservationConfirmation(Reservation reservation) {
+        String providerEmail = reservation.getSelectedService().getProvider().getEmail();
+        String serviceName = reservation.getSelectedService().getName();
+        String organizerEmail = reservation.getSelectedEvent().getOrganiser().getEmail();
+        String eventName = reservation.getSelectedEvent().getName();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy 'at' h:mm a");
+        String reservationStartDate = reservation.getReservationStartDateTime().format(dateTimeFormatter);
+        String reservationEndDate = reservation.getReservationEndDateTime().format(dateTimeFormatter);
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            helper.setFrom(new InternetAddress("eventy.app.team11@gmail.com", "Eventy"));
+            helper.setTo(providerEmail);
+            helper.setSubject("\uD83D\uDCC5  Your service '" + serviceName + "' has been reserved!");
+
+            String homepageLink = "http://" + NetworkUtils.getLocalIpAddress() +":8080/api/events/homepage-routing/";
+            String eventyLogoSrc = "src/main/resources/static/logo-nav.png";
+
+            // create HTML content
+            String htmlContent;
+            htmlContent = buildEmailContent("provider", providerEmail, organizerEmail, serviceName, eventName, reservationStartDate, reservationEndDate, homepageLink, eventyLogoSrc);
+            helper.setText(htmlContent, true);
+
+            // add Eventy Logo image --> <img src="cid:logoImage" alt="Eventy Logo"/>
+            File logoFile = new File(eventyLogoSrc);
+            if (!logoFile.exists()) {
+                throw new IllegalArgumentException("Logo file not found at: " + eventyLogoSrc);
+            }
+            helper.addInline("logoImage", new FileDataSource(logoFile)); // `cid:logoImage` matches HTML
+
+            mailSender.send(message);
+
+            ////////////////////
+
+            message = mailSender.createMimeMessage();
+            helper = new MimeMessageHelper(message, true);
+
+            helper.setFrom(new InternetAddress("eventy.app.team11@gmail.com", "Eventy"));
+            helper.setTo(organizerEmail);
+            helper.setSubject("\uD83D\uDCC5  Your reservation for the event '" + eventName + "' is successful!");
+
+            homepageLink = "http://" + NetworkUtils.getLocalIpAddress() +":8080/api/events/homepage-routing/";
+            eventyLogoSrc = "src/main/resources/static/logo-nav.png";
+
+            // create HTML content
+            htmlContent = buildEmailContent("organizer", providerEmail, organizerEmail, serviceName, eventName, reservationStartDate, reservationEndDate, homepageLink, eventyLogoSrc);
+            helper.setText(htmlContent, true);
+
+            // add Eventy Logo image --> <img src="cid:logoImage" alt="Eventy Logo"/>
+            logoFile = new File(eventyLogoSrc);
+            if (!logoFile.exists()) {
+                throw new IllegalArgumentException("Logo file not found at: " + eventyLogoSrc);
+            }
+            helper.addInline("logoImage", new FileDataSource(logoFile)); // `cid:logoImage` matches HTML
+
+            mailSender.send(message);
+
+        } catch (MessagingException e) {
+            e.printStackTrace();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String buildEmailContent(String type, String providerEmail, String organizerEmail, String serviceName, String eventName, String reservationStartDate, String reservationEndDate, String homepageLink, String eventyLogoSrc) {
+        if (type.equals("provider")) {
+            return """
+            <!DOCTYPE html>
+            <html>
+               <head>
+                 <meta name="color-scheme" content="light">
+                 <meta name="supported-color-schemes" content="light">
+                 <style>
+                    body {
+                       font-family: Arial, sans-serif;
+                       background-color: #ffffff !important;
+                       margin: 0;
+                       padding: 0;
+                    }
+                       .container {
+                          max-width: 680px;
+                          margin: 5px auto;
+                          background: #929AB7 !important;
+                          border-radius: 10px;
+                          overflow: hidden;
+                       }
+                          .header {
+                             background-color: #929AB7 !important;
+                             color: white;         \s
+                          }
+                         \s
+                             .header p {
+                                font-size: 23px;
+                                font-weight: 700;
+                                padding: 23px;
+                                padding-top: 17px;
+                                padding-bottom: 17px;
+                                margin: 0px;
+                                line-height: 30px;
+                                color: white;
+                                letter-spacing: 1px; \s
+                             }
+           
+                             .header img {
+                                width: 145px;
+                                height: 26px;             \s
+                             }
+           
+                       .content {
+                          padding: 15px;
+                          margin-left: 16px;
+                          margin-right: 16px;
+                          color: #515151 !important;
+                          background-color: white !important;
+                          border-radius: 10px;
+                       }
+                          .content p {
+                             margin: 0;
+                             font-size: 15.5px;
+                             line-height: 26px;
+                          }
+           
+                          .button {
+                             display: inline-block;
+                             background-color: #8890ac !important;
+                             color: white !important;
+                             text-decoration: none;
+                             padding: 7px 15px;
+                             border-radius: 7px;
+                             color: white !important;
+                             margin: 7px 0px;
+                             margin-bottom: 10px;
+                          }
+           
+                          .line_container {
+                             display: flex;
+                             flex-direction: column;
+                             justify-content: center;
+                             align-items: center;
+                             position: relative;
+                          }
+                             .line {
+                                width: 100%;
+                                height: 1px;
+                                background: rgb(221, 221, 221) !important;
+                             }
+           
+                       .footer {
+                          text-align: center;
+                          padding: 5px;
+                          font-size: 14.5px;
+                          color: #ffffff !important;
+                          letter-spacing: 0.2px;
+                       }
+                 </style>
+              </head>
+              <body>
+                 <div class="container">
+                    <div class="header">\s
+                       <div style = "margin-left: 20px; margin-top: 17.5px;">
+                          <a href="${homepageLink}">
+                             <div>
+                                <img src="cid:logoImage" alt=""/>
+                             </div>
+                          </a> \s
+                       </div>
+                       <p>Your service has been reserved!</p>
+                    </div>
+                    <div class="content">
+                       <p>Dear <strong>${recipientEmail}</strong>,</p>
+                       <br/>
+                       <p>Your service "<strong>${serviceName}</strong>" has been reserved by\s
+                       <strong>${otherEmail}</strong> for the event "<strong>${eventName}</strong>"!</p>
+                       <p style = "color: #929AB7; font-size: 19px; letter-spacing: 0.5px; font-weight: 600; margin-top: 20px">Reservation Details:</p>
+                       <ul style = "padding-left: 25px; margin: 0; margin-bottom: 18px; margin-top: 8px; ">
+                          <li style = "margin-bottom: 5px; font-size: 16px;"><strong>Start datetime:</strong> ${reservationStartDate}</li>
+                          <li style = "font-size: 16px;"><strong>End datetime:</strong> ${reservationEndDate}</li>
+                       </ul>
+                       <p style = "margin-bottom: 20px; margin-top: 15px">You can now initiate a chat with the organizer in the application! 😊</p>
+                      \s
+                       <div class = "line_container">
+                          <div class = "line"></div>
+                       </div>
+           
+                       <div style = "color: rgb(171, 171, 171); margin-top: 9px; margin-bottom: 9px">          \s
+                          <p style = "font-family: monospace; font-size: 14.5px; line-height: 17.5px; margin-bottom: 8px;">This is an automated message. Please do not reply.</p>
+                          <p style = "font-family: monospace; font-size: 14.5px; line-height: 17.5px;">If you require any assistance or information regarding the reservation, please contact the event organizer directly in the application.</p>
+                       </div>
+                    </div>
+           
+                    <div class="footer">
+                       <p>&copy; 2025 Eventy. All rights reserved.</p>
+                    </div>
+                 </div>
+              </body>
+            </html>
+            """
+                .replace("${recipientEmail}", providerEmail)
+                .replace("${otherEmail}", organizerEmail)
+                .replace("${eventName}", eventName)
+                .replace("${serviceName}", serviceName)
+                .replace("${reservationStartDate}", reservationStartDate)
+                .replace("${reservationEndDate}", reservationEndDate)
+                .replace("${homepageLink}", homepageLink)
+                .replace("${eventyLogoSrc}", eventyLogoSrc);
+        } else { // "organizer"
+            return """
+            <!DOCTYPE html>
+            <html>
+               <head>
+                 <meta name="color-scheme" content="light">
+                 <meta name="supported-color-schemes" content="light">
+                 <style>
+                    body {
+                       font-family: Arial, sans-serif;
+                       background-color: #ffffff !important;
+                       margin: 0;
+                       padding: 0;
+                    }
+                       .container {
+                          max-width: 680px;
+                          margin: 5px auto;
+                          background: #929AB7 !important;
+                          border-radius: 10px;
+                          overflow: hidden;
+                       }
+                          .header {
+                             background-color: #929AB7 !important;
+                             color: white;         \s
+                          }
+                         \s
+                             .header p {
+                                font-size: 23px;
+                                font-weight: 700;
+                                padding: 23px;
+                                padding-top: 17px;
+                                padding-bottom: 17px;
+                                margin: 0px;
+                                line-height: 30px;
+                                color: white;
+                                letter-spacing: 1px; \s
+                             }
+                       
+                             .header img {
+                                width: 145px;
+                                height: 26px;             \s
+                             }
+                       
+                       .content {
+                          padding: 15px;
+                          margin-left: 16px;
+                          margin-right: 16px;
+                          color: #515151 !important;
+                          background-color: white !important;
+                          border-radius: 10px;
+                       }
+                          .content p {
+                             margin: 0;
+                             font-size: 15.5px;
+                             line-height: 26px;
+                          }
+                       
+                          .button {
+                             display: inline-block;
+                             background-color: #8890ac !important;
+                             color: white !important;
+                             text-decoration: none;
+                             padding: 7px 15px;
+                             border-radius: 7px;
+                             color: white !important;
+                             margin: 7px 0px;
+                             margin-bottom: 10px;
+                          }
+                       
+                          .line_container {
+                             display: flex;
+                             flex-direction: column;
+                             justify-content: center;
+                             align-items: center;
+                             position: relative;
+                          }
+                             .line {
+                                width: 100%;
+                                height: 1px;
+                                background: rgb(221, 221, 221) !important;
+                             }
+                       
+                       .footer {
+                          text-align: center;
+                          padding: 5px;
+                          font-size: 14.5px;
+                          color: #ffffff !important;
+                          letter-spacing: 0.2px;
+                       }
+                 </style>
+              </head>
+              <body>
+                 <div class="container">
+                    <div class="header">\s
+                       <div style = "margin-left: 20px; margin-top: 17.5px;">
+                          <a href="${homepageLink}">
+                             <div>
+                                <img src="cid:logoImage" alt=""/>
+                             </div>
+                          </a> \s
+                       </div>
+                       <p>Your service has been reserved!</p>
+                    </div>
+                    <div class="content">
+                       <p>Dear <strong>${recipientEmail}</strong>,</p>
+                       <br/>
+                       <p>Your reservation for the service "<strong>${serviceName}</strong>" provided by\s
+                       <strong>${otherEmail}</strong>, for the event "<strong>${eventName}</strong>" is successful!</p>
+                       <p style = "color: #929AB7; font-size: 19px; letter-spacing: 0.5px; font-weight: 600; margin-top: 20px">Reservation Details:</p>
+                       <ul style = "padding-left: 25px; margin: 0; margin-bottom: 18px; margin-top: 8px; ">
+                          <li style = "margin-bottom: 5px; font-size: 16px;"><strong>Start datetime:</strong> ${reservationStartDate}</li>
+                          <li style = "font-size: 16px;"><strong>End datetime:</strong> ${reservationEndDate}</li>
+                       </ul>
+                       <p style = "margin-bottom: 20px; margin-top: 15px">You can now initiate a chat with the provider in the application! 😊</p>
+                      \s
+                       <div class = "line_container">
+                          <div class = "line"></div>
+                       </div>
+                       
+                       <div style = "color: rgb(171, 171, 171); margin-top: 9px; margin-bottom: 9px">          \s
+                          <p style = "font-family: monospace; font-size: 14.5px; line-height: 17.5px; margin-bottom: 8px;">This is an automated message. Please do not reply.</p>
+                          <p style = "font-family: monospace; font-size: 14.5px; line-height: 17.5px;">If you require any assistance or information regarding the reservation, please contact the service provider directly in the application.</p>
+                       </div>
+                    </div>
+                       
+                    <div class="footer">
+                       <p>&copy; 2025 Eventy. All rights reserved.</p>
+                    </div>
+                 </div>
+              </body>
+            </html>
+            """
+                .replace("${recipientEmail}", organizerEmail)
+                .replace("${otherEmail}", providerEmail)
+                .replace("${eventName}", eventName)
+                .replace("${serviceName}", serviceName)
+                .replace("${reservationStartDate}", reservationStartDate)
+                .replace("${reservationEndDate}", reservationEndDate)
+                .replace("${homepageLink}", homepageLink)
+                .replace("${eventyLogoSrc}", eventyLogoSrc);
+        }
+    }
+
 }
