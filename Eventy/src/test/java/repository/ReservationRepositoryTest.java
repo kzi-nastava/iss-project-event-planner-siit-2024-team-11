@@ -302,6 +302,7 @@ public class ReservationRepositoryTest {
         existingReservation2.setReservationStartDateTime(LocalDateTime.of(2025, LocalDateTime.now().getMonth().plus(1), 15, 12, 0));
         existingReservation2.setReservationEndDateTime(LocalDateTime.of(2025, LocalDateTime.now().getMonth().plus(1), 22, 12, 0));
         existingReservation2.setSelectedEvent(eventRepository.findById(2L).get());
+        reservationRepository.save(existingReservation2);
 
         Reservation overlappingReservation = new Reservation();
         overlappingReservation.setSelectedService(randomSolution);
@@ -315,7 +316,7 @@ public class ReservationRepositoryTest {
                 overlappingReservation.getSelectedService()
         );
 
-        assertEquals(1, isOverlapping.size());
+        assertEquals(2, isOverlapping.size());
     }
 
     @Test
@@ -334,6 +335,7 @@ public class ReservationRepositoryTest {
         existingReservation2.setReservationStartDateTime(LocalDateTime.of(2025, LocalDateTime.now().getMonth().plus(1), 15, 12, 0));
         existingReservation2.setReservationEndDateTime(LocalDateTime.of(2025, LocalDateTime.now().getMonth().plus(1), 22, 12, 0));
         existingReservation2.setSelectedEvent(eventRepository.findById(2L).get());
+        reservationRepository.save(existingReservation2);
 
         Reservation overlappingReservation = new Reservation();
         overlappingReservation.setSelectedService(randomSolution);
@@ -412,6 +414,7 @@ public class ReservationRepositoryTest {
         existingReservation2.setReservationStartDateTime(LocalDateTime.of(2025, LocalDateTime.now().getMonth().plus(1), 15, 12, 0));
         existingReservation2.setReservationEndDateTime(LocalDateTime.of(2025, LocalDateTime.now().getMonth().plus(1), 22, 12, 0));
         existingReservation2.setSelectedEvent(eventRepository.findById(2L).get());
+        reservationRepository.save(existingReservation2);
 
         Reservation overlappingReservation = new Reservation();
         overlappingReservation.setSelectedService(solutionRepository.findById(7L).get());
