@@ -11,7 +11,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic/web", "/topic/mobile");
+        config.enableSimpleBroker("/topic/web", "/topic/mobile", "/topic/chat");
         config.setApplicationDestinationPrefixes("/app");
     }
 
@@ -19,5 +19,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/web-notifications").setAllowedOrigins("*"); // Web
         registry.addEndpoint("/mobile-notifications").setAllowedOrigins("*"); // Mobile
+
+        registry.addEndpoint("/chats").setAllowedOrigins("*");
     }
 }
