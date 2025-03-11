@@ -39,9 +39,9 @@ INSERT INTO events(
     max_number_participants, privacy, date, event_type_id, id, location_id, organizer_id, description, name
 )
 VALUES
-    (50, 'PUBLIC', '2024-12-25 15:00:00', 1, DEFAULT, 1, 1, 'This is a birthday party for our friend John, I hope he does not know we are organizing this!', 'Birthday Party for John'),
-    (100, 'PUBLIC', '2024-12-26 15:00:00', 2, DEFAULT, 2, 1, 'High school students of prestigious high school "Jonny Smith" are graduating this month!', 'High School Graduation'),
-    (150, 'PUBLIC', '2024-12-27 15:00:00', 1, DEFAULT, 3, 2, 'Lunch in our best office ever! See you there! Big thanks to Eventy for being such a cool platform! #sponsored', 'Office Lunch');
+    (50, 'PUBLIC', '2026-12-25 15:00:00', 1, DEFAULT, 1, 1, 'This is a birthday party for our friend John, I hope he does not know we are organizing this!', 'Birthday Party for John'),
+    (100, 'PUBLIC', '2026-12-26 15:00:00', 2, DEFAULT, 2, 1, 'High school students of prestigious high school "Jonny Smith" are graduating this month!', 'High School Graduation'),
+    (150, 'PUBLIC', '2026-12-27 15:00:00', 1, DEFAULT, 3, 2, 'Lunch in our best office ever! See you there! Big thanks to Eventy for being such a cool platform! #sponsored', 'Office Lunch');
 
 -- Accepted Events
 INSERT INTO users_attending_events (event_id, user_id) VALUES
@@ -71,7 +71,7 @@ VALUES
     (15, 15, FALSE, FALSE, TRUE, 240, 60, 99.99, 7, 0, 2, DEFAULT, NULL, 4, NULL, 'Service', 'Wedding photography package', 'Photography', 'Includes editing and delivery in 2 weeks'),
     (12, 20, TRUE, FALSE, TRUE, 180, 30, 149.99, 0, 1, 3, DEFAULT, NULL, 4, NULL, 'Service', 'Personal training session', 'Training', 'One-on-one session with certified trainer'),
     (7, 10, TRUE, FALSE, TRUE, 300, 90, 199.99, 14, 1, 2, DEFAULT, NULL, 4, NULL, 'Service', 'Event planning service', 'Event Planning', 'Full-service planning and coordination'),
-    (17, 25, TRUE, FALSE, TRUE, 120, 30, 79.99, 14, 0, 3, DEFAULT, NULL, 3, NULL, 'Service', 'House cleaning service', 'Cleaning', 'Deep cleaning for apartments and houses');
+    (17, 25, TRUE, FALSE, TRUE, 60, 60, 79.99, 14, 0, 3, DEFAULT, NULL, 3, NULL, 'Service', 'House cleaning service', 'Cleaning', 'Deep cleaning for apartments and houses');
 
 -- Pictures
 INSERT INTO pictures
@@ -145,3 +145,14 @@ INSERT INTO reviews (user_id, event_id, solution_id, comment, grade, status, is_
 VALUES
     (1, 2, NULL, 'Great event, really enjoyed it!', 5, 'PENDING', false),
     (1, 3, NULL, 'Great event 2!', 3, 'PENDING', false);
+
+-- Reservations
+INSERT INTO reservations (id, selected_event_id, selected_service_id, reservation_start_date_time, reservation_end_date_time, notification_sent)
+VALUES
+    (DEFAULT, 1, 6, '2027-06-10T10:00:00', '2027-06-10T11:00:00', false),
+    (DEFAULT, 1, 6, '2027-06-10T11:00:00', '2027-06-11T12:00:00', false),
+    (DEFAULT, 1, 6, '2027-06-12T12:00:00', '2027-06-12T13:00:00', false),
+    (DEFAULT, 1, 6, '2027-06-13T13:00:00', '2027-06-13T14:00:00', false),
+    (DEFAULT, 1, 6, '2027-06-14T14:00:00', '2027-06-14T15:00:00', false),
+    (DEFAULT, 2, 7, '2027-06-13T13:00:00', '2027-06-13T14:00:00', false),
+    (DEFAULT, 2, 7, '2027-06-13T14:00:00', '2027-06-14T15:00:00', false);

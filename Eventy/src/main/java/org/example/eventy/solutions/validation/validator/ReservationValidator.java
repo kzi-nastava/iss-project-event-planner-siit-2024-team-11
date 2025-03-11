@@ -24,8 +24,7 @@ public class ReservationValidator implements ConstraintValidator<ValidReservatio
     @Autowired
     private ReservationService reservationService;
 
-    public ReservationValidator() {
-    }
+    public ReservationValidator() {}
 
     @Override
     public boolean isValid(ReservationDTO reservationDTO, ConstraintValidatorContext context) {
@@ -113,6 +112,22 @@ public class ReservationValidator implements ConstraintValidator<ValidReservatio
             }
         }
 
+        Event selectedEvent = eventService.getEvent(reservationDTO.getSelectedEventId());
+
+        // 10. Check if the reservation time is on the event date
+        if (reservationDTO.getReservationStartDateTime().getYear() != selectedEvent.getDate().getYear() ||
+            reservationDTO.getReservationStartDateTime().getMonth() != selectedEvent.getDate().getMonth() ||
+            reservationDTO.getReservationStartDateTime().getDayOfMonth() != selectedEvent.getDate().getDayOfMonth() ||
+            reservationDTO.getReservationEndDateTime().getYear() != selectedEvent.getDate().getYear() ||
+            reservationDTO.getReservationEndDateTime().getMonth() != selectedEvent.getDate().getMonth() ||
+            reservationDTO.getReservationEndDateTime().getDayOfMonth() != selectedEvent.getDate().getDayOfMonth() ||
+            reservationDTO.getReservationStartDateTime().getHour() < selectedEvent.getDate().getHour() ||
+            reservationDTO.getReservationEndDateTime().getHour() < selectedEvent.getDate().getHour()) {
+            context.buildConstraintViolationWithTemplate("Reservation must be the same day as the event start date.")
+                .addPropertyNode("reservationStartDateTime")
+                .addConstraintViolation();
+            return false;
+        }
         return true;
     }
 }
