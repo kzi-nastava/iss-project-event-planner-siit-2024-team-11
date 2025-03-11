@@ -38,7 +38,7 @@ public class ReservationServiceTest {
     private ServiceService serviceService;
 
     @Test
-    public void createReservation_SuccessfulReservation_True() {
+    public void createReservation_ValidInput_ReturnsSavedReservation() {
         ReservationDTO reservationDTO = new ReservationDTO();
         reservationDTO.setSelectedEventId(1L);
         reservationDTO.setSelectedServiceId(6L);
@@ -71,7 +71,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void findOverlappingReservations_ValidOverlap_True() {
+    public void findOverlappingReservations_OverlappingExists_ReturnsOverlappingReservations() {
         Solution mockService = new Service();
         mockService.setId(6L);
 

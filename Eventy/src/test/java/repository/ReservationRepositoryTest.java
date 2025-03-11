@@ -33,7 +33,7 @@ public class ReservationRepositoryTest {
     private EventRepository eventRepository;
 
     @Test
-    public void findAllBySelectedService_ReservationsExist_True() {
+    public void findAllBySelectedService_ReservationsExist_ReturnsReservations() {
         Solution randomSolution = solutionRepository.findById(6L).get();
 
         Reservation reservation1 = new Reservation();
@@ -67,7 +67,7 @@ public class ReservationRepositoryTest {
     }
 
     @Test
-    public void findAllBySelectedService_ReservationsExist_False() {
+    public void findAllBySelectedService_NoReservationsExist_ReturnsEmptyList() {
         Solution randomSolution = solutionRepository.findById(7L).get();
 
         // make a random reservation for a service that is not being tested
@@ -84,7 +84,7 @@ public class ReservationRepositoryTest {
     }
 
     @Test
-    public void findAllBySelectedEvent_ReservationsExist_True() {
+    public void findAllBySelectedEvent_ReservationsExist_ReturnsReservations() {
         Event randomEvent = eventRepository.findById(1L).get();
 
         Reservation reservation1 = new Reservation();
@@ -118,7 +118,7 @@ public class ReservationRepositoryTest {
     }
 
     @Test
-    public void findAllBySelectedEvent_ReservationsExist_False() {
+    public void findAllBySelectedEvent_NoReservationsExist_ReturnsEmptyList() {
         Event randomEvent = eventRepository.findById(1L).get();
         ArrayList<Reservation> reservationsByService = reservationRepository.findAllBySelectedEvent(randomEvent);
 
@@ -134,7 +134,7 @@ public class ReservationRepositoryTest {
     }
 
     @Test
-    public void findAllByUserId_ReservationsExist_True() {
+    public void findAllByUserId_ReservationsExist_ReturnsReservations() {
         Pageable pageable = PageRequest.of(0, 5);
 
         Reservation reservation1 = new Reservation();
@@ -167,7 +167,7 @@ public class ReservationRepositoryTest {
     }
 
     @Test
-    public void findAllByUserId_ReservationsExist_False() {
+    public void findAllByUserId_NoReservationsExist_ReturnsEmptyList() {
         Pageable pageable = PageRequest.of(0, 5);
 
         // create a random reservation by another user
@@ -183,7 +183,7 @@ public class ReservationRepositoryTest {
     }
 
     @Test
-    public void findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService_ReservationsOverlapsAfter_True() {
+    public void findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService_ReservationOverlapsAfter_ReturnsOverlappingReservations() {
         Solution randomSolution = solutionRepository.findById(6L).get();
 
         Reservation existingReservation = new Reservation();
@@ -209,7 +209,7 @@ public class ReservationRepositoryTest {
     }
 
     @Test
-    public void findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService_ReservationsOverlapsAfter_False() {
+    public void findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService_NoReservationOverlapsAfter_ReturnsEmptyList() {
         Solution randomSolution = solutionRepository.findById(6L).get();
 
         Reservation existingReservation = new Reservation();
@@ -235,7 +235,7 @@ public class ReservationRepositoryTest {
     }
 
     @Test
-    public void findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService_ReservationsOverlapsBefore_True() {
+    public void findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService_ReservationOverlapsBefore_ReturnsOverlappingReservations() {
         Solution randomSolution = solutionRepository.findById(6L).get();
 
         Reservation existingReservation = new Reservation();
@@ -261,7 +261,7 @@ public class ReservationRepositoryTest {
     }
 
     @Test
-    public void findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService_ReservationsOverlapsBefore_False() {
+    public void findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService_NoReservationOverlapsBefore_ReturnsEmptyList() {
         Solution randomSolution = solutionRepository.findById(6L).get();
 
         Reservation existingReservation = new Reservation();
@@ -287,7 +287,7 @@ public class ReservationRepositoryTest {
     }
 
     @Test
-    public void findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService_ReservationsOverlapsBeforeAndAfter_True() {
+    public void findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService_ReservationOverlapsAfterAndBefore_ReturnsOverlappingReservations() {
         Solution randomSolution = solutionRepository.findById(6L).get();
 
         Reservation existingReservation1 = new Reservation();
@@ -320,7 +320,7 @@ public class ReservationRepositoryTest {
     }
 
     @Test
-    public void findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService_ReservationsOverlapsBeforeAndAfter_False() {
+    public void findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService_NoReservationOverlapsAfterAndBefore_ReturnsEmptyList() {
         Solution randomSolution = solutionRepository.findById(6L).get();
 
         Reservation existingReservation1 = new Reservation();
@@ -353,7 +353,7 @@ public class ReservationRepositoryTest {
     }
 
     @Test
-    public void findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService_ReservationsOverlapsAfterWithAnotherService_False() {
+    public void findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService_ReservationsOverlapsAfterWithAnotherService_ReturnsEmptyList() {
         Reservation existingReservation = new Reservation();
         existingReservation.setSelectedService(solutionRepository.findById(6L).get());
         existingReservation.setReservationStartDateTime(LocalDateTime.of(2025, LocalDateTime.now().getMonth().plus(1), 10, 10, 0));
@@ -377,7 +377,7 @@ public class ReservationRepositoryTest {
     }
 
     @Test
-    public void findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService_ReservationsOverlapsBeforeWithAnotherService_False() {
+    public void findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService_ReservationsOverlapsBeforeWithAnotherService_ReturnsEmptyList() {
         Reservation existingReservation = new Reservation();
         existingReservation.setSelectedService(solutionRepository.findById(6L).get());
         existingReservation.setReservationStartDateTime(LocalDateTime.of(2025, LocalDateTime.now().getMonth().plus(1), 10, 10, 0));
@@ -401,7 +401,7 @@ public class ReservationRepositoryTest {
     }
 
     @Test
-    public void findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService_ReservationsOverlapsBeforeAndAfterWithAnotherService_False() {
+    public void findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService_ReservationsOverlapsAfterAndBeforeWithAnotherService_ReturnsEmptyList() {
         Reservation existingReservation1 = new Reservation();
         existingReservation1.setSelectedService(solutionRepository.findById(6L).get());
         existingReservation1.setReservationStartDateTime(LocalDateTime.of(2025, LocalDateTime.now().getMonth().plus(1), 6, 10, 0));

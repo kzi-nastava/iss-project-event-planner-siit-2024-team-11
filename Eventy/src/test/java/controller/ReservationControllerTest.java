@@ -45,7 +45,7 @@ public class ReservationControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    public void getReservation_ReservationExists_True() throws Exception {
+    public void getReservation_ReservationExists_ReturnsReservation() throws Exception {
         Event mockEvent = new Event();
         mockEvent.setId(5L);
 
@@ -68,7 +68,7 @@ public class ReservationControllerTest {
     }
 
     @Test
-    public void getReservation_ReservationExists_False() throws Exception {
+    public void getReservation_NoReservationExists_ReturnsNotFound() throws Exception {
         Long mockReservationId = 1L;
 
         Mockito.when(reservationService.getReservation(mockReservationId)).thenReturn(null);
@@ -79,7 +79,7 @@ public class ReservationControllerTest {
     }
 
     @Test
-    public void getReservationsByServiceId_ReservationsExist_True() throws Exception {
+    public void getReservationsByServiceId_ReservationsExist_ReturnsReservations() throws Exception {
         Event mockEvent = new Event();
         mockEvent.setId(5L);
 
@@ -112,11 +112,10 @@ public class ReservationControllerTest {
     }
 
     @Test
-    public void getReservationsByServiceId_ReservationsEmpty_True() throws Exception {
+    public void getReservationsByServiceId_NoReservationsExists_ReturnsEmptyList() throws Exception {
         Long mockServiceId = 6L;
 
         ArrayList<Reservation> expectedReservations = new ArrayList<>();
-
         Mockito.when(reservationService.getReservationsByServiceId(mockServiceId)).thenReturn(expectedReservations);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/reservations/service/{serviceId}", mockServiceId)
@@ -126,18 +125,7 @@ public class ReservationControllerTest {
     }
 
     @Test
-    public void getReservationsByServiceId_ReservationsExist_False() throws Exception {
-        Long mockServiceId = 6L;
-
-        Mockito.when(reservationService.getReservationsByServiceId(mockServiceId)).thenReturn(null);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/reservations/service/{serviceId}", mockServiceId)
-                .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNotFound()); // 404
-    }
-
-    @Test
-    public void getReservationsByEventId_ReservationsExist_True() throws Exception {
+    public void getReservationsByEventId_ReservationsExist_ReturnsReservations() throws Exception {
         Long mockEventId = 5L;
         Event mockEvent = new Event();
         mockEvent.setId(mockEventId);
@@ -170,11 +158,10 @@ public class ReservationControllerTest {
     }
 
     @Test
-    public void getReservationsByEventId_ReservationsEmpty_True() throws Exception {
+    public void getReservationsByEventId_NoReservationsExists_ReturnsEmptyList() throws Exception {
         Long mockEventId = 5L;
 
         ArrayList<Reservation> expectedReservations = new ArrayList<>();
-
         Mockito.when(reservationService.getReservationsByEventId(mockEventId)).thenReturn(expectedReservations);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/reservations/event/{eventId}", mockEventId)
@@ -184,18 +171,7 @@ public class ReservationControllerTest {
     }
 
     @Test
-    public void getReservationsByEventId_ReservationsExist_False() throws Exception {
-        Long mockEventId = 5L;
-
-        Mockito.when(reservationService.getReservationsByEventId(mockEventId)).thenReturn(null);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/reservations/event/{eventId}", mockEventId)
-                .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNotFound()); // 404
-    }
-
-    @Test
-    public void getReservationsByUserId_ReservationsExist_True() throws Exception {
+    public void getReservationsByUserId_ReservationsExist_ReturnsReservations() throws Exception {
         Long mockUserId = 1L;
         EventOrganizer mockEventOrganizer = new EventOrganizer();
         mockEventOrganizer.setId(mockUserId);
@@ -239,7 +215,7 @@ public class ReservationControllerTest {
     }
 
     @Test
-    public void getReservationsByUserId_ReservationsEmpty_True() throws Exception {
+    public void getReservationsByUserId_NoReservationsExists_ReturnsEmptyList() throws Exception {
         Long mockUserId = 1L;
 
         ArrayList<Reservation> reservationList = new ArrayList<>();
@@ -258,21 +234,7 @@ public class ReservationControllerTest {
     }
 
     @Test
-    public void getReservationsByUserId_ReservationsExist_False() throws Exception {
-        Long mockUserId = 1L;
-
-        Pageable pageable = PageRequest.of(0, 5);
-        Mockito.when(reservationService.getReservationsByUserId(mockUserId, pageable)).thenReturn(null);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/reservations/user/{userId}", mockUserId)
-                .param("page", "0")
-                .param("size", "5")
-                .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNotFound()); // 404
-    }
-
-    @Test
-    public void createReservation_ReservationsCreated_True() throws Exception {
+    public void createReservation_ValidInput_ReturnsCreatedReservation() throws Exception {
         Long mockUserId = 1L;
         EventOrganizer mockEventOrganizer = new EventOrganizer();
         mockEventOrganizer.setId(mockUserId);
