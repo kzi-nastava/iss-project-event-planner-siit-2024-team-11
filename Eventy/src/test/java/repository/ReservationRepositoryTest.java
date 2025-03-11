@@ -21,9 +21,9 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(classes = EventyApplication.class) // ✅ Ensures it loads full Spring context
-@ActiveProfiles("test") // ✅ Uses test database
-@Transactional // ✅ Ensures DB is cleaned up after each test
+@SpringBootTest(classes = EventyApplication.class) // loads full Spring context
+@ActiveProfiles("test") // uses test database
+@Transactional // DB is cleaned up after each test
 public class ReservationRepositoryTest {
     @Autowired
     private ReservationRepository reservationRepository;
