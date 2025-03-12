@@ -145,14 +145,3 @@ INSERT INTO reviews (user_id, event_id, solution_id, comment, grade, status, is_
 VALUES
     (1, 2, NULL, 'Great event, really enjoyed it!', 5, 'PENDING', false),
     (1, 3, NULL, 'Great event 2!', 3, 'PENDING', false);
-
--- Reservations
-INSERT INTO reservations (id, selected_event_id, selected_service_id, reservation_start_date_time, reservation_end_date_time, notification_sent)
-VALUES
-    (DEFAULT, 1, 6, '2027-06-10T10:00:00', '2027-06-10T11:00:00', false),
-    (DEFAULT, 1, 6, '2027-06-10T11:00:00', '2027-06-11T12:00:00', false),
-    (DEFAULT, 1, 6, '2027-06-12T12:00:00', '2027-06-12T13:00:00', false),
-    (DEFAULT, 1, 6, '2027-06-13T13:00:00', '2027-06-13T14:00:00', false),
-    (DEFAULT, 1, 6, '2027-06-14T14:00:00', '2027-06-14T15:00:00', false),
-    (DEFAULT, 2, 7, '2027-06-13T13:00:00', '2027-06-13T14:00:00', false),
-    (DEFAULT, 2, 7, '2027-06-13T14:00:00', '2027-06-14T15:00:00', false);

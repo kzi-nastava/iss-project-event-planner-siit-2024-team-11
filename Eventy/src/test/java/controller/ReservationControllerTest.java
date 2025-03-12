@@ -10,8 +10,10 @@ import org.example.eventy.solutions.models.Reservation;
 import org.example.eventy.solutions.models.Service;
 import org.example.eventy.solutions.services.ReservationService;
 import org.example.eventy.solutions.services.SolutionService;
+import org.example.eventy.users.dtos.LoginDTO;
+import org.example.eventy.users.dtos.UserTokenState;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = EventyApplication.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test") // uses test database
-@Transactional
+@TestInstance(TestInstance.Lifecycle.PER_CLASS) // Ensures @BeforeAll is not static
 public class ReservationControllerTest {
     @MockBean
     private EmailService emailService;
@@ -50,6 +53,33 @@ public class ReservationControllerTest {
     private EventService eventService;
     @Autowired
     private SolutionService solutionService;
+    private String jwtToken;
+    private int testNumber = 0;
+
+    @BeforeAll
+    void setupTestData() throws Exception {
+        login();
+        logout();
+
+        Event event1 = eventService.getEvent(1L);
+        Event event2 = eventService.getEvent(2L);
+        Service service6 = (Service) solutionService.getSolution(6L);
+        Service service7 = (Service) solutionService.getSolution(7L);
+
+        List<Reservation> reservations = List.of(
+            new Reservation(null, event1, service6, LocalDateTime.of(2027, 6, 10, 10, 0), LocalDateTime.of(2027, 6, 10, 11, 0), false),
+            new Reservation(null, event1, service6, LocalDateTime.of(2027, 6, 11, 11, 0), LocalDateTime.of(2027, 6, 11, 12, 0), false),
+            new Reservation(null, event1, service6, LocalDateTime.of(2027, 6, 12, 12, 0), LocalDateTime.of(2027, 6, 12, 13, 0), false),
+            new Reservation(null, event1, service6, LocalDateTime.of(2027, 6, 13, 13, 0), LocalDateTime.of(2027, 6, 13, 14, 0), false),
+            new Reservation(null, event1, service6, LocalDateTime.of(2027, 6, 14, 14, 0), LocalDateTime.of(2027, 6, 14, 15, 0), false),
+            new Reservation(null, event2, service7, LocalDateTime.of(2027, 6, 13, 13, 0), LocalDateTime.of(2027, 6, 13, 14, 0), false),
+            new Reservation(null, event2, service7, LocalDateTime.of(2027, 6, 13, 14, 0), LocalDateTime.of(2027, 6, 13, 15, 0), false)
+        );
+
+        for (Reservation reservation : reservations) {
+            reservationService.saveReservation(reservation);
+        }
+    }
 
     @Test
     public void getReservation_ReservationExists_ReturnsReservation() throws Exception {
@@ -160,7 +190,10 @@ public class ReservationControllerTest {
     }
 
     @Test
+    @Transactional
     public void createReservation_ValidInput_ReturnsCreatedReservation() throws Exception {
+        login();
+
         Event event = eventService.getEvent(1L);
         Service service = (Service) solutionService.getSolution(6L);
 
@@ -171,16 +204,22 @@ public class ReservationControllerTest {
         newReservationDTO.setReservationEndDateTime(LocalDateTime.of(event.getDate().getYear(), event.getDate().getMonth(), event.getDate().getDayOfMonth(), event.getDate().getHour(), 0).plusMinutes(service.getMinReservationTime()));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/reservations", newReservationDTO)
+                .header("Authorization", "Bearer " + jwtToken)  // Include token
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(newReservationDTO)))
             .andExpect(status().isCreated()) // 201
             .andExpect(jsonPath("$.selectedEventId").value(newReservationDTO.getSelectedEventId().intValue()))
             .andExpect(jsonPath("$.selectedServiceId").value(newReservationDTO.getSelectedServiceId().intValue()));
+
+        logout();
     }
 
     @Test
+    @Transactional
     public void createReservation_NonexistentEvent_ReturnsBadRequest() throws Exception {
+        login();
+
         Service service = (Service) solutionService.getSolution(6L);
 
         ReservationDTO newReservationDTO = new ReservationDTO();
@@ -190,6 +229,7 @@ public class ReservationControllerTest {
         newReservationDTO.setReservationEndDateTime(null);
 
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/api/reservations", newReservationDTO)
+                .header("Authorization", "Bearer " + jwtToken)  // Include token
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(newReservationDTO)))
@@ -199,10 +239,15 @@ public class ReservationControllerTest {
         List<String> errorMessages = objectMapper.readValue(responseBody, List.class);
 
         assertTrue(errorMessages.contains("selectedEventId: Selected event does not exist."));
+
+        logout();
     }
 
     @Test
+    @Transactional
     public void createReservation_NonexistentService_ReturnsBadRequest() throws Exception {
+        login();
+
         Event event = eventService.getEvent(1L);
 
         ReservationDTO newReservationDTO = new ReservationDTO();
@@ -212,6 +257,7 @@ public class ReservationControllerTest {
         newReservationDTO.setReservationEndDateTime(null);
 
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/api/reservations", newReservationDTO)
+                .header("Authorization", "Bearer " + jwtToken)  // Include token
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(newReservationDTO)))
@@ -221,10 +267,15 @@ public class ReservationControllerTest {
         List<String> errorMessages = objectMapper.readValue(responseBody, List.class);
 
         assertTrue(errorMessages.contains("selectedServiceId: Selected service does not exist."));
+
+        logout();
     }
 
     @Test
+    @Transactional
     public void createReservation_ServiceUnavailable_ReturnsBadRequest() throws Exception {
+        login();
+
         Event event = eventService.getEvent(1L);
         Service service = (Service) solutionService.getSolution(5L);
 
@@ -235,6 +286,7 @@ public class ReservationControllerTest {
         newReservationDTO.setReservationEndDateTime(null);
 
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/api/reservations", newReservationDTO)
+                .header("Authorization", "Bearer " + jwtToken)  // Include token
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(newReservationDTO)))
@@ -244,10 +296,15 @@ public class ReservationControllerTest {
         List<String> errorMessages = objectMapper.readValue(responseBody, List.class);
 
         assertTrue(errorMessages.contains("selectedServiceId: Selected service is not available."));
+
+        logout();
     }
 
     @Test
+    @Transactional
     public void createReservation_StartTimeInPast_ReturnsBadRequest() throws Exception {
+        login();
+
         Event event = eventService.getEvent(1L);
         event.setDate(LocalDateTime.now());
         eventService.save(event);
@@ -262,6 +319,7 @@ public class ReservationControllerTest {
         newReservationDTO.setReservationEndDateTime(LocalDateTime.of(event.getDate().getYear(), event.getDate().getMonth(), event.getDate().getDayOfMonth(), event.getDate().getHour(), 0).plusHours(service.getMinReservationTime() / 60).plusMinutes(service.getMinReservationTime() % 60));
 
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/api/reservations", newReservationDTO)
+                .header("Authorization", "Bearer " + jwtToken)  // Include token
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(newReservationDTO)))
@@ -271,10 +329,15 @@ public class ReservationControllerTest {
         List<String> errorMessages = objectMapper.readValue(responseBody, List.class);
 
         assertTrue(errorMessages.contains("reservationStartDateTime: It's too late to make a reservation."));
+
+        logout();
     }
 
     @Test
+    @Transactional
     public void createReservation_EndTimeBeforeStartTime_ReturnsBadRequest() throws Exception {
+        login();
+
         Event event = eventService.getEvent(1L);
         Service service = (Service) solutionService.getSolution(6L);
 
@@ -285,6 +348,7 @@ public class ReservationControllerTest {
         newReservationDTO.setReservationEndDateTime(LocalDateTime.of(event.getDate().getYear(), event.getDate().getMonth(), event.getDate().getDayOfMonth(), event.getDate().getHour(), 0).plusMinutes(service.getMinReservationTime()));
 
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/api/reservations", newReservationDTO)
+                .header("Authorization", "Bearer " + jwtToken)  // Include token
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(newReservationDTO)))
@@ -294,10 +358,15 @@ public class ReservationControllerTest {
         List<String> errorMessages = objectMapper.readValue(responseBody, List.class);
 
         assertTrue(errorMessages.contains("reservationEndDateTime: Reservation end time must be after start time."));
+
+        logout();
     }
 
     @Test
+    @Transactional
     public void createReservation_DurationTooShort_ReturnsBadRequest() throws Exception {
+        login();
+
         Event event = eventService.getEvent(1L);
         Service service = (Service) solutionService.getSolution(6L);
 
@@ -308,6 +377,7 @@ public class ReservationControllerTest {
         newReservationDTO.setReservationEndDateTime(LocalDateTime.of(event.getDate().getYear(), event.getDate().getMonth(), event.getDate().getDayOfMonth(), event.getDate().getHour(), 0).plusMinutes(service.getMinReservationTime() - 1));
 
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/api/reservations", newReservationDTO)
+                .header("Authorization", "Bearer " + jwtToken)  // Include token
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(newReservationDTO)))
@@ -317,10 +387,15 @@ public class ReservationControllerTest {
         List<String> errorMessages = objectMapper.readValue(responseBody, List.class);
 
         assertTrue(errorMessages.contains("reservationStartDateTime: " + "Reservation duration must be between " + service.getMinReservationTime() + " and " + service.getMaxReservationTime() + " minutes."));
+
+        logout();
     }
 
     @Test
+    @Transactional
     public void createReservation_DurationTooLong_ReturnsBadRequest() throws Exception {
+        login();
+
         Event event = eventService.getEvent(1L);
         Service service = (Service) solutionService.getSolution(6L);
 
@@ -331,6 +406,7 @@ public class ReservationControllerTest {
         newReservationDTO.setReservationEndDateTime(LocalDateTime.of(event.getDate().getYear(), event.getDate().getMonth(), event.getDate().getDayOfMonth(), event.getDate().getHour(), 0).plusDays(1));
 
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/api/reservations", newReservationDTO)
+                .header("Authorization", "Bearer " + jwtToken)  // Include token
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(newReservationDTO)))
@@ -340,10 +416,15 @@ public class ReservationControllerTest {
         List<String> errorMessages = objectMapper.readValue(responseBody, List.class);
 
         assertTrue(errorMessages.contains("reservationStartDateTime: " + "Reservation duration must be between " + service.getMinReservationTime() + " and " + service.getMaxReservationTime() + " minutes."));
+
+        logout();
     }
 
     @Test
+    @Transactional
     public void createReservation_ReservationOverlapsAfter_ReturnsBadRequest() throws Exception {
+        login();
+
         Event event = eventService.getEvent(1L);
         Service service = (Service) solutionService.getSolution(6L);
 
@@ -354,6 +435,7 @@ public class ReservationControllerTest {
         newReservationDTO.setReservationEndDateTime(LocalDateTime.of(2027, 6, 14, 15, service.getMinReservationTime()));
 
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/api/reservations", newReservationDTO)
+                .header("Authorization", "Bearer " + jwtToken)  // Include token
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(newReservationDTO)))
@@ -363,10 +445,15 @@ public class ReservationControllerTest {
         List<String> errorMessages = objectMapper.readValue(responseBody, List.class);
 
         assertTrue(errorMessages.contains("reservationStartDateTime: The selected time overlaps with an existing reservation."));
+
+        logout();
     }
 
     @Test
+    @Transactional
     public void createReservation_ReservationOverlapsBefore_ReturnsBadRequest() throws Exception {
+        login();
+
         Event event = eventService.getEvent(1L);
         Service service = (Service) solutionService.getSolution(6L);
 
@@ -377,19 +464,25 @@ public class ReservationControllerTest {
         newReservationDTO.setReservationEndDateTime(LocalDateTime.of(2027, 6, 14, 14, service.getMinReservationTime()));
 
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/api/reservations", newReservationDTO)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(newReservationDTO)))
-                .andExpect(status().isBadRequest()); // 400
+                .header("Authorization", "Bearer " + jwtToken)  // Include token
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(newReservationDTO)))
+            .andExpect(status().isBadRequest()); // 400
 
         String responseBody = result.andReturn().getResponse().getContentAsString();
         List<String> errorMessages = objectMapper.readValue(responseBody, List.class);
 
         assertTrue(errorMessages.contains("reservationStartDateTime: The selected time overlaps with an existing reservation."));
+
+        logout();
     }
 
     @Test
+    @Transactional
     public void createReservation_ReservationOverlapsBeforeAndAfter_ReturnsBadRequest() throws Exception {
+        login();
+
         Event event = eventService.getEvent(1L);
         Service service = (Service) solutionService.getSolution(6L);
 
@@ -400,19 +493,25 @@ public class ReservationControllerTest {
         newReservationDTO.setReservationEndDateTime(LocalDateTime.of(2027, 6, 10, 11, 30));
 
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/api/reservations", newReservationDTO)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(newReservationDTO)))
-                .andExpect(status().isBadRequest()); // 400
+                .header("Authorization", "Bearer " + jwtToken)  // Include token
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(newReservationDTO)))
+            .andExpect(status().isBadRequest()); // 400
 
         String responseBody = result.andReturn().getResponse().getContentAsString();
         List<String> errorMessages = objectMapper.readValue(responseBody, List.class);
 
         assertTrue(errorMessages.contains("reservationStartDateTime: The selected time overlaps with an existing reservation."));
+
+        logout();
     }
 
     @Test
+    @Transactional
     public void createReservation_ReservationNotOnEventDate_ReturnsBadRequest() throws Exception {
+        login();
+
         Event event = eventService.getEvent(1L);
         Service service = (Service) solutionService.getSolution(6L);
 
@@ -423,6 +522,7 @@ public class ReservationControllerTest {
         newReservationDTO.setReservationEndDateTime(newReservationDTO.getReservationStartDateTime().plusHours(1));
 
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/api/reservations", newReservationDTO)
+                .header("Authorization", "Bearer " + jwtToken)  // Include token
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(newReservationDTO)))
@@ -432,5 +532,29 @@ public class ReservationControllerTest {
         List<String> errorMessages = objectMapper.readValue(responseBody, List.class);
 
         assertTrue(errorMessages.contains("reservationStartDateTime: Reservation must be the same day as the event start date."));
+
+        logout();
+    }
+
+    private void login() throws Exception {
+        LoginDTO loginDTO = new LoginDTO("tac@gmail.com", "admin");
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/api/authentication/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginDTO)))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        String responseContent = mvcResult.getResponse().getContentAsString();
+        UserTokenState tokenState = objectMapper.readValue(responseContent, UserTokenState.class);
+        jwtToken = tokenState.getAccessToken();
+    }
+
+    private void logout() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/authentication/logout")
+                .header("Authorization", "Bearer " + jwtToken)  // Include token
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andReturn();
     }
 }
