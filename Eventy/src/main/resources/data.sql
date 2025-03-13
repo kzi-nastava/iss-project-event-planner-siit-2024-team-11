@@ -39,9 +39,9 @@ INSERT INTO events(
     max_number_participants, privacy, date, event_type_id, id, location_id, organizer_id, description, name
 )
 VALUES
-    (50, 'PUBLIC', '2026-12-25 15:00:00', 1, DEFAULT, 1, 1, 'This is a birthday party for our friend John, I hope he does not know we are organizing this!', 'Birthday Party for John'),
-    (100, 'PUBLIC', '2026-12-26 15:00:00', 2, DEFAULT, 2, 1, 'High school students of prestigious high school "Jonny Smith" are graduating this month!', 'High School Graduation'),
-    (150, 'PUBLIC', '2026-12-27 15:00:00', 1, DEFAULT, 3, 2, 'Lunch in our best office ever! See you there! Big thanks to Eventy for being such a cool platform! #sponsored', 'Office Lunch');
+    (50, 'PUBLIC', '2025-03-20 15:00:00', 1, DEFAULT, 1, 1, 'This is a birthday party for our friend John, I hope he does not know we are organizing this!', 'Birthday Party for John'),
+    (100, 'PUBLIC', '2024-12-26 15:00:00', 2, DEFAULT, 2, 1, 'High school students of prestigious high school "Jonny Smith" are graduating this month!', 'High School Graduation'),
+    (150, 'PUBLIC', '2025-02-18 15:00:00', 1, DEFAULT, 3, 2, 'Lunch in our best office ever! See you there! Big thanks to Eventy for being such a cool platform! #sponsored', 'Office Lunch');
 
 -- Accepted Events
 INSERT INTO users_attending_events (event_id, user_id) VALUES

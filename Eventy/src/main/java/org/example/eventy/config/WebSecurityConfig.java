@@ -83,13 +83,16 @@ public class WebSecurityConfig {
          http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(restAuthenticationEntryPoint));
          http.authorizeHttpRequests(request -> {
              request.requestMatchers(new AntPathRequestMatcher("/api/authentication/**")).permitAll()
+                     //.requestMatchers(new AntPathRequestMatcher("/api/**")).permitAll()
+                     //.requestMatchers(new AntPathRequestMatcher("/**")).permitAll();
                     .requestMatchers(new AntPathRequestMatcher("/api/events")).permitAll()
                      .requestMatchers(new AntPathRequestMatcher("/api/events/featured")).permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/api/solutions/**")).permitAll()
                      .requestMatchers(new AntPathRequestMatcher("/api/solutions/featured")).permitAll()
                      .requestMatchers(new AntPathRequestMatcher("/api/events/pdfs/**")).permitAll()
                      .requestMatchers(new AntPathRequestMatcher("/api/events/{eventId}")).permitAll()
-                  //.requestMatchers(new AntPathRequestMatcher("/api/whoami")).hasRole("USER")
+                     .requestMatchers(new AntPathRequestMatcher("/api/chats/**")).permitAll()
+                  .requestMatchers(new AntPathRequestMatcher("/api/whoami")).hasRole("USER")
              .anyRequest().authenticated();
          });
          http.addFilterBefore(new TokenAuthenticationFilter(tokenUtils, userDetailsService()), UsernamePasswordAuthenticationFilter.class);
