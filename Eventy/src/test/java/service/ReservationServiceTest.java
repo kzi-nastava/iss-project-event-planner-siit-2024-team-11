@@ -98,4 +98,23 @@ public class ReservationServiceTest {
         assertEquals(1, overlappingReservations.size());
         assertEquals(mockService, overlappingReservations.get(0).getSelectedService());
     }
+
+    @Test
+    public void findOverlappingReservations_NoOverlapping_ReturnsEmptyList() {
+        Solution mockService = new Service();
+        mockService.setId(6L);
+
+        Mockito.when(serviceService.getService(6L)).thenReturn(mockService);
+        Mockito.when(reservationRepository.findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(new ArrayList<>());
+
+        ReservationDTO reservationDTO = new ReservationDTO();
+        reservationDTO.setSelectedServiceId(6L);
+        reservationDTO.setReservationStartDateTime(LocalDateTime.of(2025, LocalDateTime.now().getMonth().plus(1), 10, 10, 0));
+        reservationDTO.setReservationEndDateTime(LocalDateTime.of(2025, LocalDateTime.now().getMonth().plus(1), 10, 11, 0));
+
+        List<Reservation> overlappingReservations = reservationService.findOverlappingReservations(reservationDTO);
+
+        assertNotNull(overlappingReservations);
+        assertTrue(overlappingReservations.isEmpty());
+    }
 }
