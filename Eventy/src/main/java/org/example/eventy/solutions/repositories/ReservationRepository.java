@@ -34,6 +34,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
+    // find overlapping reservations
     List<Reservation> findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService(
             LocalDateTime end, LocalDateTime start, Solution selectedService);
 

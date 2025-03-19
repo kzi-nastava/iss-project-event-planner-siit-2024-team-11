@@ -8,12 +8,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public interface SolutionRepository extends JpaRepository<Solution, Long> {
     @Query("SELECT s FROM Solution s WHERE s.provider.id = :providerId " +
             "AND (LOWER(s.name) LIKE LOWER(CONCAT('%', :search, '%')) " +
