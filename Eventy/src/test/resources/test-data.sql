@@ -23,7 +23,12 @@ INSERT INTO locations(latitude, longitude, id, address, name)
 VALUES
     (40.7128, -74.0060, DEFAULT, '123 Main St, New York, NY 10001', 'New York Office'),
     (34.0522, -118.2437, DEFAULT, '456 Sunset Blvd, Los Angeles, CA 90001', 'Los Angeles Office'),
-    (51.5074, -0.1278, DEFAULT, '789 Oxford St, London, W1D 2ES', 'London Office');
+    (51.5074, -0.1278, DEFAULT, '789 Oxford St, London, W1D 2ES', 'London Office'),
+    (34.0522, -118.2437, DEFAULT, 'Belgrade 32b', 'Belgrade'),
+    (34.0522, -118.2437, DEFAULT, 'Novi Sad 38b', 'Novi Sad'),
+    (34.0522, -118.2437, DEFAULT, 'Nis 21b', 'Nis'),
+    (34.0522, -118.2437, DEFAULT, 'Banja Luka 53b', 'Banja Luka'),
+    (34.0522, -118.2437, DEFAULT, 'Gradiska 12a', 'Gradiska');
 
 -- Event Types
 INSERT INTO event_types(is_active, id, description, name)
@@ -41,7 +46,12 @@ INSERT INTO events(
 VALUES
     (50, 'PUBLIC', '2024-12-25 15:00:00', 1, DEFAULT, 1, 1, 'This is a birthday party for our friend John, I hope he does not know we are organizing this!', 'Birthday Party for John'),
     (100, 'PUBLIC', '2024-12-26 15:00:00', 2, DEFAULT, 2, 1, 'High school students of prestigious high school "Jonny Smith" are graduating this month!', 'High School Graduation'),
-    (150, 'PUBLIC', '2024-12-27 15:00:00', 1, DEFAULT, 3, 2, 'Lunch in our best office ever! See you there! Big thanks to Eventy for being such a cool platform! #sponsored', 'Office Lunch');
+    (150, 'PUBLIC', '2024-12-27 15:00:00', 1, DEFAULT, 3, 2, 'Lunch in our best office ever! See you there! Big thanks to Eventy for being such a cool platform! #sponsored', 'Office Lunch'),
+    (5, 'PUBLIC', '2025-12-25 15:00:00', 4, DEFAULT, 4, 1, 'D1', 'Event 1'),
+    (10, 'PUBLIC', '2025-12-26 15:00:00', 4, DEFAULT, 4, 1, 'D2', 'Event 2'),
+    (15, 'PUBLIC', '2025-12-27 15:00:00', 2, DEFAULT, 6, 2, 'D3', 'Event 3'),
+    (20, 'PUBLIC', '2025-12-26 15:00:00', 4, DEFAULT, 7, 1, 'D4', 'Event 4'),
+    (25, 'PUBLIC', '2025-12-26 15:00:00', 5, DEFAULT, 8, 1, 'D5', 'Event 5');
 
 -- Accepted Events
 INSERT INTO users_attending_events (event_id, user_id) VALUES

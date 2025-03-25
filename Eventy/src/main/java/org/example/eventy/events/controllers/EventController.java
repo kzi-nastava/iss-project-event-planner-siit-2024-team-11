@@ -410,7 +410,6 @@ public class EventController {
 
         List<EventCardDTO> eventsDTO = new ArrayList<>();
         for (Event event : events) {
-            System.out.println(event.toString());
             eventsDTO.add(new EventCardDTO(event, user));
         }
         long count = events.getTotalElements();
