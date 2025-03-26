@@ -1,9 +1,7 @@
 package e2e.pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -65,7 +63,8 @@ public class HomePage {
             eventTypeMatOptions.get(position).click();
         }
 
-        eventTypesSelect.click(); // close event type select
+        Actions actions = new Actions(driver);
+        actions.sendKeys(Keys.ESCAPE).perform();
     }
 
     public void enterMaxParticipants(String maxParticipants) {
@@ -113,22 +112,9 @@ public class HomePage {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(1));
         JavascriptExecutor js = (JavascriptExecutor) driver;
 
-        // treba -footer
-        js.executeScript("window.scrollTo(0, document.body.scrollHeight - 200)");
+        WebElement eventsContainer = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@style='background-color: #F1F1F1; width: 100%;']")));
+        js.executeScript("arguments[0].scrollIntoView({behavior: 'smooth', block: 'start'});", eventsContainer);
 
-        wait.until(webDriver -> {
-            Number innerHeight = (Number) js.executeScript("return window.innerHeight;");
-            Number scrollY = (Number) js.executeScript("return window.scrollY;");
-            Number bodyScrollHeight = (Number) js.executeScript("return document.body.scrollHeight - 200;");
-
-            double innerHeightValue = innerHeight.doubleValue();
-            double scrollYValue = scrollY.doubleValue();
-            double bodyScrollHeightValue = bodyScrollHeight.doubleValue();
-
-            System.out.println("Checking scroll position - Inner height: " + innerHeightValue + ", Scroll Y: " + scrollYValue + ", Body scroll height: " + bodyScrollHeightValue);
-
-            double margin = 10.0;
-            return (innerHeightValue + scrollYValue + margin) >= bodyScrollHeightValue;
-        });
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#event_filters")));
     }
 }
