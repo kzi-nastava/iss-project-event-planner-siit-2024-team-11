@@ -4,6 +4,7 @@ import e2e.base.ChromeTestBase;
 import e2e.pages.HomePage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -18,19 +19,18 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SearchAndFilterEventsTest extends ChromeTestBase {
-    private DataSource dataSource;
     private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
-    void setupTestData() throws Exception {
-        dataSource = new DriverManagerDataSource(
+    void setupTestData() {
+        DataSource dataSource = new DriverManagerDataSource(
             "jdbc:postgresql://localhost:5432/eventytestdb", "postgres", "admin"
         );
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
     @Test
-    public void filterEvents_ValidInput_ReturnsEvents() throws Exception {
+    public void filterEvents_ValidInputs_ReturnsEvents() {
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
             Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 4);
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
@@ -46,9 +46,9 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         home.scrollToEvents();
         slowDown();
 
-        ArrayList<Integer> positions = new ArrayList<>();
-        positions.add(3);
-        home.selectEventTypes(positions);
+        ArrayList<String> eventTypeNames = new ArrayList<>();
+        eventTypeNames.add("Workout");
+        home.selectEventTypes(eventTypeNames);
 
         home.enterMaxParticipants("15");
 
@@ -78,38 +78,35 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         }
     }
 
-    /*@Test
-    public void filterEvents_ValidInput_ReturnsEvents() throws Exception {
+    @Test
+    public void filterEvents_EventTypesValid_ReturnsEvents() {
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-                Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 4);
+            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 4);
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-                Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 5);
+            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 5);
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-                Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 6);
+            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 6);
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-                Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 7);
+            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 7);
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-                Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 8);
+            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 8);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 9);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 10);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 11);
 
         HomePage home = new HomePage(driver);
         home.scrollToEvents();
         slowDown();
 
-        ArrayList<Integer> positions = new ArrayList<>();
-        positions.add(3);
-        home.selectEventTypes(positions);
-
-        home.enterMaxParticipants("15");
-
-        home.enterLocation("Belgrade");
-
-        LocalDateTime dateTimeStart = LocalDateTime.now().plusDays(3);
-        LocalDateTime dateTimeEnd = LocalDateTime.now().plusDays(7);
-        DateTimeFormatter formatterStart = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-        DateTimeFormatter formatterEnd = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-
-        home.selectEndDate(dateTimeEnd.format(formatterEnd));
-        home.selectStartDate(dateTimeStart.format(formatterStart));
+        ArrayList<String> eventTypeNames = new ArrayList<>();
+        eventTypeNames.add("Workout");
+        eventTypeNames.add("Party");
+        eventTypeNames.add("EventType7");
+        eventTypeNames.add("EventType8");
+        home.selectEventTypes(eventTypeNames);
 
         home.clickFilterButton();
         slowDown();
@@ -117,17 +114,67 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         List<String> originalEventCardTitles = new ArrayList<>();
         originalEventCardTitles.add("Event 1");
         originalEventCardTitles.add("Event 2");
+        originalEventCardTitles.add("Event 4");
+        originalEventCardTitles.add("Event 7");
+        originalEventCardTitles.add("Event 8");
 
         List<WebElement> eventCards = home.getFilteredEvents();
-        assertEquals(eventCards.size(), 2);
+        assertEquals(eventCards.size(), 5);
 
         List<WebElement> eventCardTitles = home.getFilteredEventTitles();
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
         }
-    }*/
+    }
 
-    // use this method only to slow down the automated test view so you can see what is going on and what values are selected!
+    @Test
+    public void filterEvents_MaxParticipantsValid_ReturnsEvents() {
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 4);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 5);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 6);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 7);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 8);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 9);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 10);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 11);
+
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterMaxParticipants("30");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<String> originalEventCardTitles = new ArrayList<>();
+        originalEventCardTitles.add("Event 1");
+        originalEventCardTitles.add("Event 2");
+        originalEventCardTitles.add("Event 3");
+        originalEventCardTitles.add("Event 4");
+        originalEventCardTitles.add("Event 5");
+        originalEventCardTitles.add("Event 6");
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 5);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 5 of 6");
+
+        List<WebElement> eventCardTitles = home.getFilteredEventTitles();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+    }
+
+    // use this method only to slow down the automated test view, so you can see what is going on and what values are selected!
     // it's forbidden to use it for waiting for the element to show or anything similar related to the actual testing!
     public void slowDown() {
         try {

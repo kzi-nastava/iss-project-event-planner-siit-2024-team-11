@@ -42,7 +42,7 @@ public class EventService {
             }
         }
 
-        return eventRepository.findAll(search, eventTypes, maxParticipants, location, startDate, endDate, PrivacyType.PUBLIC, blockedUsersConcatenated.toString(), pageable);
+        return eventRepository.findAll(search, eventTypes, maxParticipants, location, startDate, endDate, PrivacyType.PUBLIC, blockedUsersConcatenated.toString(), LocalDateTime.now(), pageable);
     }
   
     public Page<Event> getEventsByUserId(Long userId, String search, ArrayList<String> eventTypes, Integer maxParticipants, String location, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
@@ -86,7 +86,7 @@ public class EventService {
             }
         }
 
-        return eventRepository.findFeaturedEvents(PrivacyType.PUBLIC, blockedUsersConcatenated.toString(), pageable);
+        return eventRepository.findFeaturedEvents(PrivacyType.PUBLIC, blockedUsersConcatenated.toString(), LocalDateTime.now(), pageable);
     }
 
     public Event save(Event event) {

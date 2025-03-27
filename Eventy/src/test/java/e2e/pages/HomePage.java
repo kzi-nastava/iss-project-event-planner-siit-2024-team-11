@@ -52,15 +52,19 @@ public class HomePage {
         searchInput.sendKeys(query);
     }
 
-    public void selectEventTypes(ArrayList<Integer> positions) {
+    public void selectEventTypes(ArrayList<String> eventTypeNames) {
         (new WebDriverWait(driver, Duration.ofSeconds(1)))
             .until(ExpectedConditions.elementToBeClickable(eventTypesSelect)).click();
 
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(1));
 
         List<WebElement> eventTypeMatOptions = driver.findElements(By.cssSelector("mat-option"));
-        for (int position : positions) {
-            eventTypeMatOptions.get(position).click();
+        for (String eventType : eventTypeNames) {
+            for (WebElement option : eventTypeMatOptions) {
+                if (option.getText().equals(eventType)) {
+                    option.click();
+                }
+            }
         }
 
         Actions actions = new Actions(driver);
