@@ -27,10 +27,7 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
             "jdbc:postgresql://localhost:5432/eventytestdb", "postgres", "admin"
         );
         jdbcTemplate = new JdbcTemplate(dataSource);
-    }
 
-    @Test
-    public void filterEvents_ValidInputs_ReturnsEvents() {
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
             Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 4);
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
@@ -41,7 +38,16 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
             Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 7);
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
             Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 8);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 9);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 10);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 11);
+    }
 
+    @Test
+    public void filterEvents_ValidInputs_ReturnsEvents() {
         HomePage home = new HomePage(driver);
         home.scrollToEvents();
         slowDown();
@@ -65,12 +71,14 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         home.clickFilterButton();
         slowDown();
 
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 2);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 2 of 2");
+
         List<String> originalEventCardTitles = new ArrayList<>();
         originalEventCardTitles.add("Event 1");
         originalEventCardTitles.add("Event 2");
-
-        List<WebElement> eventCards = home.getFilteredEvents();
-        assertEquals(eventCards.size(), 2);
 
         List<WebElement> eventCardTitles = home.getFilteredEventTitles();
         for (int i = 0; i < eventCardTitles.size(); i++) {
@@ -80,23 +88,6 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
 
     @Test
     public void filterEvents_EventTypesValid_ReturnsEvents() {
-        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 4);
-        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 5);
-        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 6);
-        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 7);
-        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 8);
-        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 9);
-        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 10);
-        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 11);
-
         HomePage home = new HomePage(driver);
         home.scrollToEvents();
         slowDown();
@@ -111,15 +102,17 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         home.clickFilterButton();
         slowDown();
 
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 5);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 5 of 5");
+
         List<String> originalEventCardTitles = new ArrayList<>();
         originalEventCardTitles.add("Event 1");
         originalEventCardTitles.add("Event 2");
         originalEventCardTitles.add("Event 4");
         originalEventCardTitles.add("Event 7");
         originalEventCardTitles.add("Event 8");
-
-        List<WebElement> eventCards = home.getFilteredEvents();
-        assertEquals(eventCards.size(), 5);
 
         List<WebElement> eventCardTitles = home.getFilteredEventTitles();
         for (int i = 0; i < eventCardTitles.size(); i++) {
@@ -129,23 +122,6 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
 
     @Test
     public void filterEvents_MaxParticipantsValid_ReturnsEvents() {
-        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 4);
-        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 5);
-        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 6);
-        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 7);
-        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 8);
-        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 9);
-        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 10);
-        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 11);
-
         HomePage home = new HomePage(driver);
         home.scrollToEvents();
         slowDown();
@@ -155,6 +131,11 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         home.clickFilterButton();
         slowDown();
 
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 5);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 5 of 6");
+
         List<String> originalEventCardTitles = new ArrayList<>();
         originalEventCardTitles.add("Event 1");
         originalEventCardTitles.add("Event 2");
@@ -163,10 +144,253 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         originalEventCardTitles.add("Event 5");
         originalEventCardTitles.add("Event 6");
 
+        List<WebElement> eventCardTitles = home.getFilteredEventTitles();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+    }
+
+    @Test
+    public void filterEvents_MaxParticipantsValid_ReturnsEmptyList() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterMaxParticipants("1");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 0);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "0 of 0");
+    }
+
+    @Test
+    public void filterEvents_MaxParticipantsInvalid_DoesNotFilter() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterMaxParticipants("0");
+
+        home.clickFilterButton();
+        slowDown();
+
         List<WebElement> eventCards = home.getFilteredEvents();
         assertEquals(eventCards.size(), 5);
 
-        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 5 of 6");
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 5 of 9");
+    }
+
+    @Test
+    public void filterEvents_EventTypesAndMaxParticipantsValid_ReturnsEvents() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        ArrayList<String> eventTypeNames = new ArrayList<>();
+        eventTypeNames.add("Workout");
+        home.selectEventTypes(eventTypeNames);
+
+        home.enterMaxParticipants("20");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 3);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 3 of 3");
+
+        List<String> originalEventCardTitles = new ArrayList<>();
+        originalEventCardTitles.add("Event 1");
+        originalEventCardTitles.add("Event 2");
+        originalEventCardTitles.add("Event 4");
+
+        List<WebElement> eventCardTitles = home.getFilteredEventTitles();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+    }
+
+    @Test
+    public void filterEvents_EventTypesAndMaxParticipantsValid_ReturnsEmptyList() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        ArrayList<String> eventTypeNames = new ArrayList<>();
+        eventTypeNames.add("Workout");
+        home.selectEventTypes(eventTypeNames);
+
+        home.enterMaxParticipants("1");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 0);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "0 of 0");
+    }
+
+    @Test
+    public void filterEvents_LocationValid_ReturnsEvents() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterLocation("Belgrade");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 3);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 3 of 3");
+
+        List<String> originalEventCardTitles = new ArrayList<>();
+        originalEventCardTitles.add("Event 1");
+        originalEventCardTitles.add("Event 2");
+        originalEventCardTitles.add("Event 3");
+
+        List<WebElement> eventCardTitles = home.getFilteredEventTitles();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+    }
+
+    @Test
+    public void filterEvents_LocationLowercaseValid_ReturnsEvents() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterLocation("belgrade");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 3);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 3 of 3");
+
+        List<String> originalEventCardTitles = new ArrayList<>();
+        originalEventCardTitles.add("Event 1");
+        originalEventCardTitles.add("Event 2");
+        originalEventCardTitles.add("Event 3");
+
+        List<WebElement> eventCardTitles = home.getFilteredEventTitles();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+    }
+
+    @Test
+    public void filterEvents_LocationInvalid_ReturnsEmptyList() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterLocation("belgrad");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 0);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "0 of 0");
+    }
+
+    @Test
+    public void filterEvents_EventTypesAndLocationValid_ReturnsEvents() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        ArrayList<String> eventTypeNames = new ArrayList<>();
+        eventTypeNames.add("Workout");
+        home.selectEventTypes(eventTypeNames);
+
+        home.enterLocation("belgrade");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 2);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 2 of 2");
+
+        List<String> originalEventCardTitles = new ArrayList<>();
+        originalEventCardTitles.add("Event 1");
+        originalEventCardTitles.add("Event 2");
+
+        List<WebElement> eventCardTitles = home.getFilteredEventTitles();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+    }
+
+    @Test
+    public void filterEvents_MaxParticipantsAndLocationValid_ReturnsEvents() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterMaxParticipants("35");
+
+        home.enterLocation("gradiska");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 1);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 1 of 1");
+
+        List<String> originalEventCardTitles = new ArrayList<>();
+        originalEventCardTitles.add("Event 7");
+
+        List<WebElement> eventCardTitles = home.getFilteredEventTitles();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+    }
+
+    @Test
+    public void filterEvents_EventTypesAndMaxParticipantsAndLocationValid_ReturnsEvents() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        ArrayList<String> eventTypeNames = new ArrayList<>();
+        eventTypeNames.add("Graduation");
+        eventTypeNames.add("Workout");
+        home.selectEventTypes(eventTypeNames);
+
+        home.enterMaxParticipants("15");
+
+        home.enterLocation("belgrade");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 3);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 3 of 3");
+
+        List<String> originalEventCardTitles = new ArrayList<>();
+        originalEventCardTitles.add("Event 1");
+        originalEventCardTitles.add("Event 2");
+        originalEventCardTitles.add("Event 3");
 
         List<WebElement> eventCardTitles = home.getFilteredEventTitles();
         for (int i = 0; i < eventCardTitles.size(); i++) {
