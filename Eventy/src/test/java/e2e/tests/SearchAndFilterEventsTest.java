@@ -860,7 +860,7 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
     }
 
     @Test
-    public void filterEvents_ValidInputs_ReturnsEvents() {
+    public void filterEvents_AllFilterInputsValid_ReturnsEvents() {
         HomePage home = new HomePage(driver);
         home.scrollToEvents();
         slowDown();
@@ -897,6 +897,309 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
         }
+    }
+
+    @Test
+    public void filterEvents_SearchByNameValid_ReturnsEvent_Example1() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterSearchQuery("event 1");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 1);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 1 of 1");
+
+        List<String> originalEventCardTitles = new ArrayList<>();
+        originalEventCardTitles.add("Event 1");
+
+        List<WebElement> eventCardTitles = home.getFilteredEventTitles();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+    }
+
+    @Test
+    public void filterEvents_SearchByNameValid_ReturnsEvent_Example2() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterSearchQuery("1");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 1);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 1 of 1");
+
+        List<String> originalEventCardTitles = new ArrayList<>();
+        originalEventCardTitles.add("Event 1");
+
+        List<WebElement> eventCardTitles = home.getFilteredEventTitles();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+    }
+
+    @Test
+    public void filterEvents_SearchByNameInvalid_ReturnsEmptyList_Example1() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterSearchQuery("event 11");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 0);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "0 of 0");
+    }
+
+    @Test
+    public void filterEvents_SearchByNameInvalid_ReturnsEmptyList_Example2() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterSearchQuery("11");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 0);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "0 of 0");
+    }
+
+    @Test
+    public void filterEvents_SearchByNameValid_ReturnsEvents() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterSearchQuery("event");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 5);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 5 of 8");
+    }
+
+    @Test
+    public void filterEvents_SearchByNameInvalid_ReturnsEmptyList() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterSearchQuery("eventt");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 0);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "0 of 0");
+    }
+
+    @Test
+    public void filterEvents_SearchByDescriptionValid_ReturnsEvent_Example1() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterSearchQuery("D1");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 1);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 1 of 1");
+
+        List<String> originalEventCardTitles = new ArrayList<>();
+        originalEventCardTitles.add("Event 1");
+
+        List<WebElement> eventCardTitles = home.getFilteredEventTitles();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+    }
+
+    @Test
+    public void filterEvents_SearchByDescriptionValid_ReturnsEvent_Example2() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterSearchQuery("d1");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 1);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 1 of 1");
+
+        List<String> originalEventCardTitles = new ArrayList<>();
+        originalEventCardTitles.add("Event 1");
+
+        List<WebElement> eventCardTitles = home.getFilteredEventTitles();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+    }
+
+    @Test
+    public void filterEvents_SearchByDescriptionValid_ReturnsEvent_Example3() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterSearchQuery("jonny");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 1);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 1 of 1");
+
+        List<String> originalEventCardTitles = new ArrayList<>();
+        originalEventCardTitles.add("High School Graduation");
+
+        List<WebElement> eventCardTitles = home.getFilteredEventTitles();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+    }
+
+    @Test
+    public void filterEvents_SearchByDescriptionValid_ReturnsEvent_Example4() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterSearchQuery("duating");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 1);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 1 of 1");
+
+        List<String> originalEventCardTitles = new ArrayList<>();
+        originalEventCardTitles.add("High School Graduation");
+
+        List<WebElement> eventCardTitles = home.getFilteredEventTitles();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+    }
+
+    @Test
+    public void filterEvents_SearchByDescriptionInvalid_ReturnsEmptyList_Example1() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterSearchQuery("D11");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 0);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "0 of 0");
+    }
+
+    @Test
+    public void filterEvents_SearchByDescriptionInvalid_ReturnsEmptyList_Example2() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterSearchQuery("d11");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 0);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "0 of 0");
+    }
+
+    @Test
+    public void filterEvents_SearchByDescriptionInvalid_ReturnsEmptyList_Example3() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterSearchQuery("jonnie");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 0);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "0 of 0");
+    }
+
+    @Test
+    public void filterEvents_SearchByDescriptionValid_ReturnsEvents() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterSearchQuery("d");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 5);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 5 of 9");
+    }
+
+    @Test
+    public void filterEvents_SearchByDescriptionInvalid_ReturnsEmptyList() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterSearchQuery("dd");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 0);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "0 of 0");
     }
 
     // use this method only to slow down the automated test view, so you can see what is going on and what values are selected!
