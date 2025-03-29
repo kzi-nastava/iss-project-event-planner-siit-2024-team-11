@@ -55,14 +55,14 @@ VALUES
     (50, 'PUBLIC', '2024-12-25 15:00:00', 1, DEFAULT, 1, 1, 'This is a birthday party for our friend John, I hope he does not know we are organizing this!', 'Birthday Party for John'),
     (100, 'PUBLIC', '2037-12-26 15:00:00', 2, DEFAULT, 2, 1, 'High school students of prestigious high school "Jonny Smith" are graduating this month!', 'High School Graduation'),
     (150, 'PUBLIC', '2024-12-27 15:00:00', 1, DEFAULT, 3, 2, 'Lunch in our best office ever! See you there! Big thanks to Eventy for being such a cool platform! #sponsored', 'Office Lunch'),
-    (5, 'PUBLIC', '2025-12-25 15:00:00', 4, DEFAULT, 4, 1, 'D1', 'Event 1'),
-    (10, 'PUBLIC', '2025-12-26 15:00:00', 4, DEFAULT, 5, 1, 'D2', 'Event 2'),
-    (15, 'PUBLIC', '2025-12-27 15:00:00', 2, DEFAULT, 6, 2, 'D3', 'Event 3'),
-    (20, 'PUBLIC', '2025-12-26 15:00:00', 4, DEFAULT, 7, 1, 'D4', 'Event 4'),
-    (25, 'PUBLIC', '2025-12-26 15:00:00', 5, DEFAULT, 8, 1, 'D5', 'Event 5'),
-    (30, 'PUBLIC', '2025-12-26 15:00:00', 6, DEFAULT, 9, 1, 'D6', 'Event 6'),
-    (35, 'PUBLIC', '2025-12-26 15:00:00', 7, DEFAULT, 10, 1, 'D7', 'Event 7'),
-    (40, 'PUBLIC', '2025-12-26 15:00:00', 8, DEFAULT, 11, 1, 'D8', 'Event 8');
+    (5, 'PUBLIC', '2025-12-25 15:00:00', 4, DEFAULT, 4, 1, 'D1 aa', 'Event 1'),
+    (10, 'PUBLIC', '2025-12-26 15:00:00', 4, DEFAULT, 5, 1, 'D2 aaa', 'Event 2'),
+    (15, 'PUBLIC', '2025-12-27 15:00:00', 2, DEFAULT, 6, 2, 'D3 bbb', 'Event 3'),
+    (20, 'PUBLIC', '2025-12-26 15:00:00', 4, DEFAULT, 7, 1, 'D4 bbbb', 'Event 4'),
+    (25, 'PUBLIC', '2025-12-26 15:00:00', 5, DEFAULT, 8, 1, 'D5 ccc', 'Event 5'),
+    (30, 'PUBLIC', '2025-12-26 15:00:00', 6, DEFAULT, 9, 1, 'D6 cccc', 'Event 6'),
+    (35, 'PUBLIC', '2025-12-26 15:00:00', 7, DEFAULT, 10, 1, 'D7 ccccc', 'Event 7'),
+    (40, 'PUBLIC', '2025-12-26 15:00:00', 8, DEFAULT, 11, 1, 'D8 cccccc', 'Event 8');
 
 -- Accepted Events
 INSERT INTO users_attending_events (event_id, user_id) VALUES
