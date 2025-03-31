@@ -139,9 +139,13 @@ public class SolutionController {
         // sort by: "category", "name", "price,asc", "price,desc"
         if (startDate == null) {
             startDate = LocalDateTime.of(1970, 1, 1, 0, 0); // Very small date
+        } else {
+            startDate = LocalDateTime.of(startDate.getYear(), startDate.getMonth(), startDate.getDayOfMonth(), 0, 0, 0).plusDays(1);
         }
         if (endDate == null) {
             endDate = LocalDateTime.of(2099, 12, 31, 23, 59); // Very large date
+        } else {
+            endDate = LocalDateTime.of(endDate.getYear(), endDate.getMonth(), endDate.getDayOfMonth(), 23, 59, 59).plusDays(1);
         }
 
         StringBuilder eventTypesConcatenated = new StringBuilder();

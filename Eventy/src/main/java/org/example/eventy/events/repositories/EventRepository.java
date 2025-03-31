@@ -59,7 +59,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "   OR (:search IS NULL OR :search = '' OR e.description ILIKE ('%' || :search || '%'))) " +
             "AND (:maxParticipants IS NULL OR e.maxNumberParticipants <= :maxParticipants) " +
             "AND (:location IS NULL OR :location = '' OR LOWER(e.location.name) = LOWER(:location)) " +
-            "AND (CAST(:startDate AS timestamp) IS NULL OR CAST(:endDate AS timestamp) IS NULL OR e.date BETWEEN CAST(:startDate AS timestamp) AND CAST(:endDate AS timestamp)) " +
+            "AND (CAST(:startDate AS timestamp) IS NULL OR CAST(:endDate AS timestamp) IS NULL OR ((e.date >= CAST(:startDate AS timestamp)) AND (e.date <= CAST(:endDate AS timestamp)))) " +
             "AND (:eventTypes IS NULL OR e.type.name IN :eventTypes) " +
             "AND (e.privacy = :privacy) " +
             "AND e.date > :dateNow " +
