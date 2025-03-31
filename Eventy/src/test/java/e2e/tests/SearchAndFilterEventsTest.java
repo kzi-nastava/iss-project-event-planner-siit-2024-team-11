@@ -24,26 +24,26 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
     @BeforeEach
     void setupTestData() {
         DataSource dataSource = new DriverManagerDataSource(
-            "jdbc:postgresql://localhost:5432/eventytestdb", "postgres", "admin"
+                "jdbc:postgresql://localhost:5432/eventytestdb", "postgres", "admin"
         );
         jdbcTemplate = new JdbcTemplate(dataSource);
 
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 4);
+                Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 4);
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 5);
+                Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 5);
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 6);
+                Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 6);
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 7);
+                Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 7);
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 8);
+                Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 8);
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 9);
+                Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 9);
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 10);
+                Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 10);
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 11);
+                Timestamp.valueOf(LocalDateTime.now().plusDays(5)), 11);
     }
 
     @Test
@@ -413,9 +413,9 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
     @Test
     public void filterEvents_OnlyStartDate_ReturnsEvents() {
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(30)), 4);
+                Timestamp.valueOf(LocalDateTime.now().plusDays(30)), 4);
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(30)), 5);
+                Timestamp.valueOf(LocalDateTime.now().plusDays(30)), 5);
 
         HomePage home = new HomePage(driver);
         home.scrollToEvents();
@@ -448,9 +448,9 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
     @Test
     public void filterEvents_OnlyEndTime_ReturnsEvents() {
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(1)), 4);
+                Timestamp.valueOf(LocalDateTime.now().plusDays(1)), 4);
         jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
-            Timestamp.valueOf(LocalDateTime.now().plusDays(1)), 5);
+                Timestamp.valueOf(LocalDateTime.now().plusDays(1)), 5);
 
         HomePage home = new HomePage(driver);
         home.scrollToEvents();
@@ -462,7 +462,12 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         home.selectEndDate(dateTimeEnd.format(formatterEnd));
 
         home.clickFilterButton();
-        slowDown(); slowDown(); slowDown();slowDown(); slowDown(); slowDown();
+        slowDown();
+        slowDown();
+        slowDown();
+        slowDown();
+        slowDown();
+        slowDown();
 
         List<WebElement> eventCards = home.getFilteredEvents();
         assertEquals(eventCards.size(), 2);
@@ -1200,6 +1205,254 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         assertEquals(eventCards.size(), 0);
 
         assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "0 of 0");
+    }
+
+    @Test
+    public void filterEvents_SearchAndMaxParticipantsValid_ReturnsEvent() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterSearchQuery("ccc");
+
+        home.enterMaxParticipants("35");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 3);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 3 of 3");
+
+        List<String> originalEventCardTitles = new ArrayList<>();
+        originalEventCardTitles.add("Event 5");
+        originalEventCardTitles.add("Event 6");
+        originalEventCardTitles.add("Event 7");
+
+        List<WebElement> eventCardTitles = home.getFilteredEventTitles();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+    }
+
+    @Test
+    public void filterEvents_SearchAndLocationValid_ReturnsEvent() {
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterSearchQuery("ccc");
+
+        home.enterLocation("banja luka");
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 1);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 1 of 1");
+
+        List<String> originalEventCardTitles = new ArrayList<>();
+        originalEventCardTitles.add("Event 6");
+
+        List<WebElement> eventCardTitles = home.getFilteredEventTitles();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+    }
+
+    @Test
+    public void filterEvents_SearchAndEventTypesAndDateValid_ReturnsEvent() {
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+                Timestamp.valueOf(LocalDateTime.now().plusDays(15)), 8);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+                Timestamp.valueOf(LocalDateTime.now().plusDays(15)), 9);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+                Timestamp.valueOf(LocalDateTime.now().plusDays(15)), 10);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+                Timestamp.valueOf(LocalDateTime.now().plusDays(15)), 11);
+
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterSearchQuery("ccc");
+
+        ArrayList<String> eventTypeNames = new ArrayList<>();
+        eventTypeNames.add("Tech");
+        eventTypeNames.add("Donation");
+        home.selectEventTypes(eventTypeNames);
+
+        LocalDateTime dateTimeStart = LocalDateTime.now().plusDays(14);
+        LocalDateTime dateTimeEnd = LocalDateTime.now().plusDays(16);
+        DateTimeFormatter formatterStart = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        DateTimeFormatter formatterEnd = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+
+        home.selectEndDate(dateTimeEnd.format(formatterEnd));
+        home.selectStartDate(dateTimeStart.format(formatterStart));
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 2);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 2 of 2");
+
+        List<String> originalEventCardTitles = new ArrayList<>();
+        originalEventCardTitles.add("Event 5");
+        originalEventCardTitles.add("Event 6");
+
+        List<WebElement> eventCardTitles = home.getFilteredEventTitles();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+    }
+
+    @Test
+    public void filterEvents_SearchAndLocationAndDateValid_ReturnsEvent() {
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+            Timestamp.valueOf(LocalDateTime.now().plusDays(15)), 10);
+
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterSearchQuery("ccc");
+
+        home.enterLocation("gradiska");
+
+        LocalDateTime dateTimeStart = LocalDateTime.now().plusDays(15);
+        LocalDateTime dateTimeEnd = LocalDateTime.now().plusDays(15);
+        DateTimeFormatter formatterStart = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        DateTimeFormatter formatterEnd = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+
+        home.selectEndDate(dateTimeEnd.format(formatterEnd));
+        home.selectStartDate(dateTimeStart.format(formatterStart));
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 1);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 1 of 1");
+
+        List<String> originalEventCardTitles = new ArrayList<>();
+        originalEventCardTitles.add("Event 7");
+
+        List<WebElement> eventCardTitles = home.getFilteredEventTitles();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+    }
+
+    @Test
+    public void filterEvents_SearchAndEventTypesAndLocationAndDateValid_ReturnsEvent() {
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+                Timestamp.valueOf(LocalDateTime.now().plusDays(15)), 8);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+                Timestamp.valueOf(LocalDateTime.now().plusDays(15)), 9);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+                Timestamp.valueOf(LocalDateTime.now().plusDays(15)), 10);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+                Timestamp.valueOf(LocalDateTime.now().plusDays(15)), 11);
+
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterSearchQuery("ccc");
+
+        ArrayList<String> eventTypeNames = new ArrayList<>();
+        eventTypeNames.add("Tech");
+        eventTypeNames.add("Donation");
+        home.selectEventTypes(eventTypeNames);
+
+        home.enterLocation("nis");
+
+        LocalDateTime dateTimeStart = LocalDateTime.now().plusDays(15);
+        LocalDateTime dateTimeEnd = LocalDateTime.now().plusDays(15);
+        DateTimeFormatter formatterStart = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        DateTimeFormatter formatterEnd = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+
+        home.selectEndDate(dateTimeEnd.format(formatterEnd));
+        home.selectStartDate(dateTimeStart.format(formatterStart));
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 1);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 1 of 1");
+
+        List<String> originalEventCardTitles = new ArrayList<>();
+        originalEventCardTitles.add("Event 5");
+
+        List<WebElement> eventCardTitles = home.getFilteredEventTitles();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+    }
+
+    @Test
+    public void filterEvents_SearchAndAllFilterInputsValid_ReturnsEvent() {
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+                Timestamp.valueOf(LocalDateTime.now().plusDays(15)), 6);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+                Timestamp.valueOf(LocalDateTime.now().plusDays(15)), 7);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+                Timestamp.valueOf(LocalDateTime.now().plusDays(15)), 8);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+                Timestamp.valueOf(LocalDateTime.now().plusDays(15)), 9);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+                Timestamp.valueOf(LocalDateTime.now().plusDays(15)), 10);
+        jdbcTemplate.update("UPDATE events SET date = ? WHERE id = ?",
+                Timestamp.valueOf(LocalDateTime.now().plusDays(15)), 11);
+
+        HomePage home = new HomePage(driver);
+        home.scrollToEvents();
+        slowDown();
+
+        home.enterSearchQuery("ccc");
+
+        ArrayList<String> eventTypeNames = new ArrayList<>();
+        eventTypeNames.add("Tech");
+        eventTypeNames.add("Donation");
+        eventTypeNames.add("EventType7");
+        eventTypeNames.add("EventType8");
+        home.selectEventTypes(eventTypeNames);
+
+        home.enterMaxParticipants("35");
+
+        home.enterLocation("gradiska");
+
+        LocalDateTime dateTimeStart = LocalDateTime.now().plusDays(15);
+        LocalDateTime dateTimeEnd = LocalDateTime.now().plusDays(15);
+        DateTimeFormatter formatterStart = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        DateTimeFormatter formatterEnd = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+
+        home.selectEndDate(dateTimeEnd.format(formatterEnd));
+        home.selectStartDate(dateTimeStart.format(formatterStart));
+
+        home.clickFilterButton();
+        slowDown();
+
+        List<WebElement> eventCards = home.getFilteredEvents();
+        assertEquals(eventCards.size(), 1);
+
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 1 of 1");
+
+        List<String> originalEventCardTitles = new ArrayList<>();
+        originalEventCardTitles.add("Event 7");
+
+        List<WebElement> eventCardTitles = home.getFilteredEventTitles();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
     }
 
     // use this method only to slow down the automated test view, so you can see what is going on and what values are selected!
