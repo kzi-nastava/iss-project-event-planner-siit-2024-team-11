@@ -59,9 +59,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "   OR (:search IS NULL OR :search = '' OR e.description ILIKE ('%' || :search || '%'))) " +
             "AND (:maxParticipants IS NULL OR e.maxNumberParticipants <= :maxParticipants) " +
             "AND (:location IS NULL OR :location = '' OR LOWER(e.location.name) = LOWER(:location)) " +
-            "AND (CAST(:startDate AS timestamp) IS NULL OR CAST(:endDate AS timestamp) IS NULL OR e.date BETWEEN CAST(:startDate AS timestamp) AND CAST(:endDate AS timestamp)) " +
+            "AND (CAST(:startDate AS timestamp) IS NULL OR CAST(:endDate AS timestamp) IS NULL OR ((e.date >= CAST(:startDate AS timestamp)) AND (e.date <= CAST(:endDate AS timestamp)))) " +
             "AND (:eventTypes IS NULL OR e.type.name IN :eventTypes) " +
             "AND (e.privacy = :privacy) " +
+            "AND e.date > :dateNow " +
             "AND (:blocked IS NULL OR :blocked = '' OR NOT :blocked ILIKE ('%' || e.organiser.id || '%')) ")
     Page<Event> findAll(@Param("search") String search,
                         @Param("eventTypes") ArrayList<String> eventTypes,
@@ -71,6 +72,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                         @Param("endDate") LocalDateTime endDate,
                         @Param("privacy") PrivacyType privacy,
                         @Param("blocked") String blocked,
+                        @Param("dateNow") LocalDateTime dateNow,
                         Pageable pageable);
 
   @Query("SELECT e FROM Event e " +
@@ -127,9 +129,11 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("SELECT e FROM Event e " +
            "WHERE e.privacy = :privacy " +
            "AND (:blocked IS NULL OR :blocked = '' OR NOT :blocked ILIKE ('%' || e.organiser.id || '%')) " +
+           "AND e.date > :dateNow " +
            "ORDER BY e.id DESC ")
     ArrayList<Event> findFeaturedEvents(@Param("privacy") PrivacyType privacy,
                                         @Param("blocked") String blocked,
+                                        @Param("dateNow") LocalDateTime dateNow,
                                         Pageable pageable);
 
     @Query("SELECT DISTINCT et.name FROM EventType et JOIN Event e ON et.id = e.type.id ORDER BY et.name ASC")

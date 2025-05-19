@@ -195,6 +195,8 @@ public class ReservationControllerTest {
         login();
 
         Event event = eventService.getEvent(1L);
+        event.setDate(LocalDateTime.now().plusDays(20));
+        event = eventService.save(event);
         Service service = (Service) solutionService.getSolution(6L);
 
         ReservationDTO newReservationDTO = new ReservationDTO();
@@ -354,6 +356,8 @@ public class ReservationControllerTest {
         login();
 
         Event event = eventService.getEvent(1L);
+        event.setDate(LocalDateTime.now().plusDays(20));
+        event = eventService.save(event);
         Service service = (Service) solutionService.getSolution(6L);
 
         ReservationDTO newReservationDTO = new ReservationDTO();
@@ -386,6 +390,8 @@ public class ReservationControllerTest {
         login();
 
         Event event = eventService.getEvent(1L);
+        event.setDate(LocalDateTime.now().plusDays(20));
+        event = eventService.save(event);
         Service service = (Service) solutionService.getSolution(6L);
 
         ReservationDTO newReservationDTO = new ReservationDTO();
@@ -418,6 +424,8 @@ public class ReservationControllerTest {
         login();
 
         Event event = eventService.getEvent(1L);
+        event.setDate(LocalDateTime.now().plusDays(20));
+        event = eventService.save(event);
         Service service = (Service) solutionService.getSolution(6L);
 
         ReservationDTO newReservationDTO = new ReservationDTO();
@@ -594,6 +602,8 @@ public class ReservationControllerTest {
         login();
 
         Event event = eventService.getEvent(1L);
+        event.setDate(LocalDateTime.now().plusDays(20));
+        event = eventService.save(event);
         Service service = (Service) solutionService.getSolution(6L);
 
         ReservationDTO newReservationDTO = new ReservationDTO();
