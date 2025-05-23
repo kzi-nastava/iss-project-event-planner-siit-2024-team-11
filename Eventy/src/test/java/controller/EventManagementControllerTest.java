@@ -1,5 +1,6 @@
 package controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfReader;
@@ -7,15 +8,15 @@ import com.itextpdf.kernel.pdf.canvas.parser.PdfTextExtractor;
 import org.example.eventy.EventyApplication;
 import org.example.eventy.events.dtos.CreateActivityDTO;
 import org.example.eventy.events.dtos.CreateLocationDTO;
+import org.example.eventy.events.dtos.EventTypeCardDTO;
 import org.example.eventy.events.dtos.OrganizeEventDTO;
+import org.example.eventy.events.models.EventType;
 import org.example.eventy.events.services.EventService;
 import org.example.eventy.events.services.EventTypeService;
 import org.example.eventy.users.dtos.LoginDTO;
 import org.example.eventy.users.dtos.UserTokenState;
 import org.example.eventy.util.TokenUtils;
 import org.junit.jupiter.api.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,8 +33,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -42,18 +42,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test") // uses test database
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // Ensures @BeforeAll is not static
 public class EventManagementControllerTest {
-    private static final Logger log = LoggerFactory.getLogger(EventManagementControllerTest.class);
-    // 1. Po tipu eventa, bilo koji, null, all -- DONE
-    // 2. Naziv, opis, maks broj ucesnika, tip privatnosti, lokacija, datum - za vecinu normalna vrednost ili null, ponegde i
-    // jos neka logika, npr za broj ucesnika mozemo negativan test za 0 i manje, za datum ne moze proslost i sl -- DONE
-    // 3. Agenda, za naziv, opis, vreme trajanja, lokaciju sve testirati, mozda cak i samu agendu da nije prazna? -- DONE
-    // 4. PDF sa agendom preuzimanje -- DONE
-    // 5. getActiveTypes iz EventTypeController-a treba testirati takodje? dovoljno je praznu listu i
-    // da ima 2 elementa i da se lepo prevedu u DTO? kako ovo testirati uopste, samo pozvati i da vrati? ovo zavisi od baze
-    // 6. da ga kreira neko neauth ili neko auth a da nije organizer -- DONE
-    // 7. nesto normalno sto treba da prodje -- DONE
-    // 8. Organizer ID i u jwt-u ne pise isto -- DONE
-
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -1665,4 +1653,25 @@ public class EventManagementControllerTest {
         }
     }
 
+    @Test
+    public void getActiveTypes_FewActiveTypesExist_ReturnsOk() throws Exception {
+        String responseContent = mockMvc.perform(MockMvcRequestBuilders.get("/api/events/types/active")
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
+                        .header("Authorization", "Bearer " + jwtToken))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<EventTypeCardDTO> activeEventTypeCards = objectMapper.readValue(responseContent, new TypeReference<List<EventTypeCardDTO>>() {
+        });
+
+        List<EventType> activeEventTypes = eventTypeService.getActiveTypes();
+        assertEquals(activeEventTypeCards.size(), activeEventTypes.size());
+
+        for(int i = 0; i < activeEventTypes.size(); i++) {
+            assertEquals(activeEventTypes.get(i).getId(), activeEventTypeCards.get(i).getId());
+            assertEquals(activeEventTypes.get(i).getName(), activeEventTypeCards.get(i).getName());
+        }
+    }
 }
