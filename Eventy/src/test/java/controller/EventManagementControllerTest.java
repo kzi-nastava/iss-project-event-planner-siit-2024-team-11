@@ -361,7 +361,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "City", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -393,7 +393,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "City", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -425,7 +425,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription(null);
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "City", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -457,7 +457,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "City", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -489,7 +489,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(-1);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "City", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -521,7 +521,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(0);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "City", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -601,7 +601,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "City", 10.23, 10.23));
         newEvent.setDate(null);
         newEvent.setAgenda(List.of(
@@ -633,7 +633,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "City", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().minusDays(1));
         newEvent.setAgenda(List.of(
@@ -665,7 +665,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "City", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now());
         newEvent.setAgenda(List.of(
@@ -697,7 +697,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(null);
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -729,7 +729,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO(null, "City", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -761,7 +761,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("", "City", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -793,7 +793,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", null, 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -825,7 +825,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -857,7 +857,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", -90.25, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -889,7 +889,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 90.25, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -1017,7 +1017,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.21, -180.25));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -1049,7 +1049,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 180.25));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -1177,7 +1177,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(null);
@@ -1201,7 +1201,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(new ArrayList<>());
@@ -1225,7 +1225,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -1257,7 +1257,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -1289,7 +1289,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -1321,7 +1321,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -1353,7 +1353,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -1385,7 +1385,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -1411,13 +1411,13 @@ public class EventManagementControllerTest {
 
     @Test
     @Transactional
-    public void createEvent_AgendaActivityStartTimenNotGiven_ReturnsBadRequest() throws Exception {
+    public void createEvent_AgendaActivityStartTimeNotGiven_ReturnsBadRequest() throws Exception {
         OrganizeEventDTO newEvent = new OrganizeEventDTO();
         newEvent.setName("Sample Event");
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -1449,7 +1449,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -1481,7 +1481,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -1513,7 +1513,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -1545,7 +1545,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         newEvent.setAgenda(List.of(
@@ -1577,7 +1577,7 @@ public class EventManagementControllerTest {
         newEvent.setDescription("This is a sample event description.");
         newEvent.setMaxNumberParticipants(100);
         newEvent.setIsPublic(true);
-        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setEventTypeId(eventTypeService.getActiveTypes().get(1).getId());
         newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
         newEvent.setDate(LocalDateTime.now().plusDays(1));
         LocalDateTime startTime = LocalDateTime.now().plusHours(26);
