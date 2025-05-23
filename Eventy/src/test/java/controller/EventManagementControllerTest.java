@@ -42,9 +42,9 @@ public class EventManagementControllerTest {
     // 4. PDF sa agendom preuzimanje
     // 5. getActiveTypes iz EventTypeController-a treba testirati takodje? dovoljno je praznu listu i
     // da ima 2 elementa i da se lepo prevedu u DTO
-    // 6. da ga kreira neko neauth ili neko auth a da nije organizer
-    // 7. nesto normalno sto treba da prodje
-    // 8. Organizer ID i u jwt-u ne pise isto
+    // 6. da ga kreira neko neauth ili neko auth a da nije organizer -- DONE
+    // 7. nesto normalno sto treba da prodje -- DONE
+    // 8. Organizer ID i u jwt-u ne pise isto -- DONE
 
     @Autowired
     private MockMvc mockMvc;
@@ -56,7 +56,7 @@ public class EventManagementControllerTest {
 
     @BeforeAll
     void setupTestData() throws Exception {
-        login();
+        login("ves@gmail.com");
     }
 
     @AfterAll
@@ -64,8 +64,8 @@ public class EventManagementControllerTest {
         logout();
     }
 
-    private void login() throws Exception {
-        LoginDTO loginDTO = new LoginDTO("ves@gmail.com", "admin");
+    private void login(String email) throws Exception {
+        LoginDTO loginDTO = new LoginDTO(email, "admin");
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/api/authentication/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -84,6 +84,8 @@ public class EventManagementControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
+
+        jwtToken = null;
     }
 
     @Test
@@ -132,5 +134,109 @@ public class EventManagementControllerTest {
                 .andExpect(jsonPath("$.agenda[0].startTime").value(newEvent.getAgenda().get(0).getStartTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
                 .andExpect(jsonPath("$.agenda[0].endTime").value(newEvent.getAgenda().get(0).getEndTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
                 .andExpect(jsonPath("$.organizerId").value(newEvent.getOrganizerId()));
+    }
+
+    @Test
+    @Transactional
+    public void createEvent_InvalidOrganizerID_ReturnsBadRequest() throws Exception {
+        OrganizeEventDTO newEvent = new OrganizeEventDTO();
+        newEvent.setName("Sample Event");
+        newEvent.setDescription("This is a sample event description.");
+        newEvent.setMaxNumberParticipants(100);
+        newEvent.setIsPublic(true);
+        newEvent.setEventTypeId(1L);
+        newEvent.setLocation(new CreateLocationDTO("123 Street", "City", 10.23, 10.23));
+        newEvent.setDate(LocalDateTime.now().plusDays(1));
+        newEvent.setAgenda(List.of(
+                new CreateActivityDTO(
+                        "Activity 1",
+                        "Activity description",
+                        "Activity Location",
+                        LocalDateTime.now(),
+                        LocalDateTime.now().plusHours(2)
+                )
+        ));
+        newEvent.setEmails(new ArrayList<>());
+        newEvent.setOrganizerId(tokenUtils.getIdFromToken(jwtToken) + 2);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/events", newEvent)
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(newEvent)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").value("Invalid Organizer ID!"));
+    }
+
+    @Test
+    @Transactional
+    public void createEvent_UserNotOrganizer_ReturnsForbidden() throws Exception {
+        logout();
+        login("provider@gmail.com");
+
+        OrganizeEventDTO newEvent = new OrganizeEventDTO();
+        newEvent.setName("Sample Event");
+        newEvent.setDescription("This is a sample event description.");
+        newEvent.setMaxNumberParticipants(100);
+        newEvent.setIsPublic(true);
+        newEvent.setEventTypeId(1L);
+        newEvent.setLocation(new CreateLocationDTO("123 Street", "City", 10.23, 10.23));
+        newEvent.setDate(LocalDateTime.now().plusDays(1));
+        newEvent.setAgenda(List.of(
+                new CreateActivityDTO(
+                        "Activity 1",
+                        "Activity description",
+                        "Activity Location",
+                        LocalDateTime.now(),
+                        LocalDateTime.now().plusHours(2)
+                )
+        ));
+        newEvent.setEmails(new ArrayList<>());
+        newEvent.setOrganizerId(tokenUtils.getIdFromToken(jwtToken));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/events", newEvent)
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(newEvent)))
+                .andExpect(status().isForbidden());
+
+        logout();
+        login("ves@gmail.com");
+    }
+
+    @Test
+    @Transactional
+    public void createEvent_UserNotAuthenticated_ReturnsUnauthorized() throws Exception {
+        logout();
+
+        OrganizeEventDTO newEvent = new OrganizeEventDTO();
+        newEvent.setName("Sample Event");
+        newEvent.setDescription("This is a sample event description.");
+        newEvent.setMaxNumberParticipants(100);
+        newEvent.setIsPublic(true);
+        newEvent.setEventTypeId(1L);
+        newEvent.setLocation(new CreateLocationDTO("123 Street", "City", 10.23, 10.23));
+        newEvent.setDate(LocalDateTime.now().plusDays(1));
+        newEvent.setAgenda(List.of(
+                new CreateActivityDTO(
+                        "Activity 1",
+                        "Activity description",
+                        "Activity Location",
+                        LocalDateTime.now(),
+                        LocalDateTime.now().plusHours(2)
+                )
+        ));
+        newEvent.setEmails(new ArrayList<>());
+        newEvent.setOrganizerId(1L);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/events", newEvent)
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(newEvent)))
+                .andExpect(status().isUnauthorized());
+
+        login("ves@gmail.com");
     }
 }

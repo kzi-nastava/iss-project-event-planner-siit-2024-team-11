@@ -87,7 +87,11 @@ public class EventController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('Organizer')")
-    public ResponseEntity<EventDTO> organizeEvent(@Valid @RequestBody OrganizeEventDTO organizeEventDTO, BindingResult bindingResult) {
+    public ResponseEntity<EventDTO> organizeEvent(@Valid @RequestBody OrganizeEventDTO organizeEventDTO, BindingResult bindingResult, @RequestHeader(value = "Authorization", required = true) String token) {
+        if (organizeEventDTO.getOrganizerId() == null || !organizeEventDTO.getOrganizerId().equals(tokenUtils.getIdFromToken(token.substring(7)))) {
+            return new ResponseEntity("Invalid Organizer ID!", HttpStatus.BAD_REQUEST);
+        }
+
         if (bindingResult.hasErrors()) {
             // if there are validation errors, we return a 400 Bad Request response
             List<String> errorMessages = bindingResult.getFieldErrors().stream()
