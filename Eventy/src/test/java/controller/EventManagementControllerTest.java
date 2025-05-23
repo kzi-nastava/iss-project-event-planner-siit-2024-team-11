@@ -44,7 +44,7 @@ public class EventManagementControllerTest {
     // da ima 2 elementa i da se lepo prevedu u DTO
     // 6. da ga kreira neko neauth ili neko auth a da nije organizer
     // 7. nesto normalno sto treba da prodje
-    // Organizer ID i u jwt-u ne pise isto
+    // 8. Organizer ID i u jwt-u ne pise isto
 
     @Autowired
     private MockMvc mockMvc;
@@ -56,8 +56,6 @@ public class EventManagementControllerTest {
 
     @BeforeAll
     void setupTestData() throws Exception {
-        login();
-        logout();
         login();
     }
 
