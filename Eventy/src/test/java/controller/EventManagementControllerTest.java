@@ -1171,4 +1171,437 @@ public class EventManagementControllerTest {
                 .andExpect(jsonPath("$.agenda[0].endTime").value(newEvent.getAgenda().get(0).getEndTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
                 .andExpect(jsonPath("$.organizerId").value(newEvent.getOrganizerId()));
     }
+
+    @Test
+    @Transactional
+    public void createEvent_AgendaNotGiven_ReturnsBadRequest() throws Exception {
+        OrganizeEventDTO newEvent = new OrganizeEventDTO();
+        newEvent.setName("Sample Event");
+        newEvent.setDescription("This is a sample event description.");
+        newEvent.setMaxNumberParticipants(100);
+        newEvent.setIsPublic(true);
+        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
+        newEvent.setDate(LocalDateTime.now().plusDays(1));
+        newEvent.setAgenda(null);
+        newEvent.setEmails(new ArrayList<>());
+        newEvent.setOrganizerId(tokenUtils.getIdFromToken(jwtToken));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/events", newEvent)
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(newEvent)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").value("agenda: Agenda cannot be empty"));
+    }
+
+    @Test
+    @Transactional
+    public void createEvent_AgendaEmpty_ReturnsBadRequest() throws Exception {
+        OrganizeEventDTO newEvent = new OrganizeEventDTO();
+        newEvent.setName("Sample Event");
+        newEvent.setDescription("This is a sample event description.");
+        newEvent.setMaxNumberParticipants(100);
+        newEvent.setIsPublic(true);
+        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
+        newEvent.setDate(LocalDateTime.now().plusDays(1));
+        newEvent.setAgenda(new ArrayList<>());
+        newEvent.setEmails(new ArrayList<>());
+        newEvent.setOrganizerId(tokenUtils.getIdFromToken(jwtToken));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/events", newEvent)
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(newEvent)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").value("agenda: Agenda cannot be empty"));
+    }
+
+    @Test
+    @Transactional
+    public void createEvent_AgendaActivityNameNotGiven_ReturnsBadRequest() throws Exception {
+        OrganizeEventDTO newEvent = new OrganizeEventDTO();
+        newEvent.setName("Sample Event");
+        newEvent.setDescription("This is a sample event description.");
+        newEvent.setMaxNumberParticipants(100);
+        newEvent.setIsPublic(true);
+        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
+        newEvent.setDate(LocalDateTime.now().plusDays(1));
+        newEvent.setAgenda(List.of(
+                new CreateActivityDTO(
+                        null,
+                        "Activity description",
+                        "Activity Location",
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(26)
+                )
+        ));
+        newEvent.setEmails(new ArrayList<>());
+        newEvent.setOrganizerId(tokenUtils.getIdFromToken(jwtToken));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/events", newEvent)
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(newEvent)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").value("agenda[0].name: Activity name cannot be empty!"));
+    }
+
+    @Test
+    @Transactional
+    public void createEvent_AgendaActivityNameEmpty_ReturnsBadRequest() throws Exception {
+        OrganizeEventDTO newEvent = new OrganizeEventDTO();
+        newEvent.setName("Sample Event");
+        newEvent.setDescription("This is a sample event description.");
+        newEvent.setMaxNumberParticipants(100);
+        newEvent.setIsPublic(true);
+        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
+        newEvent.setDate(LocalDateTime.now().plusDays(1));
+        newEvent.setAgenda(List.of(
+                new CreateActivityDTO(
+                        "",
+                        "Activity description",
+                        "Activity Location",
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(26)
+                )
+        ));
+        newEvent.setEmails(new ArrayList<>());
+        newEvent.setOrganizerId(tokenUtils.getIdFromToken(jwtToken));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/events", newEvent)
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(newEvent)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").value("agenda[0].name: Activity name cannot be empty!"));
+    }
+
+    @Test
+    @Transactional
+    public void createEvent_AgendaActivityDescriptionNotGiven_ReturnsBadRequest() throws Exception {
+        OrganizeEventDTO newEvent = new OrganizeEventDTO();
+        newEvent.setName("Sample Event");
+        newEvent.setDescription("This is a sample event description.");
+        newEvent.setMaxNumberParticipants(100);
+        newEvent.setIsPublic(true);
+        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
+        newEvent.setDate(LocalDateTime.now().plusDays(1));
+        newEvent.setAgenda(List.of(
+                new CreateActivityDTO(
+                        "Activity 1",
+                        null,
+                        "Activity Location",
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(26)
+                )
+        ));
+        newEvent.setEmails(new ArrayList<>());
+        newEvent.setOrganizerId(tokenUtils.getIdFromToken(jwtToken));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/events", newEvent)
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(newEvent)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").value("agenda[0].description: Activity description cannot be empty!"));
+    }
+
+    @Test
+    @Transactional
+    public void createEvent_AgendaActivityDescriptionEmpty_ReturnsBadRequest() throws Exception {
+        OrganizeEventDTO newEvent = new OrganizeEventDTO();
+        newEvent.setName("Sample Event");
+        newEvent.setDescription("This is a sample event description.");
+        newEvent.setMaxNumberParticipants(100);
+        newEvent.setIsPublic(true);
+        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
+        newEvent.setDate(LocalDateTime.now().plusDays(1));
+        newEvent.setAgenda(List.of(
+                new CreateActivityDTO(
+                        "Activity 1",
+                        "",
+                        "Activity Location",
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(26)
+                )
+        ));
+        newEvent.setEmails(new ArrayList<>());
+        newEvent.setOrganizerId(tokenUtils.getIdFromToken(jwtToken));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/events", newEvent)
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(newEvent)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").value("agenda[0].description: Activity description cannot be empty!"));
+    }
+
+    @Test
+    @Transactional
+    public void createEvent_AgendaActivityLocationNotGiven_ReturnsBadRequest() throws Exception {
+        OrganizeEventDTO newEvent = new OrganizeEventDTO();
+        newEvent.setName("Sample Event");
+        newEvent.setDescription("This is a sample event description.");
+        newEvent.setMaxNumberParticipants(100);
+        newEvent.setIsPublic(true);
+        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
+        newEvent.setDate(LocalDateTime.now().plusDays(1));
+        newEvent.setAgenda(List.of(
+                new CreateActivityDTO(
+                        "Activity 1",
+                        "Activity description",
+                        null,
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(26)
+                )
+        ));
+        newEvent.setEmails(new ArrayList<>());
+        newEvent.setOrganizerId(tokenUtils.getIdFromToken(jwtToken));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/events", newEvent)
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(newEvent)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").value("agenda[0].location: Activity location cannot be empty!"));
+    }
+
+    @Test
+    @Transactional
+    public void createEvent_AgendaActivityLocationEmpty_ReturnsBadRequest() throws Exception {
+        OrganizeEventDTO newEvent = new OrganizeEventDTO();
+        newEvent.setName("Sample Event");
+        newEvent.setDescription("This is a sample event description.");
+        newEvent.setMaxNumberParticipants(100);
+        newEvent.setIsPublic(true);
+        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
+        newEvent.setDate(LocalDateTime.now().plusDays(1));
+        newEvent.setAgenda(List.of(
+                new CreateActivityDTO(
+                        "Activity 1",
+                        "Activity description",
+                        "",
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(26)
+                )
+        ));
+        newEvent.setEmails(new ArrayList<>());
+        newEvent.setOrganizerId(tokenUtils.getIdFromToken(jwtToken));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/events", newEvent)
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(newEvent)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").value("agenda[0].location: Activity location cannot be empty!"));
+    }
+
+    @Test
+    @Transactional
+    public void createEvent_AgendaActivityStartTimenNotGiven_ReturnsBadRequest() throws Exception {
+        OrganizeEventDTO newEvent = new OrganizeEventDTO();
+        newEvent.setName("Sample Event");
+        newEvent.setDescription("This is a sample event description.");
+        newEvent.setMaxNumberParticipants(100);
+        newEvent.setIsPublic(true);
+        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
+        newEvent.setDate(LocalDateTime.now().plusDays(1));
+        newEvent.setAgenda(List.of(
+                new CreateActivityDTO(
+                        "Activity 1",
+                        "Activity description",
+                        "Activity Location",
+                        null,
+                        LocalDateTime.now().plusHours(26)
+                )
+        ));
+        newEvent.setEmails(new ArrayList<>());
+        newEvent.setOrganizerId(tokenUtils.getIdFromToken(jwtToken));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/events", newEvent)
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(newEvent)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").value("agenda[0].startTime: Activity start time cannot be empty!"));
+    }
+
+    @Test
+    @Transactional
+    public void createEvent_AgendaActivityEndTimeNotGiven_ReturnsBadRequest() throws Exception {
+        OrganizeEventDTO newEvent = new OrganizeEventDTO();
+        newEvent.setName("Sample Event");
+        newEvent.setDescription("This is a sample event description.");
+        newEvent.setMaxNumberParticipants(100);
+        newEvent.setIsPublic(true);
+        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
+        newEvent.setDate(LocalDateTime.now().plusDays(1));
+        newEvent.setAgenda(List.of(
+                new CreateActivityDTO(
+                        "Activity 1",
+                        "Activity description",
+                        "Activity Location",
+                        LocalDateTime.now().plusHours(25),
+                        null
+                )
+        ));
+        newEvent.setEmails(new ArrayList<>());
+        newEvent.setOrganizerId(tokenUtils.getIdFromToken(jwtToken));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/events", newEvent)
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(newEvent)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").value("agenda[0].endTime: Activity end time cannot be empty!"));
+    }
+
+    @Test
+    @Transactional
+    public void createEvent_AgendaActivityStartTimeBeforeEvent_ReturnsBadRequest() throws Exception {
+        OrganizeEventDTO newEvent = new OrganizeEventDTO();
+        newEvent.setName("Sample Event");
+        newEvent.setDescription("This is a sample event description.");
+        newEvent.setMaxNumberParticipants(100);
+        newEvent.setIsPublic(true);
+        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
+        newEvent.setDate(LocalDateTime.now().plusDays(1));
+        newEvent.setAgenda(List.of(
+                new CreateActivityDTO(
+                        "Activity 1",
+                        "Activity description",
+                        "Activity Location",
+                        LocalDateTime.now(),
+                        LocalDateTime.now().plusHours(26)
+                )
+        ));
+        newEvent.setEmails(new ArrayList<>());
+        newEvent.setOrganizerId(tokenUtils.getIdFromToken(jwtToken));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/events", newEvent)
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(newEvent)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").value("Agenda timeline is not possible!"));
+    }
+
+    @Test
+    @Transactional
+    public void createEvent_AgendaActivityEndTimeAfterEvent_ReturnsBadRequest() throws Exception {
+        OrganizeEventDTO newEvent = new OrganizeEventDTO();
+        newEvent.setName("Sample Event");
+        newEvent.setDescription("This is a sample event description.");
+        newEvent.setMaxNumberParticipants(100);
+        newEvent.setIsPublic(true);
+        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
+        newEvent.setDate(LocalDateTime.now().plusDays(1));
+        newEvent.setAgenda(List.of(
+                new CreateActivityDTO(
+                        "Activity 1",
+                        "Activity description",
+                        "Activity Location",
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(100)
+                )
+        ));
+        newEvent.setEmails(new ArrayList<>());
+        newEvent.setOrganizerId(tokenUtils.getIdFromToken(jwtToken));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/events", newEvent)
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(newEvent)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").value("Agenda timeline is not possible!"));
+    }
+
+    @Test
+    @Transactional
+    public void createEvent_AgendaActivityStartTimeAfterEndTime_ReturnsBadRequest() throws Exception {
+        OrganizeEventDTO newEvent = new OrganizeEventDTO();
+        newEvent.setName("Sample Event");
+        newEvent.setDescription("This is a sample event description.");
+        newEvent.setMaxNumberParticipants(100);
+        newEvent.setIsPublic(true);
+        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
+        newEvent.setDate(LocalDateTime.now().plusDays(1));
+        newEvent.setAgenda(List.of(
+                new CreateActivityDTO(
+                        "Activity 1",
+                        "Activity description",
+                        "Activity Location",
+                        LocalDateTime.now().plusHours(26),
+                        LocalDateTime.now().plusHours(25)
+                )
+        ));
+        newEvent.setEmails(new ArrayList<>());
+        newEvent.setOrganizerId(tokenUtils.getIdFromToken(jwtToken));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/events", newEvent)
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(newEvent)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").value("Agenda timeline is not possible!"));
+    }
+
+    @Test
+    @Transactional
+    public void createEvent_AgendaActivityDurationIs0_ReturnsBadRequest() throws Exception {
+        OrganizeEventDTO newEvent = new OrganizeEventDTO();
+        newEvent.setName("Sample Event");
+        newEvent.setDescription("This is a sample event description.");
+        newEvent.setMaxNumberParticipants(100);
+        newEvent.setIsPublic(true);
+        newEvent.setEventTypeId((long) eventTypeService.getActiveTypes().get(1).getId());
+        newEvent.setLocation(new CreateLocationDTO("123 Street", "Address", 10.23, 10.23));
+        newEvent.setDate(LocalDateTime.now().plusDays(1));
+        LocalDateTime startTime = LocalDateTime.now().plusHours(26);
+        newEvent.setAgenda(List.of(
+                new CreateActivityDTO(
+                        "Activity 1",
+                        "Activity description",
+                        "Activity Location",
+                        startTime,
+                        startTime
+                )
+        ));
+        newEvent.setEmails(new ArrayList<>());
+        newEvent.setOrganizerId(tokenUtils.getIdFromToken(jwtToken));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/events", newEvent)
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(newEvent)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").value("Agenda timeline is not possible!"));
+    }
 }
