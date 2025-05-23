@@ -33,7 +33,7 @@ public class OrganizeEventDTO {
     private LocalDateTime date;
 
     @NotEmpty(message = "Agenda cannot be empty")
-    private List<CreateActivityDTO> agenda;
+    private List<@Valid CreateActivityDTO> agenda;
 
     private List<String> emails;
 

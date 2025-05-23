@@ -100,6 +100,13 @@ public class EventController {
             return new ResponseEntity(errorMessages, HttpStatus.BAD_REQUEST);
         }
 
+        for(CreateActivityDTO activityDTO : organizeEventDTO.getAgenda()) {
+            if(activityDTO.getStartTime().isAfter(activityDTO.getEndTime()) || activityDTO.getStartTime().isEqual(activityDTO.getEndTime()) ||
+            activityDTO.getStartTime().isBefore(organizeEventDTO.getDate()) || activityDTO.getEndTime().isAfter(organizeEventDTO.getDate().plusDays(1))) {
+                return new ResponseEntity("Agenda timeline is not possible!", HttpStatus.BAD_REQUEST);
+            }
+        }
+
         Event event = new Event();
         event.setName(organizeEventDTO.getName());
         event.setDescription(organizeEventDTO.getDescription());

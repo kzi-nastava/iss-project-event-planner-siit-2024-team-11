@@ -108,8 +108,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -292,8 +292,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -324,8 +324,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -564,8 +564,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(List.of("veselin.roganovic.rogan003@gmail.com"));
@@ -932,8 +932,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -980,8 +980,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -1092,8 +1092,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -1140,8 +1140,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
