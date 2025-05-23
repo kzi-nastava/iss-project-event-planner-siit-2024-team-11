@@ -106,8 +106,14 @@ public class EventController {
         event.setMaxNumberParticipants(organizeEventDTO.getMaxNumberParticipants());
         event.setPrivacy(organizeEventDTO.getIsPublic() ? PrivacyType.PUBLIC : PrivacyType.PRIVATE);
         event.setDate(organizeEventDTO.getDate());
-        event.setType(eventTypeService.get(organizeEventDTO.getEventTypeId()));
         event.setOrganiser((EventOrganizer) userService.get(organizeEventDTO.getOrganizerId()));
+        EventType eventType = eventTypeService.get(organizeEventDTO.getEventTypeId());
+
+        if(eventType == null) {
+            return new ResponseEntity("Event type doesn't exist!", HttpStatus.BAD_REQUEST);
+        }
+
+        event.setType(eventType);
 
         Location location = new Location();
         location.setName(organizeEventDTO.getLocation().getName());
