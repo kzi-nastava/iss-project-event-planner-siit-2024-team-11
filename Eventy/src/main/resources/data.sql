@@ -28,6 +28,7 @@ VALUES
 -- Event Types
 INSERT INTO event_types(is_active, id, description, name)
 VALUES
+    (TRUE, 0, 'ALL', 'All'),
     (TRUE, DEFAULT, 'You know what we want? A HUGE PARTY!', 'Party'),
     (TRUE, DEFAULT, 'Graduations of all types!', 'Graduation'),
     (FALSE, DEFAULT, 'Only for luxurious event', 'Luxury'),

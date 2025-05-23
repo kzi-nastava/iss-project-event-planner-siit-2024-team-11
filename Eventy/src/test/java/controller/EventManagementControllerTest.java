@@ -1,10 +1,14 @@
 package controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfReader;
+import com.itextpdf.kernel.pdf.canvas.parser.PdfTextExtractor;
 import org.example.eventy.EventyApplication;
 import org.example.eventy.events.dtos.CreateActivityDTO;
 import org.example.eventy.events.dtos.CreateLocationDTO;
 import org.example.eventy.events.dtos.OrganizeEventDTO;
+import org.example.eventy.events.services.EventService;
 import org.example.eventy.events.services.EventTypeService;
 import org.example.eventy.users.dtos.LoginDTO;
 import org.example.eventy.users.dtos.UserTokenState;
@@ -22,11 +26,14 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayInputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -39,8 +46,8 @@ public class EventManagementControllerTest {
     // 1. Po tipu eventa, bilo koji, null, all -- DONE
     // 2. Naziv, opis, maks broj ucesnika, tip privatnosti, lokacija, datum - za vecinu normalna vrednost ili null, ponegde i
     // jos neka logika, npr za broj ucesnika mozemo negativan test za 0 i manje, za datum ne moze proslost i sl -- DONE
-    // 3. Agenda, za naziv, opis, vreme trajanja, lokaciju sve testirati, mozda cak i samu agendu da nije prazna?
-    // 4. PDF sa agendom preuzimanje
+    // 3. Agenda, za naziv, opis, vreme trajanja, lokaciju sve testirati, mozda cak i samu agendu da nije prazna? -- DONE
+    // 4. PDF sa agendom preuzimanje -- DONE
     // 5. getActiveTypes iz EventTypeController-a treba testirati takodje? dovoljno je praznu listu i
     // da ima 2 elementa i da se lepo prevedu u DTO? kako ovo testirati uopste, samo pozvati i da vrati? ovo zavisi od baze
     // 6. da ga kreira neko neauth ili neko auth a da nije organizer -- DONE
@@ -57,6 +64,8 @@ public class EventManagementControllerTest {
 
     @Autowired
     private EventTypeService eventTypeService;
+    @Autowired
+    private EventService eventService;
 
     @BeforeAll
     void setupTestData() throws Exception {
@@ -1604,4 +1613,56 @@ public class EventManagementControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$").value("Agenda timeline is not possible!"));
     }
+
+    @Test
+    public void downloadGuestListPDF_EventDoesntExist_ReturnsNotFound() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/events/pdfs/guest-list/100")
+                        .accept(MediaType.APPLICATION_PDF)
+                        .header("Authorization", "Bearer " + jwtToken))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void downloadGuestListPDF_HasTwoGuests_ReturnsOk() throws Exception {
+        byte[] pdfBytes = mockMvc.perform(MockMvcRequestBuilders.get("/api/events/pdfs/guest-list/1")
+                        .accept(MediaType.APPLICATION_PDF)
+                        .header("Authorization", "Bearer " + jwtToken))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsByteArray();
+
+        try (PdfReader pdfReader = new PdfReader(new ByteArrayInputStream(pdfBytes))) {
+            PdfDocument pdfDocument = new PdfDocument(pdfReader);
+
+            String pageContent = PdfTextExtractor.getTextFromPage(pdfDocument.getPage(1));
+
+            assertTrue(pageContent.contains("1. ves@gmail.com"));
+            assertTrue(pageContent.contains("2. c.tamara333@gmail.com"));
+
+            assertTrue(pageContent.contains("Guest List for: " + eventService.getEvent(1L).getName()));
+            assertFalse(pageContent.contains("3."));
+        }
+    }
+
+    @Test
+    public void downloadGuestListPDF_HasNoGuests_ReturnsOk() throws Exception {
+        byte[] pdfBytes = mockMvc.perform(MockMvcRequestBuilders.get("/api/events/pdfs/guest-list/3")
+                        .accept(MediaType.APPLICATION_PDF)
+                        .header("Authorization", "Bearer " + jwtToken))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsByteArray();
+
+        try (PdfReader pdfReader = new PdfReader(new ByteArrayInputStream(pdfBytes))) {
+            PdfDocument pdfDocument = new PdfDocument(pdfReader);
+
+            String pageContent = PdfTextExtractor.getTextFromPage(pdfDocument.getPage(1));
+
+            assertTrue(pageContent.contains("Guest List for: " + eventService.getEvent(3L).getName()));
+            assertFalse(pageContent.contains("1."));
+        }
+    }
+
 }

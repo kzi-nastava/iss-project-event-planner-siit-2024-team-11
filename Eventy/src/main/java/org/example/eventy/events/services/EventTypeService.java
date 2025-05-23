@@ -50,6 +50,10 @@ public class EventTypeService {
         EventType eventType = eventTypeRepository.findById(eventTypeId).orElse(null);
 
         if(eventType != null) {
+            if(eventType.getName().equals("All")) {
+                return eventType;
+            }
+
             if (eventType.isActive()) {
                 for(Event event : eventService.getAllEvents()) {
                     if (event.getType().equals(eventType) && event.getDate().isAfter(LocalDateTime.now())) {
