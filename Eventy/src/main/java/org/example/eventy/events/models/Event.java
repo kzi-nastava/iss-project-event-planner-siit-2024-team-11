@@ -35,11 +35,11 @@ public class Event {
     private LocalDateTime date;
 
     @ManyToOne(cascade = CascadeType.REFRESH)
-    @JoinColumn(name = "event_type_id", referencedColumnName = "id")
+    @JoinColumn(name = "event_type_id", referencedColumnName = "id", nullable = false)
     private EventType type;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "location_id", referencedColumnName = "id")
+    @JoinColumn(name = "location_id", referencedColumnName = "id", nullable = false)
     private Location location;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
@@ -47,7 +47,7 @@ public class Event {
     private List<Activity> agenda;
 
     @ManyToOne(cascade = CascadeType.REFRESH)
-    @JoinColumn(name = "organizer_id", referencedColumnName = "id")
+    @JoinColumn(name = "organizer_id", referencedColumnName = "id", nullable = false)
     private EventOrganizer organiser;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
