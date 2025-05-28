@@ -5,9 +5,15 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 public class EventOrganizationPage {
     private WebDriver driver;
@@ -98,6 +104,13 @@ public class EventOrganizationPage {
     }
 
     public void pressContinueButton() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(
+                By.cssSelector(".cdk-overlay-backdrop")
+        ));
+
+        wait.until(ExpectedConditions.elementToBeClickable(continueButton));
+
         continueButton.click();
     }
 
@@ -118,6 +131,7 @@ public class EventOrganizationPage {
     }
 
     public void setEventMaxParticipants(String maxParticipants) {
+        maxParticipantsInput.clear();
         maxParticipantsInput.sendKeys(maxParticipants);
     }
 
@@ -139,41 +153,108 @@ public class EventOrganizationPage {
 
     public void setEventType(String eventType) {
         eventTypeInput.click();
-        driver.findElement(By.xpath("//mat-option/span[contains(text(),'" + eventType + "')]")).click();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(3));
+
+        By optionLocator = By.xpath("//mat-option/span[contains(text(),'" + eventType + "')]");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(optionLocator));
+
+        driver.findElement(optionLocator).click();
     }
 
     public boolean hasEventTypeError() {
         return eventTypeInputError.isDisplayed();
     }
 
-    public void setMapPin(double latitude, double longitude) {
-        String script = "var map = document.getElementById('map')._leaflet_map;" +
-                "var marker = L.marker([" + latitude + ", " + longitude + "]).addTo(map);" +
-                "map.setView([" + latitude + ", " + longitude + "], 13);";
-        ((org.openqa.selenium.JavascriptExecutor) driver).executeScript(script);
+    public void setMapPin() {
+        map.click();
     }
 
     public boolean hasLocationError() {
         return noLocationText.isDisplayed();
     }
 
-    public void setEventDate(String date) {
-        dateInput.click();
-        WebElement dateElement = driver.findElement(By.xpath("//div[contains(@class,'mat-calendar-body-cell')]//div[contains(text(),'" + date + "')]"));
-        dateElement.click();
+    public void setEventDate(LocalDate targetDate) {
+        WebElement calendarToggle = driver.findElement(By.cssSelector("mat-datepicker-toggle button"));
+        calendarToggle.click();
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+
+        WebElement periodButton = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector(".mat-calendar-period-button")
+        ));
+        periodButton.click();
+
+        By yearLocator = By.xpath("//span[contains(@class,'mat-calendar-body-cell-content') and text()=' " + targetDate.getYear() + " ']");
+        WebElement year = wait.until(ExpectedConditions.elementToBeClickable(yearLocator));
+        year.click();
+
+        String month = targetDate.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
+        By monthLocator = By.xpath("//span[contains(@class,'mat-calendar-body-cell-content') and text()=' " + month.toUpperCase() + " ']");
+        WebElement monthEl = wait.until(ExpectedConditions.elementToBeClickable(monthLocator));
+        monthEl.click();
+
+        String day = String.valueOf(targetDate.getDayOfMonth());
+        By dayLocator = By.xpath("//span[contains(@class,'mat-calendar-body-cell-content') and text()=' " + day + " ']");
+        WebElement dayEl = wait.until(ExpectedConditions.elementToBeClickable(dayLocator));
+        dayEl.click();
     }
 
     public boolean hasDateError() {
         return dateInputError.isDisplayed();
     }
 
+    private void setTime(WebDriverWait wait, LocalDateTime time) {
+        WebElement hourBox = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector(".owl-dt-timer-hour .owl-dt-control-button-content")
+        ));
+        hourBox.click();
+
+        WebElement hour = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//div[contains(@class,'owl-dt-timer-cell') and text()='" + String.format("%02d", time.getHour()) + "']")
+        ));
+        hour.click();
+
+        WebElement minuteBox = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector(".owl-dt-timer-minute .owl-dt-control-button-content")
+        ));
+        minuteBox.click();
+
+        WebElement minute = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//div[contains(@class,'owl-dt-timer-cell') and text()='" + String.format("%02d", time.getMinute()) + "']")
+        ));
+        minute.click();
+    }
+
     public void addActivity(String activityName, String activityDescription, String activityLocation, LocalDateTime activityStartTime, LocalDateTime activityEndTime) {
         activityNameInput.sendKeys(activityName);
         activityDescriptionInput.sendKeys(activityDescription);
         activityLocationInput.sendKeys(activityLocation);
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(3));
+
         activityTimeRangeInput.click();
-        activityTimeRangeInput.sendKeys(activityStartTime.format(DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm"))
-                + " - " + activityEndTime.format(DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm")));
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("owl-date-time-container")));
+
+        WebElement startDayEl = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//span[contains(@class,'owl-dt-calendar-cell-content') and text()=' " + activityStartTime.getDayOfMonth() + " ']")
+        ));
+        startDayEl.click();
+
+        setTime(wait, activityStartTime);
+
+        WebElement endDayEl = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//span[contains(@class,'owl-dt-calendar-cell-content') and text()=' " + activityEndTime.getDayOfMonth() + " ']")
+        ));
+        endDayEl.click();
+
+        setTime(wait, activityEndTime);
+
+        WebElement confirmBtn = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector("button.owl-dt-control-button.owl-dt-control-button-confirm")
+        ));
+
+        confirmBtn.click();
 
         activityAddButton.click();
     }
