@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
+import java.util.List;
 import java.util.Locale;
 
 public class EventOrganizationPage {
@@ -204,25 +205,18 @@ public class EventOrganizationPage {
     }
 
     private void setTime(WebDriverWait wait, LocalDateTime time) {
-        WebElement hourBox = wait.until(ExpectedConditions.elementToBeClickable(
-                By.cssSelector(".owl-dt-timer-hour .owl-dt-control-button-content")
+        List<WebElement> timerInputs = wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(
+                By.cssSelector(".owl-dt-timer-input"), 1
         ));
-        hourBox.click();
 
-        WebElement hour = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//div[contains(@class,'owl-dt-timer-cell') and text()='" + String.format("%02d", time.getHour()) + "']")
-        ));
-        hour.click();
+        WebElement hourInput = timerInputs.get(0);
+        WebElement minuteInput = timerInputs.get(1);
 
-        WebElement minuteBox = wait.until(ExpectedConditions.elementToBeClickable(
-                By.cssSelector(".owl-dt-timer-minute .owl-dt-control-button-content")
-        ));
-        minuteBox.click();
+        hourInput.clear();
+        hourInput.sendKeys(String.format("%02d", time.getHour()));
 
-        WebElement minute = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//div[contains(@class,'owl-dt-timer-cell') and text()='" + String.format("%02d", time.getMinute()) + "']")
-        ));
-        minute.click();
+        minuteInput.clear();
+        minuteInput.sendKeys(String.format("%02d", time.getMinute()));
     }
 
     public void addActivity(String activityName, String activityDescription, String activityLocation, LocalDateTime activityStartTime, LocalDateTime activityEndTime) {
@@ -251,7 +245,7 @@ public class EventOrganizationPage {
         setTime(wait, activityEndTime);
 
         WebElement confirmBtn = wait.until(ExpectedConditions.elementToBeClickable(
-                By.cssSelector("button.owl-dt-control-button.owl-dt-control-button-confirm")
+                By.xpath("//button[contains(@class,'owl-dt-control-button')]//span[text()=' Set ']")
         ));
 
         confirmBtn.click();

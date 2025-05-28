@@ -52,5 +52,7 @@ public class EventManagementTest extends ChromeTestBase {
         eventOrganizationPage.addActivity("Activity 1", "This is a sample activity description.", "Activity Location", LocalDateTime.of(2025, 7, 7, 10, 0, 0), LocalDateTime.of(2025, 7, 7, 12, 0, 0));
 
         eventOrganizationPage.pressContinueButton();
+
+        // assertations
     }
 }
