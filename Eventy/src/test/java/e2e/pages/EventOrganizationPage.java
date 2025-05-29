@@ -1,6 +1,7 @@
 package e2e.pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -109,6 +110,7 @@ public class EventOrganizationPage {
                 By.cssSelector(".cdk-overlay-backdrop")
         ));
 
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("#no-location-text")));
         wait.until(ExpectedConditions.elementToBeClickable(continueButton));
 
         continueButton.click();
@@ -119,7 +121,13 @@ public class EventOrganizationPage {
     }
 
     public boolean hasNameError() {
-        return nameInputError.isDisplayed();
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+            wait.until(ExpectedConditions.visibilityOf(nameInputError));
+            return nameInputError.isDisplayed();
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
     public void setEventDescription(String description) {
@@ -127,7 +135,13 @@ public class EventOrganizationPage {
     }
 
     public boolean hasDescriptionError() {
-        return descriptionInputError.isDisplayed();
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+            wait.until(ExpectedConditions.visibilityOf(descriptionInputError));
+            return descriptionInputError.isDisplayed();
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
     public void setEventMaxParticipants(String maxParticipants) {
@@ -136,11 +150,23 @@ public class EventOrganizationPage {
     }
 
     public boolean hasMaxParticipantsRequiredError() {
-        return maxParticipantsInputRequiredError.isDisplayed();
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+            wait.until(ExpectedConditions.visibilityOf(maxParticipantsInputRequiredError));
+            return maxParticipantsInputRequiredError.isDisplayed();
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
     public boolean hasMaxParticipantsPositiveError() {
-        return maxParticipantsInputPositiveError.isDisplayed();
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+            wait.until(ExpectedConditions.visibilityOf(maxParticipantsInputPositiveError));
+            return maxParticipantsInputPositiveError.isDisplayed();
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
     public void setEventPrivacy(String privacy) {
@@ -162,7 +188,13 @@ public class EventOrganizationPage {
     }
 
     public boolean hasEventTypeError() {
-        return eventTypeInputError.isDisplayed();
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+            wait.until(ExpectedConditions.visibilityOf(eventTypeInputError));
+            return eventTypeInputError.isDisplayed();
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
     public void setMapPin() {
@@ -170,7 +202,13 @@ public class EventOrganizationPage {
     }
 
     public boolean hasLocationError() {
-        return noLocationText.isDisplayed();
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+            wait.until(ExpectedConditions.visibilityOf(noLocationText));
+            return noLocationText.isDisplayed();
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
     public void setEventDate(LocalDate targetDate) {
@@ -200,7 +238,13 @@ public class EventOrganizationPage {
     }
 
     public boolean hasDateError() {
-        return dateInputError.isDisplayed();
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+            wait.until(ExpectedConditions.visibilityOf(dateInputError));
+            return dateInputError.isDisplayed();
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
     private void setTime(WebDriverWait wait, LocalDateTime time) {
@@ -253,23 +297,53 @@ public class EventOrganizationPage {
     }
 
     public boolean hasActivityNameError() {
-        return activityNameInputError.isDisplayed();
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+            wait.until(ExpectedConditions.visibilityOf(activityNameInputError));
+            return activityNameInputError.isDisplayed();
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
     public boolean hasActivityDescriptionError() {
-        return activityDescriptionInputError.isDisplayed();
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+            wait.until(ExpectedConditions.visibilityOf(activityDescriptionInputError));
+            return activityDescriptionInputError.isDisplayed();
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
     public boolean hasActivityLocationError() {
-        return activityLocationInputError.isDisplayed();
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+            wait.until(ExpectedConditions.visibilityOf(activityLocationInputError));
+            return activityLocationInputError.isDisplayed();
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
     public boolean hasActivityTimeRangeError() {
-        return activityTimeRangeInputRequiredError.isDisplayed();
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+            wait.until(ExpectedConditions.visibilityOf(activityTimeRangeInputRequiredError));
+            return activityTimeRangeInputRequiredError.isDisplayed();
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
     public boolean hasActivityEndTimeRequiredError() {
-        return activityTimeRangeInputEndTimeRequiredError.isDisplayed();
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+            wait.until(ExpectedConditions.visibilityOf(activityTimeRangeInputEndTimeRequiredError));
+            return activityTimeRangeInputEndTimeRequiredError.isDisplayed();
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
 }

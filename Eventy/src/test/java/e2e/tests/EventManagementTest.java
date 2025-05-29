@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EventManagementTest extends ChromeTestBase {
     private LoginPage loginPage;
@@ -38,7 +39,7 @@ public class EventManagementTest extends ChromeTestBase {
     }
     
     @Test
-    public void organizeEvent_allValid_createsEvent() {
+    public void organizeEvent_AllValid_CreatesEvent() {
         eventOrganizationPage.setEventName("Sample Event");
         eventOrganizationPage.setEventDescription("This is a sample event description.");
         eventOrganizationPage.setEventMaxParticipants("100");
@@ -64,5 +65,192 @@ public class EventManagementTest extends ChromeTestBase {
         assertEquals("100", homePage.getFirstFeaturedEventMaxParticipants());
         assertEquals("Party", homePage.getFirstFeaturedEventType());
         assertEquals("July 7, 2025", homePage.getFirstFeaturedEventDate());
+    }
+
+    @Test
+    public void organizeEvent_NameNotSet_RaisesAnError() {
+        eventOrganizationPage.setEventDescription("This is a sample event description.");
+        eventOrganizationPage.setEventMaxParticipants("100");
+        eventOrganizationPage.setEventPrivacy("Public");
+        eventOrganizationPage.setEventType("Party");
+        eventOrganizationPage.setMapPin();
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+
+        eventOrganizationPage.pressContinueButton();
+
+        assertTrue(eventOrganizationPage.hasNameError());
+    }
+
+    @Test
+    public void organizeEvent_NameEmpty_RaisesAnError() {
+        eventOrganizationPage.setEventName("");
+        eventOrganizationPage.setEventDescription("This is a sample event description.");
+        eventOrganizationPage.setEventMaxParticipants("100");
+        eventOrganizationPage.setEventPrivacy("Public");
+        eventOrganizationPage.setEventType("Party");
+        eventOrganizationPage.setMapPin();
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+
+        eventOrganizationPage.pressContinueButton();
+
+        assertTrue(eventOrganizationPage.hasNameError());
+    }
+
+    @Test
+    public void organizeEvent_DescriptionNotSet_RaisesAnError() {
+        eventOrganizationPage.setEventName("Sample Event");
+        eventOrganizationPage.setEventMaxParticipants("100");
+        eventOrganizationPage.setEventPrivacy("Public");
+        eventOrganizationPage.setEventType("Party");
+        eventOrganizationPage.setMapPin();
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+
+        eventOrganizationPage.pressContinueButton();
+
+        assertTrue(eventOrganizationPage.hasDescriptionError());
+    }
+
+    @Test
+    public void organizeEvent_DescriptionEmpty_RaisesAnError() {
+        eventOrganizationPage.setEventName("Sample Event");
+        eventOrganizationPage.setEventDescription("");
+        eventOrganizationPage.setEventMaxParticipants("100");
+        eventOrganizationPage.setEventPrivacy("Public");
+        eventOrganizationPage.setEventType("Party");
+        eventOrganizationPage.setMapPin();
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+
+        eventOrganizationPage.pressContinueButton();
+
+        assertTrue(eventOrganizationPage.hasDescriptionError());
+    }
+
+    @Test
+    public void organizeEvent_MaxParticipantsNotSet_RaisesAnError() {
+        eventOrganizationPage.setEventName("Sample Event");
+        eventOrganizationPage.setEventDescription("This is a sample event description.");
+        eventOrganizationPage.setEventPrivacy("Public");
+        eventOrganizationPage.setEventType("Party");
+        eventOrganizationPage.setMapPin();
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+
+        eventOrganizationPage.pressContinueButton();
+
+        assertTrue(eventOrganizationPage.hasMaxParticipantsPositiveError());
+    }
+
+    @Test
+    public void organizeEvent_MaxParticipantsEmpty_RaisesAnError() {
+        eventOrganizationPage.setEventName("Sample Event");
+        eventOrganizationPage.setEventDescription("This is a sample event description.");
+        eventOrganizationPage.setEventMaxParticipants("");
+        eventOrganizationPage.setEventPrivacy("Public");
+        eventOrganizationPage.setEventType("Party");
+        eventOrganizationPage.setMapPin();
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+
+        eventOrganizationPage.pressContinueButton();
+
+        assertTrue(eventOrganizationPage.hasMaxParticipantsPositiveError());
+    }
+
+    @Test
+    public void organizeEvent_MaxParticipantsNotNumbers_RaisesAnError() {
+        eventOrganizationPage.setEventName("Sample Event");
+        eventOrganizationPage.setEventDescription("This is a sample event description.");
+        eventOrganizationPage.setEventMaxParticipants("Not a number");
+        eventOrganizationPage.setEventPrivacy("Public");
+        eventOrganizationPage.setEventType("Party");
+        eventOrganizationPage.setMapPin();
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+
+        eventOrganizationPage.pressContinueButton();
+
+        assertTrue(eventOrganizationPage.hasMaxParticipantsPositiveError());
+    }
+
+    @Test
+    public void organizeEvent_MaxParticipantsNegative_RaisesAnError() {
+        eventOrganizationPage.setEventName("Sample Event");
+        eventOrganizationPage.setEventDescription("This is a sample event description.");
+        eventOrganizationPage.setEventMaxParticipants("-1");
+        eventOrganizationPage.setEventPrivacy("Public");
+        eventOrganizationPage.setEventType("Party");
+        eventOrganizationPage.setMapPin();
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+
+        eventOrganizationPage.pressContinueButton();
+
+        assertTrue(eventOrganizationPage.hasMaxParticipantsPositiveError());
+    }
+
+    @Test
+    public void organizeEvent_MaxParticipantsZero_RaisesAnError() {
+        eventOrganizationPage.setEventName("Sample Event");
+        eventOrganizationPage.setEventDescription("This is a sample event description.");
+        eventOrganizationPage.setEventMaxParticipants("0");
+        eventOrganizationPage.setEventPrivacy("Public");
+        eventOrganizationPage.setEventType("Party");
+        eventOrganizationPage.setMapPin();
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+
+        eventOrganizationPage.pressContinueButton();
+
+        assertTrue(eventOrganizationPage.hasMaxParticipantsPositiveError());
+    }
+
+    @Test
+    public void organizeEvent_MaxParticipantsDecimal_RaisesAnError() {
+        eventOrganizationPage.setEventName("Sample Event");
+        eventOrganizationPage.setEventDescription("This is a sample event description.");
+        eventOrganizationPage.setEventMaxParticipants("12,34");
+        eventOrganizationPage.setEventPrivacy("Public");
+        eventOrganizationPage.setEventType("Party");
+        eventOrganizationPage.setMapPin();
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+
+        eventOrganizationPage.pressContinueButton();
+
+        assertTrue(eventOrganizationPage.hasMaxParticipantsPositiveError());
+    }
+
+    @Test
+    public void organizeEvent_NoMapPin_RaisesAnError() {
+        eventOrganizationPage.setEventName("Sample Event");
+        eventOrganizationPage.setEventDescription("This is a sample event description.");
+        eventOrganizationPage.setEventMaxParticipants("100");
+        eventOrganizationPage.setEventPrivacy("Public");
+        eventOrganizationPage.setEventType("Party");
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+
+        assertTrue(eventOrganizationPage.hasLocationError());
+    }
+
+    @Test
+    public void organizeEvent_EventTypeNotSet_RaisesAnError() {
+        eventOrganizationPage.setEventName("Sample Event");
+        eventOrganizationPage.setEventDescription("This is a sample event description.");
+        eventOrganizationPage.setEventMaxParticipants("100");
+        eventOrganizationPage.setEventPrivacy("Public");
+        eventOrganizationPage.setMapPin();
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+
+        eventOrganizationPage.pressContinueButton();
+
+        assertTrue(eventOrganizationPage.hasEventTypeError());
+    }
+
+    @Test
+    public void organizeEvent_EventDateNotSet_RaisesAnError() {
+        eventOrganizationPage.setEventName("Sample Event");
+        eventOrganizationPage.setEventDescription("This is a sample event description.");
+        eventOrganizationPage.setEventMaxParticipants("100");
+        eventOrganizationPage.setEventPrivacy("Public");
+        eventOrganizationPage.setEventType("Party");
+        eventOrganizationPage.setMapPin();
+
+        eventOrganizationPage.pressContinueButton();
+
+        assertTrue(eventOrganizationPage.hasDateError());
     }
 }
