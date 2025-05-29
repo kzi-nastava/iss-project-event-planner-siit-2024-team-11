@@ -41,6 +41,24 @@ public class HomePage {
     @FindBy(css = "input[formcontrolname='end']")
     private WebElement endDatePicker;
 
+    @FindBy(css = ".featured_card:first-child #title")
+    private WebElement firstFeaturedEventTitle;
+
+    @FindBy(css = ".featured_card:first-child #type")
+    private WebElement firstFeaturedEventType;
+
+    @FindBy(css = ".featured_card:first-child #max_participants")
+    private WebElement firstFeaturedEventMaxParticipants;
+
+    @FindBy(css = ".featured_card:first-child #date")
+    private WebElement firstFeaturedEventDate;
+
+    @FindBy(css = ".featured_card:first-child #location")
+    private WebElement firstFeaturedEventLocation;
+
+    @FindBy(css = ".featured_card:first-child #description")
+    private WebElement firstFeaturedEventDescription;
+
     public HomePage(WebDriver driver) {
         this.driver = driver;
         driver.get(PAGE_URL);
@@ -120,5 +138,23 @@ public class HomePage {
         js.executeScript("arguments[0].scrollIntoView({behavior: 'smooth', block: 'start'});", eventsContainer);
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#event_filters")));
+    }
+
+    public String getFirstFeaturedEventTitle() {
+        return firstFeaturedEventTitle.getText();
+    }
+
+    public String getFirstFeaturedEventType() {
+        return firstFeaturedEventType.getText();
+    }
+    public String getFirstFeaturedEventMaxParticipants() {
+        return firstFeaturedEventMaxParticipants.getText();
+    }
+    public String getFirstFeaturedEventDate() {
+        return firstFeaturedEventDate.getText();
+    }
+
+    public String getFirstFeaturedEventDescription() {
+        return firstFeaturedEventDescription.getText();
     }
 }

@@ -2,6 +2,7 @@ package e2e.tests;
 
 import e2e.base.ChromeTestBase;
 import e2e.pages.EventOrganizationPage;
+import e2e.pages.HomePage;
 import e2e.pages.LoginPage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +14,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EventManagementTest extends ChromeTestBase {
     private LoginPage loginPage;
@@ -53,6 +56,13 @@ public class EventManagementTest extends ChromeTestBase {
 
         eventOrganizationPage.pressContinueButton();
 
-        // assertations
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".featured_card")));
+
+        HomePage homePage = new HomePage(driver);
+        assertEquals("Sample Event", homePage.getFirstFeaturedEventTitle());
+        assertEquals("This is a sample event description.", homePage.getFirstFeaturedEventDescription());
+        assertEquals("100", homePage.getFirstFeaturedEventMaxParticipants());
+        assertEquals("Party", homePage.getFirstFeaturedEventType());
+        assertEquals("July 7, 2025", homePage.getFirstFeaturedEventDate());
     }
 }
