@@ -98,6 +98,12 @@ public class EventOrganizationPage {
     @FindBy(id = "activity-add-button")
     private WebElement activityAddButton;
 
+    @FindBy(css = ".error_dialog")
+    private WebElement errorDialog;
+
+    @FindBy(id = "error_dialog_close_button")
+    private WebElement errorDialogCloseButton;
+
     public EventOrganizationPage(WebDriver driver) {
         this.driver = driver;
         driver.get(PAGE_URL);
@@ -273,19 +279,23 @@ public class EventOrganizationPage {
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("owl-date-time-container")));
 
-        WebElement startDayEl = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//span[contains(@class,'owl-dt-calendar-cell-content') and text()=' " + activityStartTime.getDayOfMonth() + " ']")
-        ));
-        startDayEl.click();
+        if(activityStartTime != null) {
+            WebElement startDayEl = wait.until(ExpectedConditions.elementToBeClickable(
+                    By.xpath("//span[contains(@class,'owl-dt-calendar-cell-content') and text()=' " + activityStartTime.getDayOfMonth() + " ']")
+            ));
+            startDayEl.click();
 
-        setTime(wait, activityStartTime);
+            setTime(wait, activityStartTime);
 
-        WebElement endDayEl = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//span[contains(@class,'owl-dt-calendar-cell-content') and text()=' " + activityEndTime.getDayOfMonth() + " ']")
-        ));
-        endDayEl.click();
+            if(activityEndTime != null) {
+                WebElement endDayEl = wait.until(ExpectedConditions.elementToBeClickable(
+                        By.xpath("//span[contains(@class,'owl-dt-calendar-cell-content') and text()=' " + activityEndTime.getDayOfMonth() + " ']")
+                ));
+                endDayEl.click();
 
-        setTime(wait, activityEndTime);
+                setTime(wait, activityEndTime);
+            }
+        }
 
         WebElement confirmBtn = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//button[contains(@class,'owl-dt-control-button')]//span[text()=' Set ']")
@@ -344,6 +354,20 @@ public class EventOrganizationPage {
         } catch (TimeoutException e) {
             return false;
         }
+    }
+
+    public boolean isErrorDialogDisplayed() {
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+            wait.until(ExpectedConditions.visibilityOf(errorDialog));
+            return errorDialog.isDisplayed();
+        } catch (TimeoutException e) {
+            return false;
+        }
+    }
+
+    public void closeErrorDialog() {
+        errorDialogCloseButton.click();
     }
 
 }

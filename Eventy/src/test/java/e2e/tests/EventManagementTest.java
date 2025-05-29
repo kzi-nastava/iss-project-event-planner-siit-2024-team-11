@@ -253,4 +253,146 @@ public class EventManagementTest extends ChromeTestBase {
 
         assertTrue(eventOrganizationPage.hasDateError());
     }
+
+    @Test
+    public void organizeEvent_AgendaEmpty_RaisesAnError() {
+        eventOrganizationPage.setEventName("Sample Event");
+        eventOrganizationPage.setEventDescription("This is a sample event description.");
+        eventOrganizationPage.setEventMaxParticipants("100");
+        eventOrganizationPage.setEventPrivacy("Public");
+        eventOrganizationPage.setEventType("Party");
+        eventOrganizationPage.setMapPin();
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+
+        eventOrganizationPage.pressContinueButton();
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#activity-name-input")));
+
+        eventOrganizationPage.pressContinueButton();
+
+        assertTrue(eventOrganizationPage.isErrorDialogDisplayed());
+
+        eventOrganizationPage.closeErrorDialog();
+    }
+
+    @Test
+    public void organizeEvent_ActivityNameNotSet_RaisesAnError() {
+        eventOrganizationPage.setEventName("Sample Event");
+        eventOrganizationPage.setEventDescription("This is a sample event description.");
+        eventOrganizationPage.setEventMaxParticipants("100");
+        eventOrganizationPage.setEventPrivacy("Public");
+        eventOrganizationPage.setEventType("Party");
+        eventOrganizationPage.setMapPin();
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+
+        eventOrganizationPage.pressContinueButton();
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#activity-name-input")));
+
+        eventOrganizationPage.addActivity("", "This is a sample activity description.", "Activity Location", LocalDateTime.of(2025, 7, 7, 10, 0, 0), LocalDateTime.of(2025, 7, 7, 12, 0, 0));
+
+        assertTrue(eventOrganizationPage.hasActivityNameError());
+    }
+
+    @Test
+    public void organizeEvent_ActivityDescriptionNotSet_RaisesAnError() {
+        eventOrganizationPage.setEventName("Sample Event");
+        eventOrganizationPage.setEventDescription("This is a sample event description.");
+        eventOrganizationPage.setEventMaxParticipants("100");
+        eventOrganizationPage.setEventPrivacy("Public");
+        eventOrganizationPage.setEventType("Party");
+        eventOrganizationPage.setMapPin();
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+
+        eventOrganizationPage.pressContinueButton();
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#activity-name-input")));
+
+        eventOrganizationPage.addActivity("Activity 1", "", "Activity Location", LocalDateTime.of(2025, 7, 7, 10, 0, 0), LocalDateTime.of(2025, 7, 7, 12, 0, 0));
+
+        assertTrue(eventOrganizationPage.hasActivityDescriptionError());
+    }
+
+    @Test
+    public void organizeEvent_ActivityLocationNotSet_RaisesAnError() {
+        eventOrganizationPage.setEventName("Sample Event");
+        eventOrganizationPage.setEventDescription("This is a sample event description.");
+        eventOrganizationPage.setEventMaxParticipants("100");
+        eventOrganizationPage.setEventPrivacy("Public");
+        eventOrganizationPage.setEventType("Party");
+        eventOrganizationPage.setMapPin();
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+
+        eventOrganizationPage.pressContinueButton();
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#activity-name-input")));
+
+        eventOrganizationPage.addActivity("Activity 1", "This is a sample activity description.", "", LocalDateTime.of(2025, 7, 7, 10, 0, 0), LocalDateTime.of(2025, 7, 7, 12, 0, 0));
+
+        assertTrue(eventOrganizationPage.hasActivityLocationError());
+    }
+
+    @Test
+    public void organizeEvent_ActivityTimeRangeNotSet_RaisesAnError() {
+        eventOrganizationPage.setEventName("Sample Event");
+        eventOrganizationPage.setEventDescription("This is a sample event description.");
+        eventOrganizationPage.setEventMaxParticipants("100");
+        eventOrganizationPage.setEventPrivacy("Public");
+        eventOrganizationPage.setEventType("Party");
+        eventOrganizationPage.setMapPin();
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+
+        eventOrganizationPage.pressContinueButton();
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#activity-name-input")));
+
+        eventOrganizationPage.addActivity("Activity 1", "This is a sample activity description.", "Activity Location", null, null);
+
+        assertTrue(eventOrganizationPage.hasActivityTimeRangeError());
+    }
+
+    @Test
+    public void organizeEvent_ActivityEndTimeNotSet_RaisesAnError() {
+        eventOrganizationPage.setEventName("Sample Event");
+        eventOrganizationPage.setEventDescription("This is a sample event description.");
+        eventOrganizationPage.setEventMaxParticipants("100");
+        eventOrganizationPage.setEventPrivacy("Public");
+        eventOrganizationPage.setEventType("Party");
+        eventOrganizationPage.setMapPin();
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+
+        eventOrganizationPage.pressContinueButton();
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#activity-name-input")));
+
+        eventOrganizationPage.addActivity("Activity 1", "This is a sample activity description.", "Activity Location", LocalDateTime.of(2025, 7, 7, 10, 0, 0), null);
+
+        assertTrue(eventOrganizationPage.hasActivityEndTimeRequiredError());
+    }
+
+    @Test
+    public void organizeEvent_ActivityTimeRangeZero_RaisesAnError() {
+        eventOrganizationPage.setEventName("Sample Event");
+        eventOrganizationPage.setEventDescription("This is a sample event description.");
+        eventOrganizationPage.setEventMaxParticipants("100");
+        eventOrganizationPage.setEventPrivacy("Public");
+        eventOrganizationPage.setEventType("Party");
+        eventOrganizationPage.setMapPin();
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+
+        eventOrganizationPage.pressContinueButton();
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#activity-name-input")));
+
+        eventOrganizationPage.addActivity("Activity 1", "This is a sample activity description.", "Activity Location", LocalDateTime.of(2025, 7, 7, 10, 0, 0), LocalDateTime.of(2025, 7, 7, 10, 0, 0));
+
+        assertTrue(eventOrganizationPage.hasActivityEndTimeRequiredError());
+    }
 }
