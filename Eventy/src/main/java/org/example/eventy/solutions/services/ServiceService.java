@@ -7,6 +7,7 @@ import org.example.eventy.events.models.EventType;
 import org.example.eventy.events.services.EventTypeService;
 import org.example.eventy.solutions.dtos.services.*;
 import org.example.eventy.solutions.models.Service;
+import org.example.eventy.solutions.models.ServiceHistory;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.repositories.SolutionRepository;
 import org.example.eventy.users.models.SolutionProvider;
@@ -31,6 +32,9 @@ public class ServiceService {
 
     @Autowired
     private PictureService pictureService;
+
+    @Autowired
+    private ServiceHistoryService serviceHistoryService;
 
     public Service createService(CreateServiceDTO createServiceDTO) {
         Service service = new Service();
@@ -73,7 +77,7 @@ public class ServiceService {
         service.setDescription(updateServiceDTO.getDescription());
         service.setPrice(updateServiceDTO.getPrice());
         service.setDiscount(updateServiceDTO.getDiscount());
-        service.setImageUrls(pictureService.save(updateServiceDTO.getImageUrls())); // TO-DO
+        service.setImageUrls(pictureService.save(updateServiceDTO.getImageUrls()));
         service.setVisible(updateServiceDTO.getVisible());
         service.setAvailable(updateServiceDTO.getAvailable());
         List<EventType> eventTypes = new ArrayList<>();
@@ -87,6 +91,14 @@ public class ServiceService {
         service.setReservationDeadline(updateServiceDTO.getReservationDeadline());
         service.setCancellationDeadline(updateServiceDTO.getCancellationDeadline());
         service.setReservationType(updateServiceDTO.getAutomaticReservationAcceptance() ? ReservationConfirmationType.AUTOMATIC : ReservationConfirmationType.MANUAL);
+        service.setCurrentService(serviceHistoryService.save(new ServiceHistory(service)));
+        return solutionRepository.save(service);
+    }
+
+    public Service updatePrice(Service service, Double price, Double discount) {
+        service.setPrice(price);
+        service.setDiscount(discount.intValue());
+        service.setCurrentService(serviceHistoryService.save(new ServiceHistory(service)));
         return solutionRepository.save(service);
     }
     
