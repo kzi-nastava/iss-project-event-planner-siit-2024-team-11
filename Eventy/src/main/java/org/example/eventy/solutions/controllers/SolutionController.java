@@ -1,11 +1,16 @@
 package org.example.eventy.solutions.controllers;
 
 import org.example.eventy.common.models.PagedResponse;
-import org.example.eventy.events.models.Event;
-import org.example.eventy.solutions.dtos.PriceListDTO;
+import org.example.eventy.solutions.dtos.PricelistItemDTO;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
 import org.example.eventy.solutions.dtos.SolutionDetailsDTO;
+import org.example.eventy.solutions.dtos.services.ServiceDTO;
+import org.example.eventy.solutions.dtos.services.UpdateServiceDTO;
+import org.example.eventy.solutions.models.Product;
+import org.example.eventy.solutions.models.ProductHistory;
+import org.example.eventy.solutions.models.Service;
 import org.example.eventy.solutions.models.Solution;
+import org.example.eventy.solutions.services.ProductHistoryService;
 import org.example.eventy.solutions.services.ProductService;
 import org.example.eventy.solutions.services.ServiceService;
 import org.example.eventy.solutions.services.SolutionService;
@@ -38,8 +43,11 @@ public class SolutionController {
     private UserService userService;
     @Autowired
     private TokenUtils tokenUtils;
-
+    @Autowired
+    private ProductHistoryService productHistoryService;
+    @Autowired
     private ServiceService serviceService;
+    @Autowired
     private ProductService productService;
 
     @GetMapping(value = "/favorite/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -234,19 +242,65 @@ public class SolutionController {
         return new ResponseEntity<Collection<SolutionCardDTO>>(featuredSolutionsDTO, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/pricelist/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<SolutionCardDTO>> getProviderPrices(@PathVariable Long userId) {
-        // TO-DO: deleted because unused and not part of this feature
-        return new ResponseEntity<Collection<SolutionCardDTO>>(HttpStatus.NOT_FOUND);
+    @GetMapping(value = "/pricelist", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Provider')")
+    public ResponseEntity<PagedResponse<PricelistItemDTO>> getProviderPrices(@RequestHeader(value = "Authorization") String token, Pageable pageable) {
+        User user = null;
+        if(token != null) {
+            token = token.substring(7);
+
+            try {
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
+        }
+
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        List<Solution> solutions = solutionService.getSolutionsByProvider(user.getId(), "", pageable);
+        long count = solutionService.getSolutionsByProviderCount(user.getId());
+        List<PricelistItemDTO> items = solutions.stream().map(solution -> new PricelistItemDTO(solution.getId(), solution.getName(), solution.getPrice(), (double) solution.getDiscount())).toList();
+        PagedResponse<PricelistItemDTO> response = new PagedResponse<>(items, (int) Math.ceil((double) count / pageable.getPageSize()), count);
+        return new ResponseEntity<PagedResponse<PricelistItemDTO>>(response, HttpStatus.OK);
     }
 
-    @PutMapping(value = "/pricelist/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateProviderPrices(@PathVariable Long userId, @RequestBody PriceListDTO newPricelist) {
-        if(userId == 5) {
-            // handle new price list in service
-            return new ResponseEntity<>(HttpStatus.OK);
+    @PutMapping(value = "/pricelist", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Provider')")
+    public ResponseEntity<PricelistItemDTO> updatePrice(@RequestHeader(value = "Authorization") String token, @RequestBody PricelistItemDTO newData) {
+        User user = null;
+        if(token != null) {
+            token = token.substring(7);
+
+            try {
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
         }
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+
+        Solution solution = solutionService.getSolution(newData.getId());
+        if (solution == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (solution.getPrice() == newData.getPrice() && solution.getDiscount() == newData.getDiscount()) {
+            return new ResponseEntity<PricelistItemDTO>(new PricelistItemDTO(solution.getId(), solution.getName(), solution.getPrice(), (double) solution.getDiscount()) ,HttpStatus.OK);
+        }
+
+        if (solution instanceof Service) {
+            Service service = (Service) solution;
+            service = serviceService.updatePrice(service, newData.getPrice(), newData.getDiscount());
+            return new ResponseEntity<PricelistItemDTO>(new PricelistItemDTO(service.getId(), service.getName(), service.getPrice(), (double) service.getDiscount()), HttpStatus.OK);
+        } else {
+            Product product = (Product) solution;
+            product.setPrice(newData.getPrice());
+            product.setDiscount(newData.getDiscount().intValue());
+            product.setCurrentProduct(productHistoryService.save(new ProductHistory(product)));
+            product = productService.save(product);
+            return new ResponseEntity<PricelistItemDTO>(new PricelistItemDTO(product.getId(), product.getName(), product.getPrice(), (double) product.getDiscount()), HttpStatus.OK);
+        }
     }
 
     @GetMapping(value = "/event-types", produces = MediaType.APPLICATION_JSON_VALUE)
