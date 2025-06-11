@@ -81,7 +81,7 @@ public class UserProfileController {
 
         }
 
-        user = userService.save(user, true);
+        user = userService.save(user, !updateUserProfileDTO.getPassword().isEmpty());
 
         if(user == null) {
             return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
