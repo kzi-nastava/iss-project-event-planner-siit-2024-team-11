@@ -61,7 +61,7 @@ public class UserProfileController {
         user.setEmail(updateUserProfileDTO.getEmail());
         user.setAddress(updateUserProfileDTO.getAddress());
         user.setPhoneNumber(updateUserProfileDTO.getPhoneNumber());
-        user.setPassword(updateUserProfileDTO.getPassword());
+        if(!updateUserProfileDTO.getPassword().isEmpty()) user.setPassword(updateUserProfileDTO.getPassword());
         user.setImageUrls(pictureService.save(updateUserProfileDTO.getProfilePictures())); // update!
 
         UserType userType = userService.getUserType(user);
