@@ -1,5 +1,14 @@
 package org.example.eventy.solutions.controllers;
 
+import com.itextpdf.io.source.ByteArrayOutputStream;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.properties.UnitValue;
 import org.example.eventy.common.models.PagedResponse;
 import org.example.eventy.solutions.dtos.PricelistItemDTO;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
@@ -20,6 +29,7 @@ import org.example.eventy.util.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -374,5 +384,72 @@ public class SolutionController {
         }
 
         return new ResponseEntity<>(new SolutionDetailsDTO(solution, user), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('Provider')")
+    @GetMapping(value = "/pricelist/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> downloadPricelistPDF(@RequestHeader (value = "Authorization") String token) {
+        User user = null;
+        if(token != null) {
+            token = token.substring(7);
+
+            try {
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
+        }
+
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        List<Solution> solutions = solutionService.getSolutionsByProviderUnpaged(user.getId());
+        if (solutions.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            PdfWriter pdfWriter = new PdfWriter(byteArrayOutputStream);
+
+            com.itextpdf.kernel.pdf.PdfDocument pdfDocument = new com.itextpdf.kernel.pdf.PdfDocument(pdfWriter);
+            Document document = new Document(pdfDocument);
+            document.setFont(PdfFontFactory.createFont("Helvetica-Bold"));
+
+            document.add(new Paragraph("Pricelist").setFontSize(18).setBold().setMarginTop(20));
+
+            Table table = new Table(new float[]{1, 4, 2, 2, 2});
+            table.setWidth(UnitValue.createPercentValue(100));
+
+            table.addHeaderCell(new Cell().add(new Paragraph("No.").setBold()));
+            table.addHeaderCell(new Cell().add(new Paragraph("Name").setBold()));
+            table.addHeaderCell(new Cell().add(new Paragraph("Price").setBold()));
+            table.addHeaderCell(new Cell().add(new Paragraph("Discount").setBold()));
+            table.addHeaderCell(new Cell().add(new Paragraph("Final Price").setBold()));
+
+            int count = 1;
+            for (Solution solution : solutions) {
+                table.addCell(String.valueOf(count++));
+                table.addCell(solution.getName());
+                table.addCell(String.format("%.2f", solution.getPrice()));
+                table.addCell(String.format("%.2f", (double) solution.getDiscount()));
+                table.addCell(String.format("%.2f", solution.getPrice() - (solution.getDiscount() * solution.getPrice() / 100)));
+            }
+
+            document.add(table);
+            document.close();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=pricelist.pdf");
+            headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
+
+            return new ResponseEntity<>(byteArrayOutputStream.toByteArray(), headers, HttpStatus.OK);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }
