@@ -146,3 +146,7 @@ INSERT INTO reviews (user_id, event_id, solution_id, comment, grade, status, is_
 VALUES
     (1, 2, NULL, 'Great event, really enjoyed it!', 5, 'PENDING', false),
     (1, 3, NULL, 'Great event 2!', 3, 'PENDING', false);
+
+-- Insert sample reservations into the Reservations table
+INSERT INTO reservations (selected_event_id, selected_service_id, reservation_start_date_time, reservation_end_date_time, notification_sent) VALUES
+(1, 8, '2026-03-20 15:00:00', '2026-03-20 17:00:00', false);
