@@ -339,10 +339,8 @@ public class EventController {
     }
 
     @GetMapping(value = "/favorite/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PagedResponse<EventCardDTO>> getFavoriteEvents(@PathVariable Long userId, @RequestParam(required = false) String search,
+    public ResponseEntity<PagedResponse<EventCardDTO>> getFavoriteEvents(@PathVariable Long userId, @RequestParam(required = false, defaultValue = "") String search,
                                                                   Pageable pageable, @RequestHeader(value = "Authorization", required = false) String token) {
-        List<Event> favoriteEvents = eventService.getFavoriteEventsByUser(userId, search, pageable);
-
         User user = null;
         if(token != null) {
             try {
@@ -354,6 +352,9 @@ public class EventController {
         }
 
         User finalUser = user;
+
+        List<Event> favoriteEvents = eventService.getFavoriteEventsByUser(userId, search, pageable);
+
         List<EventCardDTO> eventCards = favoriteEvents.stream()
                 .map(event -> new EventCardDTO(event, finalUser))
                 .collect(Collectors.toList());
@@ -364,10 +365,8 @@ public class EventController {
 
     @GetMapping(value = "/organized/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<PagedResponse<EventCardDTO>> getEventsOrganizedByUser(@PathVariable Long userId, @RequestParam(required = false) String search,
+    public ResponseEntity<PagedResponse<EventCardDTO>> getEventsOrganizedByUser(@PathVariable Long userId, @RequestParam(required = false, defaultValue = "") String search,
                                                                                 Pageable pageable, @RequestHeader(value = "Authorization", required = false) String token) {
-        List<Event> organizersEvents = eventService.getEventsByEventOrganizer(userId, search, pageable);
-
         User user = null;
         if(token != null) {
             try {
@@ -379,6 +378,9 @@ public class EventController {
         }
 
         User finalUser = user;
+
+        List<Event> organizersEvents = eventService.getEventsByEventOrganizer(userId, search, pageable);
+
         List<EventCardDTO> eventCards = organizersEvents.stream()
                 .map(event -> new EventCardDTO(event, finalUser))
                 .collect(Collectors.toList());

@@ -44,9 +44,8 @@ public class SolutionController {
 
     @GetMapping(value = "/favorite/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<PagedResponse<SolutionCardDTO>> getFavoriteSolutions(@PathVariable Long userId, @RequestParam(required = false) String search,
+    public ResponseEntity<PagedResponse<SolutionCardDTO>> getFavoriteSolutions(@PathVariable Long userId, @RequestParam(required = false, defaultValue = "") String search,
                                                                                @RequestHeader(value = "Authorization", required = false) String token, Pageable pageable) {
-        List<Solution> providerSolutions = solutionService.getFavoriteSolutionsByUser(userId, search, pageable);
         User user = null;
         if(token != null) {
             token = token.substring(7);
@@ -58,6 +57,9 @@ public class SolutionController {
             }
         }
         User finalUser = user;
+
+        List<Solution> providerSolutions = solutionService.getFavoriteSolutionsByUser(userId, search, pageable);
+
         List<SolutionCardDTO> solutionCards = providerSolutions.stream().map(solution -> new SolutionCardDTO(solution, finalUser)).collect(Collectors.toList());
         long count = solutionService.getFavoriteSolutionsByUserCount(userId);
         PagedResponse<SolutionCardDTO> response = new PagedResponse<>(solutionCards, (int) Math.ceil((double) count / pageable.getPageSize()), count);
@@ -97,9 +99,8 @@ public class SolutionController {
 
     @GetMapping(value = "/catalog/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<PagedResponse<SolutionCardDTO>> getProviderCatalog(@PathVariable Long userId, @RequestParam(required = false) String search,
+    public ResponseEntity<PagedResponse<SolutionCardDTO>> getProviderCatalog(@PathVariable Long userId, @RequestParam(required = false, defaultValue = "") String search,
                                                                              @RequestHeader(value = "Authorization", required = false) String token, Pageable pageable) {
-        List<Solution> providerSolutions = solutionService.getSolutionsByProvider(userId, search, pageable);
         User user = null;
         if(token != null) {
             token = token.substring(7);
@@ -111,6 +112,9 @@ public class SolutionController {
             }
         }
         User finalUser = user;
+
+        List<Solution> providerSolutions = solutionService.getSolutionsByProvider(userId, search, pageable);
+
         List<SolutionCardDTO> solutionCards = providerSolutions.stream().map(solution -> new SolutionCardDTO(solution, finalUser)).collect(Collectors.toList());
         long count = solutionService.getSolutionsByProviderCount(userId);
         PagedResponse<SolutionCardDTO> response = new PagedResponse<>(solutionCards, (int) Math.ceil((double) count / pageable.getPageSize()), count);
