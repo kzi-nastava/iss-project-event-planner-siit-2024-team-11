@@ -68,7 +68,7 @@ public class EventManagementServiceTest {
     }
 
     @Test
-    public void getetUser_UserExists() {
+    public void getUser_UserExists() {
         User mockUser = new EventOrganizer();
         mockUser.setId(1L);
 
