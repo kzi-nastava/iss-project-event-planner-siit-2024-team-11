@@ -148,4 +148,8 @@ public class SolutionService {
     public List<Solution> getAllSolutions() {
         return solutionRepository.findByIsDeletedFalse();
     }
+
+    public List<Solution> getSolutionsByProviderUnpaged(Long providerId) {
+        return solutionRepository.findByProviderUnpaged(providerId);
+    }
 }
