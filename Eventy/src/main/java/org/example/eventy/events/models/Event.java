@@ -2,6 +2,8 @@ package org.example.eventy.events.models;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Positive;
 import org.example.eventy.users.models.EventOrganizer;
 
 import java.time.LocalDateTime;
@@ -21,6 +23,7 @@ public class Event {
     private String description;
 
     @Column(nullable = false)
+    @Positive
     private int maxNumberParticipants;
 
     @Enumerated(EnumType.STRING)
@@ -28,14 +31,15 @@ public class Event {
     private PrivacyType privacy;
 
     @Column(nullable = false)
+    @Future
     private LocalDateTime date;
 
     @ManyToOne(cascade = CascadeType.REFRESH)
-    @JoinColumn(name = "event_type_id", referencedColumnName = "id")
+    @JoinColumn(name = "event_type_id", referencedColumnName = "id", nullable = false)
     private EventType type;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "location_id", referencedColumnName = "id")
+    @JoinColumn(name = "location_id", referencedColumnName = "id", nullable = false)
     private Location location;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
@@ -43,7 +47,7 @@ public class Event {
     private List<Activity> agenda;
 
     @ManyToOne(cascade = CascadeType.REFRESH)
-    @JoinColumn(name = "organizer_id", referencedColumnName = "id")
+    @JoinColumn(name = "organizer_id", referencedColumnName = "id", nullable = false)
     private EventOrganizer organiser;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)

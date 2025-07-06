@@ -68,27 +68,27 @@ public class EventDownloadPDFController {
 
             // Add content to the PDF
             PdfFont font = PdfFontFactory.createFont("Helvetica-Bold");
-            document.add(new Paragraph(event.getName())).setFont(font)
+            document.add(new Paragraph(event.getName()).setFont(font)
                     .setFontSize(24)
                     .setBold()
-                    .setTextAlignment(TextAlignment.CENTER);
+                    .setTextAlignment(TextAlignment.CENTER));
 
-            document.add(new Paragraph("Event Organizer: " + event.getOrganiser().getFirstName() + " " + event.getOrganiser().getLastName()))
+            document.add(new Paragraph("Event Organizer: " + event.getOrganiser().getFirstName() + " " + event.getOrganiser().getLastName())
                     .setFontSize(18)
-                    .setTextAlignment(TextAlignment.CENTER);
+                    .setTextAlignment(TextAlignment.CENTER));
 
-            document.add(new Paragraph(event.getDescription()))
+            document.add(new Paragraph(event.getDescription())
                     .setFontSize(18)
-                    .setTextAlignment(TextAlignment.CENTER);
+                    .setTextAlignment(TextAlignment.CENTER));
 
-            document.add(new Paragraph("Location: " + event.getLocation().getAddress()))
-                    .setFontSize(16);
+            document.add(new Paragraph("Location: " + event.getLocation().getAddress())
+                    .setFontSize(16));
 
-            document.add(new Paragraph("Date: " + event.getDate()))
-                    .setFontSize(16);
+            document.add(new Paragraph("Date: " + event.getDate())
+                    .setFontSize(16));
 
-            document.add(new Paragraph("Agenda: " + event.getDate()))
-                    .setFontSize(16);
+            document.add(new Paragraph("Agenda: " + event.getDate())
+                    .setFontSize(16));
 
             List unorderedList = new List()
                     .setSymbolIndent(14)
@@ -178,21 +178,21 @@ public class EventDownloadPDFController {
             com.itextpdf.kernel.pdf.PdfDocument pdfDocument = new com.itextpdf.kernel.pdf.PdfDocument(pdfWriter);
             Document document = new Document(pdfDocument);
 
-            document.add(new Paragraph(event.getName() + " - Stats"))
+            document.add(new Paragraph(event.getName() + " - Stats")
                     .setFontSize(24)
                     .setBold()
-                    .setTextAlignment(TextAlignment.CENTER);
+                    .setTextAlignment(TextAlignment.CENTER));
 
-            document.add(new Paragraph("Number of Visitors"))
+            document.add(new Paragraph("Number of Visitors")
                     .setFontSize(18)
-                    .setTextAlignment(TextAlignment.CENTER);
+                    .setTextAlignment(TextAlignment.CENTER));
 
             JFreeChart numberOfVisitorsChart = createDialChart(event.getInvitations().stream().filter(inv -> inv.getStatus() == Status.ACCEPTED).count(), event.getMaxNumberParticipants(), "Number of Visitors");
             document.add(createImageOfChart(numberOfVisitorsChart));
 
-            document.add(new Paragraph("Grades"))
+            document.add(new Paragraph("Grades")
                     .setFontSize(18)
-                    .setTextAlignment(TextAlignment.CENTER);
+                    .setTextAlignment(TextAlignment.CENTER));
 
             java.util.List<Integer> grades = reviewService.getGradesForEvent(eventId);
 
@@ -207,9 +207,9 @@ public class EventDownloadPDFController {
             JFreeChart gradesChart = createBarChart(numberOfGradesPerGrade);
             document.add(createImageOfChart(gradesChart));
 
-            document.add(new Paragraph("Average grade"))
+            document.add(new Paragraph("Average grade")
                     .setFontSize(18)
-                    .setTextAlignment(TextAlignment.CENTER);
+                    .setTextAlignment(TextAlignment.CENTER));
 
             JFreeChart gradeAverageChart = createDialChart(!grades.isEmpty() ? (double) (gradesSum / (double) grades.size()) : 0, 5, "Average Grade");
             document.add(createImageOfChart(gradeAverageChart));

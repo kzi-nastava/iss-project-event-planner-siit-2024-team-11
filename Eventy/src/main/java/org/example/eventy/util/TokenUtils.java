@@ -144,6 +144,26 @@ public class TokenUtils {
 	}
 
 	/**
+	 * Funkcija za preuzimanje vlasnika tokena (korisničko ime).
+	 * @param token JWT token.
+	 * @return User ID iz tokena ili null ukoliko ne postoji.
+	 */
+	public Long getIdFromToken(String token) {
+		Long id;
+
+		try {
+			final Claims claims = this.getAllClaimsFromToken(token);
+			id = claims.get("id", Long.class);
+		} catch (ExpiredJwtException ex) {
+			throw ex;
+		} catch (Exception e) {
+			id = null;
+		}
+
+		return id;
+	}
+
+	/**
 	 * Funkcija za preuzimanje datuma kreiranja tokena.
 	 * @param token JWT token.
 	 * @return Datum kada je token kreiran.

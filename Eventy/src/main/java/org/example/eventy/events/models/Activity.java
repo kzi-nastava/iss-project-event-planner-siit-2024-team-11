@@ -1,6 +1,8 @@
 package org.example.eventy.events.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
+import org.aspectj.lang.annotation.After;
 
 import java.time.LocalDateTime;
 
@@ -15,8 +17,10 @@ public class Activity {
     @Column(nullable = false)
     private String description;
     @Column(nullable = false)
+    @Future
     private LocalDateTime startTime;
     @Column(nullable = false)
+    @Future
     private LocalDateTime endTime;
     @Column(nullable = false)
     private String location;
