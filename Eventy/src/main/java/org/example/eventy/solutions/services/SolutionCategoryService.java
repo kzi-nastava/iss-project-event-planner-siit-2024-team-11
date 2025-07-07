@@ -1,6 +1,8 @@
 package org.example.eventy.solutions.services;
 
 import org.example.eventy.common.models.Status;
+import org.example.eventy.events.models.Budget;
+import org.example.eventy.events.models.BudgetItem;
 import org.example.eventy.solutions.dtos.CategoryDTO;
 import org.example.eventy.solutions.dtos.categories.CreateCategoryDTO;
 import org.example.eventy.solutions.dtos.categories.CategoryWithIDDTO;
@@ -11,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -107,5 +110,13 @@ public class SolutionCategoryService {
             return solutionCategoryRepository.save(category);
         }
         return null;
+    }
+
+    public List<Category> getAllRemaining(Budget budget) {
+        List<Long> existingCategoryIds = new ArrayList<>();
+        for (BudgetItem item: budget.getBudgetedItems()) {
+            existingCategoryIds.add(item.getCategory().getId());
+        }
+        return solutionCategoryRepository.findAllExceptFollowingIds(existingCategoryIds);
     }
 }

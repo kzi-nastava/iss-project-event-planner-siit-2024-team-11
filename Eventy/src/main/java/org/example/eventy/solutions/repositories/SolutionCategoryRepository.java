@@ -5,6 +5,7 @@ import org.example.eventy.solutions.models.Category;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -17,4 +18,7 @@ public interface SolutionCategoryRepository extends JpaRepository<Category, Long
     public List<Category> findAllByStatus(Status status);
 
     public long countByStatus(Status status);
+
+    @Query("SELECT c FROM Category c WHERE c.id NOT IN (:ids)")
+    public List<Category> findAllExceptFollowingIds(List<Long> ids);
 }
