@@ -145,3 +145,31 @@ INSERT INTO reviews (user_id, event_id, solution_id, comment, grade, status, is_
 VALUES
     (1, 2, NULL, 'Great event, really enjoyed it!', 5, 'PENDING', false),
     (1, 3, NULL, 'Great event 2!', 3, 'PENDING', false);
+
+-- BudgetItems
+INSERT INTO budget_items (id, category_id, planned_funds)
+VALUES
+    (1, 1, 300.00),
+    (2, 2, 200.00),
+    (3, 3, 500.00);
+
+-- Reserved Items for BudgetItems
+INSERT INTO reserved_items (budget_item_id, solution_id)
+VALUES
+    (1, 1), -- Dumbbell
+    (2, 5), -- Wedding Photography
+    (3, 6), -- Personal Training
+    (3, 7), -- Event Planning
+    (3, 8); -- House Cleaning
+
+-- Budgets
+INSERT INTO budgets (id, event_id)
+VALUES
+    (1, 1),
+    (2, 2);
+
+-- Link budget items to budgets (this is implicit via OneToMany + JoinColumn on budgetitems.budget_item_id)
+-- So we add this by updating the foreign key in BudgetItem (assuming the column is budget_id; if not, adjust accordingly)
+
+UPDATE budget_items SET budget_item_id = 1 WHERE id IN (1, 2);
+UPDATE budget_items SET budget_item_id = 2 WHERE id = 3;
