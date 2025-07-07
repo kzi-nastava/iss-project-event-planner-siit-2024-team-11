@@ -3,6 +3,7 @@ package org.example.eventy.events.models;
 import jakarta.persistence.*;
 import org.example.eventy.solutions.models.Category;
 import org.example.eventy.solutions.models.Solution;
+import org.example.eventy.solutions.models.SolutionHistory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +21,8 @@ public class BudgetItem {
     private Category category;
 
     @ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
-    @JoinTable(name = "ReservedItems", joinColumns = @JoinColumn(name = "budget_item_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "solution_id", referencedColumnName = "id"))
-    private List<Solution> reservedItems;
+    @JoinTable(name = "ReservedItems", joinColumns = @JoinColumn(name = "budget_item_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "solution_history_id", referencedColumnName = "id"))
+    private List<SolutionHistory> reservedItems;
 
     @Column(nullable = false)
     private double plannedFunds;
@@ -37,21 +38,9 @@ public class BudgetItem {
         this.plannedFunds = plannedFunds;
     }
 
-    public BudgetItem(Category category, double plannedFunds, List<Solution> reservedItems) {
-        this.category = category;
-        this.reservedItems = reservedItems;
-        this.plannedFunds = plannedFunds;
-    }
-
-    public BudgetItem(List<Solution> reservedItems, double plannedFunds) {
-        this.reservedItems = reservedItems;
-        this.plannedFunds = plannedFunds;
-    }
-
-
     public boolean isOverbudget() {
         double totalSum = 0.0;
-        for (Solution solution : reservedItems) {
+        for (SolutionHistory solution : reservedItems) {
             totalSum += solution.getPrice();
         }
         return totalSum >= plannedFunds;
@@ -59,17 +48,17 @@ public class BudgetItem {
 
     public double getRemainingFunds() {
         double totalSum = 0.0;
-        for (Solution solution : reservedItems) {
+        for (SolutionHistory solution : reservedItems) {
             totalSum += solution.getPrice();
         }
         return plannedFunds - totalSum;
     }
 
-    public List<Solution> getReservedItems() {
+    public List<SolutionHistory> getReservedItems() {
         return reservedItems;
     }
 
-    public void setReservedItems(List<Solution> reservedItems) {
+    public void setReservedItems(List<SolutionHistory> reservedItems) {
         this.reservedItems = reservedItems;
     }
 
