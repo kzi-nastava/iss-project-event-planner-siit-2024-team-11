@@ -7,8 +7,8 @@ import jakarta.persistence.*;
 @DiscriminatorValue("Product")
 public class Product extends Solution {
     @OneToOne(cascade = CascadeType.REFRESH)
-    @JoinColumn(name = "product_history_id", referencedColumnName = "id")
-    private ProductHistory currentProduct; // we keep this if any edits are made to the current product
+    @JoinColumn(name = "solution_history_id", referencedColumnName = "id")
+    private SolutionHistory currentProduct; // we keep this if any edits are made to the current product
 
     ///////////////////////////////////
 
@@ -16,15 +16,15 @@ public class Product extends Solution {
 
     }
 
-    public Product(ProductHistory currentProduct) {
+    public Product(SolutionHistory currentProduct) {
         this.currentProduct = currentProduct;
     }
 
-    public ProductHistory getCurrentProduct() {
+    public SolutionHistory getCurrentProduct() {
         return currentProduct;
     }
 
-    public void setCurrentProduct(ProductHistory currentProduct) {
+    public void setCurrentProduct(SolutionHistory currentProduct) {
         this.currentProduct = currentProduct;
     }
 }

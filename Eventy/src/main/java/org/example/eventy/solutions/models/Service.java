@@ -34,8 +34,8 @@ public class Service extends Solution {
     private ReservationConfirmationType reservationType;
 
     @OneToOne(cascade = CascadeType.REFRESH)
-    @JoinColumn(name = "service_history_id", referencedColumnName = "id")
-    private ServiceHistory currentService;
+    @JoinColumn(name = "solution_history_id", referencedColumnName = "id")
+    private SolutionHistory currentService;
 
     ////////////////////////////////////////////
 
@@ -43,7 +43,7 @@ public class Service extends Solution {
 
     }
 
-    public Service(Long id, String name, String description, double price, int discount, List<PicturePath> imageUrls, boolean isVisible, boolean isAvailable, boolean isDeleted, Category category, List<EventType> relatedEventTypes, SolutionProvider provider, String specifics, Integer minReservationTime, Integer maxReservationTime, Integer reservationDeadline, Integer cancellationDeadline, ReservationConfirmationType reservationType, ServiceHistory currentService) {
+    public Service(Long id, String name, String description, double price, int discount, List<PicturePath> imageUrls, boolean isVisible, boolean isAvailable, boolean isDeleted, Category category, List<EventType> relatedEventTypes, SolutionProvider provider, String specifics, Integer minReservationTime, Integer maxReservationTime, Integer reservationDeadline, Integer cancellationDeadline, ReservationConfirmationType reservationType, SolutionHistory currentService) {
         super(id, name, description, price, discount, imageUrls, isVisible, isAvailable, isDeleted, category, relatedEventTypes, provider);
         this.specifics = specifics;
         this.minReservationTime = minReservationTime;
@@ -102,11 +102,11 @@ public class Service extends Solution {
         this.reservationType = reservationType;
     }
 
-    public ServiceHistory getCurrentService() {
+    public SolutionHistory getCurrentService() {
         return currentService;
     }
 
-    public void setCurrentService(ServiceHistory currentService) {
+    public void setCurrentService(SolutionHistory currentService) {
         this.currentService = currentService;
     }
 }

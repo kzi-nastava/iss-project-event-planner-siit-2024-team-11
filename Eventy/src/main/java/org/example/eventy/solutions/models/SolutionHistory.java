@@ -3,11 +3,14 @@ package org.example.eventy.solutions.models;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "ProductHistory")
-public class ProductHistory  {
+@Table(name = "SolutionHistory")
+public class SolutionHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
+    private Long solutionId;
 
     @Column(nullable = false)
     private String name;
@@ -16,28 +19,28 @@ public class ProductHistory  {
     private String description;
 
     @Column(nullable = false)
-    private double price;
+    private Double price;
 
     @Column(nullable = false)
     private int discount;
 
-    public ProductHistory() {
+    public SolutionHistory() {}
 
-    }
-
-    public ProductHistory(Long id, String name, String description, double price, int discount) {
+    public SolutionHistory(Long id, Long solutionId, String name, String description, Double price, int discount) {
         this.id = id;
+        this.solutionId = solutionId;
         this.name = name;
         this.description = description;
         this.price = price;
         this.discount = discount;
     }
 
-    public ProductHistory(Product product) {
-        this.name = product.getName();
-        this.description = product.getDescription();
-        this.price = product.getPrice();
-        this.discount = product.getDiscount();
+    public SolutionHistory(Solution solution) {
+        this.solutionId = solution.getId();
+        this.name = solution.getName();
+        this.description = solution.getDescription();
+        this.price = solution.getPrice();
+        this.discount = solution.getDiscount();
     }
 
     public Long getId() {
@@ -46,6 +49,14 @@ public class ProductHistory  {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getSolutionId() {
+        return solutionId;
+    }
+
+    public void setSolutionId(Long solutionId) {
+        this.solutionId = solutionId;
     }
 
     public String getName() {
@@ -64,11 +75,11 @@ public class ProductHistory  {
         this.description = description;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
