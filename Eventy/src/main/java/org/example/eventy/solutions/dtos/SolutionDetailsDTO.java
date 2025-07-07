@@ -10,6 +10,7 @@ import org.example.eventy.events.models.EventType;
 import org.example.eventy.solutions.models.Product;
 import org.example.eventy.solutions.models.Service;
 import org.example.eventy.solutions.models.Solution;
+import org.example.eventy.solutions.models.SolutionHistory;
 import org.example.eventy.users.models.User;
 
 import java.util.ArrayList;
@@ -99,6 +100,51 @@ public class SolutionDetailsDTO {
         }
         this.price = solution.getPrice();
         this.discount = solution.getDiscount();
+        if (solution.getImageUrls() == null || solution.getImageUrls().isEmpty()) {
+            this.images = new ArrayList<>();
+        } else {
+            this.images = solution.getImageUrls().stream().map(PicturePath::getPath).map(PictureService::getImage).collect(Collectors.toList());
+        }
+        this.isVisible = solution.isVisible();
+        this.isAvailable = solution.isAvailable();
+        this.providerId = solution.getProvider().getId();
+        this.providerName = solution.getProvider().getName();
+        if (solution.getProvider().getImageUrls() == null || solution.getProvider().getImageUrls().isEmpty()) {
+            this.providerImageUrl = "none";
+        } else {
+            this.providerImageUrl = PictureService.getImage(solution.getProvider().getImageUrls().get(0).getPath());
+        }
+        this.isFavorite = loggedInUser != null && loggedInUser.getFavoriteSolutions().contains(solution);
+    }
+
+    public SolutionDetailsDTO(SolutionHistory solutionHistory, Solution solution, User loggedInUser) {
+        this.solutionId = solution.getId();
+        this.name = solutionHistory.getName();
+        this.categoryName = solution.getCategory().getName();
+        if (solution instanceof Service) {
+            this.type = SolutionType.SERVICE;
+            this.specifics = ((Service) solution).getSpecifics();
+            this.minReservationTime = ((Service) solution).getMinReservationTime();
+            this.maxReservationTime = ((Service) solution).getMaxReservationTime();
+            this.reservationDeadline = ((Service) solution).getReservationDeadline();
+            this.cancellationDeadline = ((Service) solution).getCancellationDeadline();
+            this.reservationType = ((Service) solution).getReservationType();
+        } else {
+            this.type = SolutionType.PRODUCT;
+            this.specifics = null;
+            this.minReservationTime = null;
+            this.maxReservationTime = null;
+            this.reservationDeadline = null;
+            this.cancellationDeadline = null;
+            this.reservationType = null;
+        }
+        this.description = solutionHistory.getDescription();
+        this.eventTypeNames = new ArrayList<String>();
+        for (EventType eventType : solution.getEventTypes()) {
+            this.eventTypeNames.add(eventType.getName());
+        }
+        this.price = solutionHistory.getPrice();
+        this.discount = solutionHistory.getDiscount();
         if (solution.getImageUrls() == null || solution.getImageUrls().isEmpty()) {
             this.images = new ArrayList<>();
         } else {
