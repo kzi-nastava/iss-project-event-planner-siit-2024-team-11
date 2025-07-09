@@ -6,9 +6,10 @@ import org.example.eventy.common.services.PictureService;
 import org.example.eventy.events.models.EventType;
 import org.example.eventy.events.services.EventTypeService;
 import org.example.eventy.solutions.dtos.services.*;
+import org.example.eventy.solutions.models.Product;
 import org.example.eventy.solutions.models.Service;
-import org.example.eventy.solutions.models.ServiceHistory;
 import org.example.eventy.solutions.models.Solution;
+import org.example.eventy.solutions.models.SolutionHistory;
 import org.example.eventy.solutions.repositories.SolutionRepository;
 import org.example.eventy.users.models.SolutionProvider;
 import org.example.eventy.users.services.UserService;
@@ -34,7 +35,11 @@ public class ServiceService {
     private PictureService pictureService;
 
     @Autowired
-    private ServiceHistoryService serviceHistoryService;
+    private SolutionHistoryService solutionHistoryService;
+
+    public Service save(Service service) {
+        return solutionRepository.save(service);
+    }
 
     public Service createService(CreateServiceDTO createServiceDTO) {
         Service service = new Service();
@@ -91,14 +96,14 @@ public class ServiceService {
         service.setReservationDeadline(updateServiceDTO.getReservationDeadline());
         service.setCancellationDeadline(updateServiceDTO.getCancellationDeadline());
         service.setReservationType(updateServiceDTO.getAutomaticReservationAcceptance() ? ReservationConfirmationType.AUTOMATIC : ReservationConfirmationType.MANUAL);
-        service.setCurrentService(serviceHistoryService.save(new ServiceHistory(service)));
+        service.setCurrentService(solutionHistoryService.save(new SolutionHistory(service)));
         return solutionRepository.save(service);
     }
 
     public Service updatePrice(Service service, Double price, Double discount) {
         service.setPrice(price);
         service.setDiscount(discount.intValue());
-        service.setCurrentService(serviceHistoryService.save(new ServiceHistory(service)));
+        service.setCurrentService(solutionHistoryService.save(new SolutionHistory(service)));
         return solutionRepository.save(service);
     }
     

@@ -15,14 +15,8 @@ import org.example.eventy.solutions.dtos.SolutionCardDTO;
 import org.example.eventy.solutions.dtos.SolutionDetailsDTO;
 import org.example.eventy.solutions.dtos.services.ServiceDTO;
 import org.example.eventy.solutions.dtos.services.UpdateServiceDTO;
-import org.example.eventy.solutions.models.Product;
-import org.example.eventy.solutions.models.ProductHistory;
-import org.example.eventy.solutions.models.Service;
-import org.example.eventy.solutions.models.Solution;
-import org.example.eventy.solutions.services.ProductHistoryService;
-import org.example.eventy.solutions.services.ProductService;
-import org.example.eventy.solutions.services.ServiceService;
-import org.example.eventy.solutions.services.SolutionService;
+import org.example.eventy.solutions.models.*;
+import org.example.eventy.solutions.services.*;
 import org.example.eventy.users.models.User;
 import org.example.eventy.users.services.UserService;
 import org.example.eventy.util.TokenUtils;
@@ -54,7 +48,7 @@ public class SolutionController {
     @Autowired
     private TokenUtils tokenUtils;
     @Autowired
-    private ProductHistoryService productHistoryService;
+    private SolutionHistoryService solutionHistoryService;
     @Autowired
     private ServiceService serviceService;
     @Autowired
@@ -311,7 +305,7 @@ public class SolutionController {
             Product product = (Product) solution;
             product.setPrice(newData.getPrice());
             product.setDiscount(newData.getDiscount().intValue());
-            product.setCurrentProduct(productHistoryService.save(new ProductHistory(product)));
+            product.setCurrentProduct(solutionHistoryService.save(new SolutionHistory(product)));
             product = productService.save(product);
             return new ResponseEntity<PricelistItemDTO>(new PricelistItemDTO(product.getId(), product.getName(), product.getPrice(), (double) product.getDiscount()), HttpStatus.OK);
         }

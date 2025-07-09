@@ -2,10 +2,13 @@ package org.example.eventy.solutions.controllers;
 
 import org.example.eventy.common.models.PagedResponse;
 import org.example.eventy.common.models.Status;
+import org.example.eventy.events.models.Budget;
+import org.example.eventy.events.services.BudgetService;
 import org.example.eventy.interactions.dtos.NotificationDTO;
 import org.example.eventy.interactions.model.Notification;
 import org.example.eventy.interactions.model.NotificationType;
 import org.example.eventy.interactions.services.NotificationService;
+import org.example.eventy.solutions.dtos.SolutionDetailsDTO;
 import org.example.eventy.solutions.dtos.categories.CreateCategoryDTO;
 import org.example.eventy.solutions.dtos.categories.CategoryWithIDDTO;
 import org.example.eventy.solutions.models.Category;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/categories")
@@ -39,6 +43,8 @@ public class SolutionCategoryController {
     private NotificationService notificationService;
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+    @Autowired
+    private BudgetService budgetService;
 
     @PreAuthorize("hasRole('Admin') or hasRole('Provider')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -279,6 +285,17 @@ public class SolutionCategoryController {
             return new ResponseEntity<>(HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    // Function used to load a budget, determine which categories have been used in its BudgetItem entities,
+    // and to return all categories which haven't been used
+    @PreAuthorize("hasRole('Organizer')")
+    @GetMapping(value = "/remaining/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<CategoryWithIDDTO>> getAllRemaining(@PathVariable Long eventId) {
+        Budget budget = budgetService.getBudget(eventId);
+        List<Category> remainingCategories = service.getAllRemaining(budget);
+        List<CategoryWithIDDTO> response = remainingCategories.stream().map(CategoryWithIDDTO::new).toList();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     private void sendNotificationToWeb(Long userId, Notification notification) {

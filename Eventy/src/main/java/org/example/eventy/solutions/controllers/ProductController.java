@@ -2,17 +2,18 @@ package org.example.eventy.solutions.controllers;
 
 import org.example.eventy.common.services.PictureService;
 import org.example.eventy.events.dtos.EventTypeDTO;
+import org.example.eventy.events.models.Budget;
+import org.example.eventy.events.models.BudgetItem;
+import org.example.eventy.events.services.BudgetItemService;
+import org.example.eventy.events.services.BudgetService;
 import org.example.eventy.events.services.EventTypeService;
-import org.example.eventy.solutions.dtos.CreateProductDTO;
-import org.example.eventy.solutions.dtos.ProductDTO;
-import org.example.eventy.solutions.dtos.ProductPurchaseDTO;
-import org.example.eventy.solutions.dtos.SolutionCardDTO;
+import org.example.eventy.solutions.dtos.*;
 import org.example.eventy.solutions.models.Product;
-import org.example.eventy.solutions.models.ProductHistory;
 import org.example.eventy.solutions.models.Solution;
-import org.example.eventy.solutions.services.ProductHistoryService;
+import org.example.eventy.solutions.models.SolutionHistory;
 import org.example.eventy.solutions.services.ProductService;
 import org.example.eventy.solutions.services.SolutionCategoryService;
+import org.example.eventy.solutions.services.SolutionHistoryService;
 import org.example.eventy.users.models.SolutionProvider;
 import org.example.eventy.users.models.User;
 import org.example.eventy.users.services.UserService;
@@ -44,7 +45,11 @@ public class ProductController {
     @Autowired
     private EventTypeService eventTypeService;
     @Autowired
-    private ProductHistoryService productHistoryService;
+    private SolutionHistoryService solutionHistoryService;
+    @Autowired
+    private BudgetService budgetService;
+    @Autowired
+    private BudgetItemService budgetItemService;
 
     // GET "/api/products/cards/5"
     @GetMapping(value = "/cards/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -100,7 +105,7 @@ public class ProductController {
         product.setAvailable(createProductDTO.getIsAvailable());
         product.setDeleted(false);
         product.setProvider((SolutionProvider) user);
-        product.setCurrentProduct(productHistoryService.save(new ProductHistory(product)));
+        product.setCurrentProduct(solutionHistoryService.save(new SolutionHistory(product)));
 
         product = productService.save(product);
 
@@ -160,7 +165,7 @@ public class ProductController {
         product.setEventTypes(productDTO.getRelatedEventTypes().stream().map(eventType -> eventTypeService.get(eventType.getId())).collect(Collectors.toList()));
         product.setVisible(productDTO.getIsVisible());
         product.setAvailable(productDTO.getIsAvailable());
-        product.setCurrentProduct(productHistoryService.save(new ProductHistory(product)));
+        product.setCurrentProduct(solutionHistoryService.save(new SolutionHistory(product)));
 
         product = productService.save(product);
 
@@ -171,9 +176,29 @@ public class ProductController {
         return new ResponseEntity<ProductDTO>(new ProductDTO(product), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('Organizer')")
     @PostMapping(value = "/purchase", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> purchaseProduct(@RequestBody ProductPurchaseDTO productPurchaseDTO) {
-        // TO-DO: BudgetService get budget by event id
+    public ResponseEntity<SolutionDetailsDTO> purchaseProduct(@RequestBody ProductPurchaseDTO productPurchaseDTO, @RequestHeader(value = "Authorization") String token) {
+
+        User user = null;
+        if(token != null) {
+            try {
+                token = token.substring(7);
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
+        }
+
+        if (user == null) {
+            return new ResponseEntity<SolutionDetailsDTO>(HttpStatus.FORBIDDEN);
+        }
+
+        Budget budget = budgetService.getBudget(productPurchaseDTO.getEventId());
+        if (budget == null) {
+            budget = budgetService.createBudget(productPurchaseDTO.getEventId());
+        }
+
         Product product = productService.getProduct(productPurchaseDTO.getProductId());
         if (product == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -182,15 +207,19 @@ public class ProductController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        ProductHistory productToBuy = product.getCurrentProduct();
+        SolutionHistory productToBuy = product.getCurrentProduct();
         if (productToBuy == null) {
-            productToBuy = productHistoryService.save(new ProductHistory(product));
+            productToBuy = solutionHistoryService.save(new SolutionHistory(product));
             product.setCurrentProduct(productToBuy);
             productService.save(product);
         }
 
-        // TO-DO: add productToBuy to the corresponding budget item in the budget
+        BudgetItem budgetItem = budget.getBudgetedItems().stream().filter(v -> v.getCategory() == product.getCategory()).findFirst().orElse(null);
+        if (budgetItem == null) {
+            budgetItem = budgetItemService.createBudgetItem(product.getCategory(), 0.0);
+        }
+        budgetItem = budgetItemService.addBudgetItemSolution(budgetItem, productToBuy);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<SolutionDetailsDTO>(new SolutionDetailsDTO(productToBuy, product, user),HttpStatus.OK);
     }
 }

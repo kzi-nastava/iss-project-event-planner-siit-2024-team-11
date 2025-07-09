@@ -6,6 +6,7 @@ import org.example.eventy.events.dtos.BudgetUpdateDTO;
 import org.example.eventy.events.models.Budget;
 import org.example.eventy.events.models.BudgetItem;
 import org.example.eventy.events.models.Event;
+import org.example.eventy.events.repositories.BudgetItemRepository;
 import org.example.eventy.events.repositories.BudgetRepository;
 import org.example.eventy.solutions.models.Category;
 import org.example.eventy.solutions.models.Solution;
@@ -21,46 +22,42 @@ import java.util.Optional;
 public class BudgetService {
     @Autowired
     private BudgetRepository budgetRepository;
-
+    @Autowired
+    private BudgetItemService budgetItemService;
     @Autowired
     private EventService eventService;
 
-    private final double plannedFundDefault = 100000;
-    @Autowired
-    private SolutionService solutionService;
+    private final double plannedFundDefault = 200;
 
-    public BudgetDTO createBudget(Long eventId) {
+    public Budget createBudget(Long eventId) {
         Budget budget = new Budget();
         Event relatedEvent = eventService.getEvent(eventId);
 
         List<BudgetItem> items = new ArrayList<>();
         for (Category category : relatedEvent.getType().getRecommendedSolutionCategories())
         {
-            items.add(new BudgetItem(category, plannedFundDefault));
+            items.add(budgetItemService.createBudgetItem(category, plannedFundDefault));
         }
 
         budget.setEvent(relatedEvent);
-        Budget createdBudget = budgetRepository.save(budget);
-        return new BudgetDTO(createdBudget);
+        budget.setBudgetedItems(items);
+        return budgetRepository.save(budget);
     }
 
-    public BudgetDTO getBudget(Long eventId) {
-        Optional<Budget> budget = budgetRepository.findByEventId(eventId);
-        return budget.isEmpty() ? null : new BudgetDTO(budget.get());
+    public Budget getBudget(Long eventId) {
+        return budgetRepository.findByEventId(eventId).orElse(null);
     }
 
-    public BudgetDTO updateBudget(Long eventId, BudgetUpdateDTO budgetDTO) {
-        Optional<Budget> budget = budgetRepository.findByEventId(eventId);
-        Budget newBudget = budget.isPresent() ? budget.get() : new Budget();
-        List<BudgetItem> newBudgetedItems = new ArrayList<>();
-        for (BudgetItemUpdateDTO b : budgetDTO.getItems()) {
-            List<Solution> newSolutions = new ArrayList<>();
-            for (Long solutionId : b.getBudgetedEntries()) {
-                newSolutions.add(solutionService.getSolution(solutionId));
-            }
-            newBudgetedItems.add(new BudgetItem(b.getCategory(), b.getPlannedFunds(), newSolutions));
-        }
-        newBudget.setBudgetedItems(newBudgetedItems);
-        return new BudgetDTO(budgetRepository.save(newBudget));
+    public Budget addBudgetItem(Budget budget, BudgetItem budgetItem) {
+        budget.getBudgetedItems().add(budgetItem);
+        return budgetRepository.save(budget);
+    }
+
+    public boolean deleteBudgetItemFromBudget(Budget budget, Long budgetItemId) {
+        int previousLength = budget.getBudgetedItems().size();
+        budget.getBudgetedItems().stream().filter(v -> v.getId() != budgetItemId).toList();
+        budgetRepository.save(budget);
+        int currentLength = budget.getBudgetedItems().size();
+        return previousLength != currentLength;
     }
 }

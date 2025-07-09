@@ -54,17 +54,17 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
     @Query(value = """
             SELECT cancellation_deadline, discount, is_available, is_deleted, is_visible,
                    max_reservation_time, min_reservation_time, price, reservation_deadline, reservation_type,
-                   category_id, id, product_history_id, provider_id, service_history_id, type, description, name, specifics
+                   category_id, id, solution_history_id, provider_id, type, description, name, specifics
             FROM (
                 SELECT cancellation_deadline, discount, is_available, is_deleted, is_visible,
                        max_reservation_time, min_reservation_time, price, reservation_deadline, reservation_type,
-                       category_name, category_id, a.id AS id, product_history_id, provider_id, u.name AS provider_name,
-                       service_history_id, type, a.description AS description, a.name AS name, specifics, et
+                       category_name, category_id, a.id AS id, solution_history_id, provider_id, u.name AS provider_name,
+                       type, a.description AS description, a.name AS name, specifics, et
                 FROM (
                     SELECT cancellation_deadline, discount, is_available, f.is_deleted AS is_deleted, is_visible,
                            max_reservation_time, min_reservation_time, price, reservation_deadline, reservation_type,
-                           cat.name AS category_name, category_id, f.id AS id, product_history_id, provider_id,
-                           service_history_id, type, f.description AS description, f.name AS name, specifics, et
+                           cat.name AS category_name, category_id, f.id AS id, solution_history_id, provider_id,
+                           type, f.description AS description, f.name AS name, specifics, et
                     FROM (
                         SELECT
                             s.*,
@@ -134,17 +134,17 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
             FROM (
                 SELECT cancellation_deadline, discount, is_available, is_deleted, is_visible,
                    max_reservation_time, min_reservation_time, price, reservation_deadline, reservation_type,
-                   category_id, id, product_history_id, provider_id, service_history_id, type, description, name, specifics
+                   category_id, id, solution_history_id, provider_id, type, description, name, specifics
                 FROM (
                     SELECT cancellation_deadline, discount, is_available, is_deleted, is_visible,
                            max_reservation_time, min_reservation_time, price, reservation_deadline, reservation_type,
-                           category_name, category_id, a.id AS id, product_history_id, provider_id, u.name AS provider_name,
-                           service_history_id, type, a.description AS description, a.name AS name, specifics, et
+                           category_name, category_id, a.id AS id, solution_history_id, provider_id, u.name AS provider_name,
+                           type, a.description AS description, a.name AS name, specifics, et
                     FROM (
                         SELECT cancellation_deadline, discount, is_available, f.is_deleted AS is_deleted, is_visible,
                                max_reservation_time, min_reservation_time, price, reservation_deadline, reservation_type,
-                               cat.name AS category_name, category_id, f.id AS id, product_history_id, provider_id,
-                               service_history_id, type, f.description AS description, f.name AS name, specifics, et
+                               cat.name AS category_name, category_id, f.id AS id, solution_history_id, provider_id,
+                               type, f.description AS description, f.name AS name, specifics, et
                         FROM (
                             SELECT
                                 s.*,

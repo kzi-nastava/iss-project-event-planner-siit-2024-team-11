@@ -3,9 +3,19 @@ package org.example.eventy.solutions.controllers;
 import jakarta.validation.Valid;
 import org.example.eventy.common.models.PagedResponse;
 import org.example.eventy.common.services.EmailService;
+import org.example.eventy.events.models.Budget;
+import org.example.eventy.events.models.BudgetItem;
+import org.example.eventy.events.services.BudgetItemService;
+import org.example.eventy.events.services.BudgetService;
 import org.example.eventy.solutions.dtos.ReservationDTO;
 import org.example.eventy.solutions.models.Reservation;
+import org.example.eventy.solutions.models.Service;
+import org.example.eventy.solutions.models.Solution;
+import org.example.eventy.solutions.models.SolutionHistory;
 import org.example.eventy.solutions.services.ReservationService;
+import org.example.eventy.solutions.services.ServiceService;
+import org.example.eventy.solutions.services.SolutionHistoryService;
+import org.example.eventy.solutions.services.SolutionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +38,16 @@ public class ReservationController {
     private ReservationService reservationService;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private BudgetService budgetService;
+    @Autowired
+    private SolutionService solutionService;
+    @Autowired
+    private SolutionHistoryService solutionHistoryService;
+    @Autowired
+    private ServiceService serviceService;
+    @Autowired
+    private BudgetItemService budgetItemService;
 
     // GET "/api/reservations/5"
     @GetMapping(value = "/{reservationId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -120,10 +140,31 @@ public class ReservationController {
         Reservation reservation = reservationService.createReservation(reservationDTO);
 
         if (reservation != null) {
+            addReservationInfoToBudget(reservationDTO);
             emailService.sendReservationConfirmation(reservation);
             return new ResponseEntity<ReservationDTO>(new ReservationDTO(reservation), HttpStatus.CREATED);
         }
 
         return new ResponseEntity<ReservationDTO>(HttpStatus.BAD_REQUEST);
+    }
+
+    private void addReservationInfoToBudget(ReservationDTO reservationDTO) {
+        Budget budget = budgetService.getBudget(reservationDTO.getSelectedEventId());
+        Service service = (Service) solutionService.getSolution(reservationDTO.getSelectedServiceId());
+
+        SolutionHistory serviceToReserve = service.getCurrentService();
+        if (serviceToReserve == null) {
+            serviceToReserve = solutionHistoryService.save(new SolutionHistory(service));
+            service.setCurrentService(serviceToReserve);
+            serviceService.save(service);
+        }
+
+        BudgetItem budgetItem = budget.getBudgetedItems().stream().filter(v -> v.getCategory() == service.getCategory()).findFirst().orElse(null);
+        if (budgetItem == null) {
+            budgetItem = budgetItemService.createBudgetItem(service.getCategory(), 0.0);
+            budgetService.addBudgetItem(budget, budgetItem);
+        }
+        budgetItem = budgetItemService.addBudgetItemSolution(budgetItem, serviceToReserve);
+
     }
 }

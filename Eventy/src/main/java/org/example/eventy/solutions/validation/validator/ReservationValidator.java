@@ -120,9 +120,9 @@ public class ReservationValidator implements ConstraintValidator<ValidReservatio
             reservationDTO.getReservationStartDateTime().getDayOfMonth() != selectedEvent.getDate().getDayOfMonth() ||
             reservationDTO.getReservationEndDateTime().getYear() != selectedEvent.getDate().getYear() ||
             reservationDTO.getReservationEndDateTime().getMonth() != selectedEvent.getDate().getMonth() ||
-            reservationDTO.getReservationEndDateTime().getDayOfMonth() != selectedEvent.getDate().getDayOfMonth() ||
-            reservationDTO.getReservationStartDateTime().getHour() < selectedEvent.getDate().getHour() ||
-            reservationDTO.getReservationEndDateTime().getHour() < selectedEvent.getDate().getHour()) {
+            reservationDTO.getReservationEndDateTime().getDayOfMonth() != selectedEvent.getDate().getDayOfMonth()) {
+            //reservationDTO.getReservationStartDateTime().getHour() < selectedEvent.getDate().getHour() ||
+            //reservationDTO.getReservationEndDateTime().getHour() < selectedEvent.getDate().getHour()) {
             context.buildConstraintViolationWithTemplate("Reservation must be the same day as the event start date.")
                 .addPropertyNode("reservationStartDateTime")
                 .addConstraintViolation();
