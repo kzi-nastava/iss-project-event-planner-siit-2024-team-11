@@ -161,8 +161,10 @@ public class ReservationController {
 
         BudgetItem budgetItem = budget.getBudgetedItems().stream().filter(v -> v.getCategory() == service.getCategory()).findFirst().orElse(null);
         if (budgetItem == null) {
-            budgetItem = budgetItemService.createBudgetItem(service.getCategory(), 999.0);
+            budgetItem = budgetItemService.createBudgetItem(service.getCategory(), 0.0);
+            budgetService.addBudgetItem(budget, budgetItem);
         }
         budgetItem = budgetItemService.addBudgetItemSolution(budgetItem, serviceToReserve);
+
     }
 }
