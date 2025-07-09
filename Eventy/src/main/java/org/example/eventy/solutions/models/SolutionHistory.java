@@ -10,7 +10,7 @@ public class SolutionHistory {
     private Long id;
 
     @Column(nullable = false)
-    private Long solutionId;
+    private Long providerId;
 
     @Column(nullable = false)
     private String name;
@@ -24,23 +24,28 @@ public class SolutionHistory {
     @Column(nullable = false)
     private int discount;
 
+    @Column(nullable = true)
+    private Integer cancellationDeadline;
+
     public SolutionHistory() {}
 
-    public SolutionHistory(Long id, Long solutionId, String name, String description, Double price, int discount) {
+    public SolutionHistory(Long id, Long providerId, String name, String description, Double price, int discount, int cancellationDeadline) {
         this.id = id;
-        this.solutionId = solutionId;
+        this.providerId = providerId;
         this.name = name;
         this.description = description;
         this.price = price;
         this.discount = discount;
+        this.cancellationDeadline = cancellationDeadline;
     }
 
     public SolutionHistory(Solution solution) {
-        this.solutionId = solution.getId();
+        this.providerId = solution.getProvider().getId();
         this.name = solution.getName();
         this.description = solution.getDescription();
         this.price = solution.getPrice();
         this.discount = solution.getDiscount();
+        this.cancellationDeadline = solution instanceof Service ? ((Service) solution).getCancellationDeadline() : null;
     }
 
     public Long getId() {
@@ -51,12 +56,12 @@ public class SolutionHistory {
         this.id = id;
     }
 
-    public Long getSolutionId() {
-        return solutionId;
+    public Long getProviderId() {
+        return providerId;
     }
 
-    public void setSolutionId(Long solutionId) {
-        this.solutionId = solutionId;
+    public void setProviderId(Long providerId) {
+        this.providerId = providerId;
     }
 
     public String getName() {
@@ -89,5 +94,13 @@ public class SolutionHistory {
 
     public void setDiscount(int discount) {
         this.discount = discount;
+    }
+
+    public Integer getCancellationDeadline() {
+        return cancellationDeadline;
+    }
+
+    public void setCancellationDeadline(Integer cancellationDeadline) {
+        this.cancellationDeadline = cancellationDeadline;
     }
 }
