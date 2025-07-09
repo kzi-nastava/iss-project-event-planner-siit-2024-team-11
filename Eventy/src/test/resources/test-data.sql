@@ -10,13 +10,13 @@ INSERT INTO users (
     id, user_type, email, password, address, phone_number, is_active, is_deactivated, enabled, has_silenced_notifications, suspension_deadline, role_id, last_password_reset_date, last_read_notifications, description, first_name, last_name, name
 )
 VALUES
-    (DEFAULT, 'Organizer', 'tac@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 3, NOW(), '2023-10-30 00:00:00', NULL, 'Tac Tac', 'Jezickovic', NULL),
-    (DEFAULT, 'Organizer', 'ves@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3815361', TRUE, FALSE, TRUE, FALSE, NULL, 3, NOW(), '2024-10-30 00:00:00', NULL, 'Ves Ves', 'Jezickovic', NULL),
-    (DEFAULT, 'Provider', 'provider@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), '2000-01-01 00:00:00', 'Description', NULL, NULL, 'VIT DOO'),
-    (DEFAULT, 'Provider', 'provider2@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), '2000-01-01 00:00:00', 'Description', NULL, NULL, 'Lidl'),
-    (DEFAULT, 'Admin', 'admin@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', 'Cara Dusana 72, Novi Sad', '+381 65 31 43 240', TRUE, FALSE, TRUE, FALSE, NULL, 1, NOW(), '2000-01-01 00:00:00', NULL, 'Veselin', 'Roganovic', NULL),
-    (DEFAULT, 'AuthenticatedUser', 'auth@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 2, NOW(), '2000-01-01 00:00:00', NULL, NULL, NULL, NULL),
-    (DEFAULT, 'AuthenticatedUser', 'c.tamara333@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 2, NOW(), '2000-01-01 00:00:00', NULL, NULL, NULL, NULL);
+    (DEFAULT, 'Organizer', 'tac@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 3, '2000-01-01 00:00:00', '2023-10-30 00:00:00', NULL, 'Tac Tac', 'Jezickovic', NULL),
+    (DEFAULT, 'Organizer', 'ves@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3815361', TRUE, FALSE, TRUE, FALSE, NULL, 3, '2000-01-01 00:00:00', '2024-10-30 00:00:00', NULL, 'Ves Ves', 'Jezickovic', NULL),
+    (DEFAULT, 'Provider', 'provider@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, '2000-01-01 00:00:00', '2000-01-01 00:00:00', 'Description', NULL, NULL, 'VIT DOO'),
+    (DEFAULT, 'Provider', 'provider2@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, '2000-01-01 00:00:00', '2000-01-01 00:00:00', 'Description', NULL, NULL, 'Lidl'),
+    (DEFAULT, 'Admin', 'admin@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', 'Cara Dusana 72, Novi Sad', '+381 65 31 43 240', TRUE, FALSE, TRUE, FALSE, NULL, 1, '2000-01-01 00:00:00', '2000-01-01 00:00:00', NULL, 'Veselin', 'Roganovic', NULL),
+    (DEFAULT, 'AuthenticatedUser', 'auth@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 2, '2000-01-01 00:00:00', '2000-01-01 00:00:00', NULL, NULL, NULL, NULL),
+    (DEFAULT, 'AuthenticatedUser', 'c.tamara333@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 2, '2000-01-01 00:00:00', '2000-01-01 00:00:00', NULL, NULL, NULL, NULL);
 
 -- Locations
 INSERT INTO locations(latitude, longitude, id, address, name)
@@ -33,6 +33,7 @@ VALUES
 -- Event Types
 INSERT INTO event_types(is_active, id, description, name)
 VALUES
+    (TRUE, 0, 'ALL', 'All'),
     (TRUE, DEFAULT, 'You know what we want? A HUGE PARTY!', 'Party'),
     (TRUE, DEFAULT, 'Graduations of all types!', 'Graduation'),
     (FALSE, DEFAULT, 'Only for luxurious event', 'Luxury'),

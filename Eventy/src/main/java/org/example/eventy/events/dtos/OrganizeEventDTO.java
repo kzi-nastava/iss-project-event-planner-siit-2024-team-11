@@ -1,7 +1,7 @@
 package org.example.eventy.events.dtos;
 
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import org.example.eventy.events.validation.annotation.ValidOrganizedEvent;
 
 import java.time.LocalDateTime;
@@ -9,13 +9,13 @@ import java.util.List;
 
 @ValidOrganizedEvent // trigger the custom validation
 public class OrganizeEventDTO {
-    @NotNull(message = "Name cannot be null")
+    @NotEmpty(message = "Name cannot be empty")
     private String name;
 
-    @NotNull(message = "Description cannot be null")
+    @NotEmpty(message = "Description cannot be empty")
     private String description;
 
-    @NotNull(message = "Number of participants cannot be null")
+    @Positive(message = "Number of participants must be positive")
     private int maxNumberParticipants;
 
     @NotNull(message = "Privacy type cannot be null")
@@ -25,14 +25,15 @@ public class OrganizeEventDTO {
     private Long eventTypeId;
 
     @NotNull(message = "Location cannot be null")
+    @Valid
     private CreateLocationDTO location;
 
     @NotNull(message = "Date cannot be null")
     @Future(message = "Date must be in the future")
     private LocalDateTime date;
 
-    @NotNull(message = "Agenda cannot be null")
-    private List<CreateActivityDTO> agenda;
+    @NotEmpty(message = "Agenda cannot be empty")
+    private List<@Valid CreateActivityDTO> agenda;
 
     private List<String> emails;
 

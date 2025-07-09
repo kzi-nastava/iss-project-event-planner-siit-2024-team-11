@@ -87,7 +87,11 @@ public class EventController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('Organizer')")
-    public ResponseEntity<EventDTO> organizeEvent(@Valid @RequestBody OrganizeEventDTO organizeEventDTO, BindingResult bindingResult) {
+    public ResponseEntity<EventDTO> organizeEvent(@Valid @RequestBody OrganizeEventDTO organizeEventDTO, BindingResult bindingResult, @RequestHeader(value = "Authorization", required = true) String token) {
+        if (organizeEventDTO.getOrganizerId() == null || !organizeEventDTO.getOrganizerId().equals(tokenUtils.getIdFromToken(token.substring(7)))) {
+            return new ResponseEntity("Invalid Organizer ID!", HttpStatus.BAD_REQUEST);
+        }
+
         if (bindingResult.hasErrors()) {
             // if there are validation errors, we return a 400 Bad Request response
             List<String> errorMessages = bindingResult.getFieldErrors().stream()
@@ -96,14 +100,27 @@ public class EventController {
             return new ResponseEntity(errorMessages, HttpStatus.BAD_REQUEST);
         }
 
+        for(CreateActivityDTO activityDTO : organizeEventDTO.getAgenda()) {
+            if(activityDTO.getStartTime().isAfter(activityDTO.getEndTime()) || activityDTO.getStartTime().isEqual(activityDTO.getEndTime()) ||
+            activityDTO.getStartTime().isBefore(organizeEventDTO.getDate()) || activityDTO.getEndTime().isAfter(organizeEventDTO.getDate().plusDays(1))) {
+                return new ResponseEntity("Agenda timeline is not possible!", HttpStatus.BAD_REQUEST);
+            }
+        }
+
         Event event = new Event();
         event.setName(organizeEventDTO.getName());
         event.setDescription(organizeEventDTO.getDescription());
         event.setMaxNumberParticipants(organizeEventDTO.getMaxNumberParticipants());
         event.setPrivacy(organizeEventDTO.getIsPublic() ? PrivacyType.PUBLIC : PrivacyType.PRIVATE);
         event.setDate(organizeEventDTO.getDate());
-        event.setType(eventTypeService.get(organizeEventDTO.getEventTypeId()));
         event.setOrganiser((EventOrganizer) userService.get(organizeEventDTO.getOrganizerId()));
+        EventType eventType = eventTypeService.get(organizeEventDTO.getEventTypeId());
+
+        if(eventType == null) {
+            return new ResponseEntity("Event type doesn't exist!", HttpStatus.BAD_REQUEST);
+        }
+
+        event.setType(eventType);
 
         Location location = new Location();
         location.setName(organizeEventDTO.getLocation().getName());
@@ -322,10 +339,8 @@ public class EventController {
     }
 
     @GetMapping(value = "/favorite/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PagedResponse<EventCardDTO>> getFavoriteEvents(@PathVariable Long userId, @RequestParam(required = false) String search,
+    public ResponseEntity<PagedResponse<EventCardDTO>> getFavoriteEvents(@PathVariable Long userId, @RequestParam(required = false, defaultValue = "") String search,
                                                                   Pageable pageable, @RequestHeader(value = "Authorization", required = false) String token) {
-        List<Event> favoriteEvents = eventService.getFavoriteEventsByUser(userId, search, pageable);
-
         User user = null;
         if(token != null) {
             try {
@@ -337,6 +352,9 @@ public class EventController {
         }
 
         User finalUser = user;
+
+        List<Event> favoriteEvents = eventService.getFavoriteEventsByUser(userId, search, pageable);
+
         List<EventCardDTO> eventCards = favoriteEvents.stream()
                 .map(event -> new EventCardDTO(event, finalUser))
                 .collect(Collectors.toList());
@@ -347,10 +365,8 @@ public class EventController {
 
     @GetMapping(value = "/organized/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<PagedResponse<EventCardDTO>> getEventsOrganizedByUser(@PathVariable Long userId, @RequestParam(required = false) String search,
+    public ResponseEntity<PagedResponse<EventCardDTO>> getEventsOrganizedByUser(@PathVariable Long userId, @RequestParam(required = false, defaultValue = "") String search,
                                                                                 Pageable pageable, @RequestHeader(value = "Authorization", required = false) String token) {
-        List<Event> organizersEvents = eventService.getEventsByEventOrganizer(userId, search, pageable);
-
         User user = null;
         if(token != null) {
             try {
@@ -362,6 +378,9 @@ public class EventController {
         }
 
         User finalUser = user;
+
+        List<Event> organizersEvents = eventService.getEventsByEventOrganizer(userId, search, pageable);
+
         List<EventCardDTO> eventCards = organizersEvents.stream()
                 .map(event -> new EventCardDTO(event, finalUser))
                 .collect(Collectors.toList());

@@ -61,7 +61,7 @@ public class UserProfileController {
         user.setEmail(updateUserProfileDTO.getEmail());
         user.setAddress(updateUserProfileDTO.getAddress());
         user.setPhoneNumber(updateUserProfileDTO.getPhoneNumber());
-        user.setPassword(updateUserProfileDTO.getPassword());
+        if(!updateUserProfileDTO.getPassword().isEmpty()) user.setPassword(updateUserProfileDTO.getPassword());
         user.setImageUrls(pictureService.save(updateUserProfileDTO.getProfilePictures())); // update!
 
         UserType userType = userService.getUserType(user);
@@ -81,7 +81,7 @@ public class UserProfileController {
 
         }
 
-        user = userService.save(user, true);
+        user = userService.save(user, !updateUserProfileDTO.getPassword().isEmpty());
 
         if(user == null) {
             return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
@@ -93,14 +93,36 @@ public class UserProfileController {
     @DeleteMapping(value="/{userId}")
     public ResponseEntity<?> deactivateProfile(@PathVariable Long userId) {
         User user = userService.get(userId);
-        if(user != null) {
-            user.setActive(false);
-            user.setDeactivated(true);
-            userService.save(user, false);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(!user.isEnabled() || user.isDeactivated() ||
+            hasOrganizerFutureEvents(user) || hasProviderFutureReservedSolutions(user)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        user.setActive(false);
+        user.setDeactivated(true);
+        userService.save(user, false);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+    
+    private boolean hasOrganizerFutureEvents(User user) {
+        if (!(user instanceof EventOrganizer)) {
+            return false;
+        }
+
+        return !eventService.getOrganizedEventsByUserBetween(user.getId(), LocalDate.now(), LocalDate.of(9999, 12, 31)).isEmpty();
+    }
+
+    private boolean hasProviderFutureReservedSolutions(User user) {
+        if (!(user instanceof SolutionProvider)) {
+            return false;
+        }
+
+        return !reservationService.getReservationByProviderBetween(user.getId(), LocalDate.now(), LocalDate.of(9999, 12, 31)).isEmpty();
     }
 
     @PostMapping(value="/{userId}/upgrade", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)

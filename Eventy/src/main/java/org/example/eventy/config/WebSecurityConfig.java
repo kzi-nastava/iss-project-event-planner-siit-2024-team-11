@@ -33,50 +33,50 @@ import java.util.Arrays;
 @EnableWebSecurity(debug = true)
 @EnableMethodSecurity
 public class WebSecurityConfig {
-	
+
     // Handler za vracanje 401 kada klijent sa neodogovarajucim korisnickim imenom i lozinkom pokusa da pristupi resursu
  	@Autowired
  	private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
- 	
+
  	// Injektujemo implementaciju iz TokenUtils klase kako bismo mogli da koristimo njene metode za rad sa JWT u TokenAuthenticationFilteru
  	@Autowired
  	private TokenUtils tokenUtils;
- 	
+
 	// Servis koji se koristi za citanje podataka o korisnicima aplikacije
 	@Bean
     public UserDetailsService userDetailsService() {
         return new CustomUserDetailsService();
     }
-	
+
 	// Implementacija PasswordEncoder-a koriscenjem BCrypt hashing funkcije.
 	// BCrypt po defalt-u radi 10 rundi hesiranja prosledjene vrednosti.
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    
+
     @Bean
  	public DaoAuthenticationProvider authenticationProvider() {
  	    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
  	   // 1. koji servis da koristi da izvuce podatke o korisniku koji zeli da se autentifikuje
  	    // prilikom autentifikacije, AuthenticationManager ce sam pozivati loadUserByUsername() metodu ovog servisa
  	    authProvider.setUserDetailsService(userDetailsService());
- 	    // 2. kroz koji enkoder da provuce lozinku koju je dobio od klijenta u zahtevu 
+ 	    // 2. kroz koji enkoder da provuce lozinku koju je dobio od klijenta u zahtevu
 	    // da bi adekvatan hash koji dobije kao rezultat hash algoritma uporedio sa onim koji se nalazi u bazi (posto se u bazi ne cuva plain lozinka)
  	    authProvider.setPasswordEncoder(passwordEncoder());
- 	 
+
  	    return authProvider;
  	}
- 	
+
  	// Registrujemo authentication manager koji ce da uradi autentifikaciju korisnika za nas
  	@Bean
  	public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
  		return authConfig.getAuthenticationManager();
  	}
-  
+
  // Definisemo prava pristupa za zahteve ka odredjenim URL-ovima/rutama
  	 @Bean
-     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception { // TO DO: Fix this whole mess here, see what should and what shouldn't be allowed for everyone
  		 http.cors(Customizer.withDefaults());
  		 http.csrf((csrf) -> csrf.disable());
          http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -84,14 +84,15 @@ public class WebSecurityConfig {
          http.authorizeHttpRequests(request -> {
              request.requestMatchers(new AntPathRequestMatcher("/api/authentication/**")).permitAll()
                      //.requestMatchers(new AntPathRequestMatcher("/api/**")).permitAll()
-                     //.requestMatchers(new AntPathRequestMatcher("/**")).permitAll().anyRequest().authenticated();
-                    .requestMatchers(new AntPathRequestMatcher("/api/events")).permitAll()
+                     //.requestMatchers(new AntPathRequestMatcher("/**")).permitAll();
+                    //.requestMatchers(new AntPathRequestMatcher("/api/events")).permitAll()
                      .requestMatchers(new AntPathRequestMatcher("/api/events/featured")).permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/api/solutions/**")).permitAll()
                      .requestMatchers(new AntPathRequestMatcher("/api/solutions/featured")).permitAll()
                      .requestMatchers(new AntPathRequestMatcher("/api/events/pdfs/**")).permitAll()
                      .requestMatchers(new AntPathRequestMatcher("/api/events/{eventId}")).permitAll()
                      .requestMatchers(new AntPathRequestMatcher("/api/chats/**")).permitAll()
+                     //.requestMatchers(new AntPathRequestMatcher("/api/reservations/**")).permitAll() -- TO DO: Tamara to add JWT token to some test requests
                   .requestMatchers(new AntPathRequestMatcher("/api/whoami")).hasRole("USER")
              .anyRequest().authenticated();
          });
@@ -105,11 +106,11 @@ public class WebSecurityConfig {
     	// Zahtevi koji se mecuju za web.ignoring().antMatchers() nemaju pristup SecurityContext-u
     	// Dozvoljena POST metoda na ruti /auth/login, za svaki drugi tip HTTP metode greska je 401 Unauthorized
     	return (web) -> web.ignoring()//.requestMatchers(HttpMethod.POST, "/auth/login")
-    			
-    			
+
+
     			// Ovim smo dozvolili pristup statickim resursima aplikacije
     			.requestMatchers(HttpMethod.GET, "/", "/webjars/*", "/*.html", "favicon.ico",
-    			"/*/*.html", "/*/*.css", "/*/*.js");	 
+    			"/*/*.html", "/*/*.css", "/*/*.js");
 
     }
     //Podesavanja CORS-a

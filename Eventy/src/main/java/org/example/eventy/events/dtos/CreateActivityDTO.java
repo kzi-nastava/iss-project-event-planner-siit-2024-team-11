@@ -1,14 +1,23 @@
 package org.example.eventy.events.dtos;
 
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.example.eventy.events.models.Activity;
 
 import java.time.LocalDateTime;
 
 public class CreateActivityDTO {
+    @NotEmpty(message = "Activity name cannot be empty!")
     private String name;
+    @NotEmpty(message = "Activity description cannot be empty!")
     private String description;
+    @NotEmpty(message = "Activity location cannot be empty!")
     private String location;
+    @NotNull(message = "Activity start time cannot be empty!")
     private LocalDateTime startTime;
+    @NotNull(message = "Activity end time cannot be empty!")
     private LocalDateTime endTime;
 
     public CreateActivityDTO() {

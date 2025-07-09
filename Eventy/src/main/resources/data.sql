@@ -28,6 +28,7 @@ VALUES
 -- Event Types
 INSERT INTO event_types(is_active, id, description, name)
 VALUES
+    (TRUE, 0, 'ALL', 'All'),
     (TRUE, DEFAULT, 'You know what we want? A HUGE PARTY!', 'Party'),
     (TRUE, DEFAULT, 'Graduations of all types!', 'Graduation'),
     (FALSE, DEFAULT, 'Only for luxurious event', 'Luxury'),
@@ -55,6 +56,18 @@ VALUES
     (DEFAULT, 'Decorations', 'Items for event lighting and venue decoration.', 0, false),
     (DEFAULT, 'Photography', 'Services for capturing memories of events.', 0, false),
     (DEFAULT, 'Catering', 'Food and drink services for events.', 0, false);
+
+-- SolutionHistory
+INSERT INTO solution_history (id, provider_id, name, description, price, discount, cancellation_deadline)
+VALUES
+    (DEFAULT, 3, 'Dumbbell', 'High-quality gym dumbbell', 19.99, 10, NULL),
+    (DEFAULT, 4, 'Office Chair', 'Ergonomic office chair', 49.99, 5, NULL),
+    (DEFAULT, 3, 'Table Lamp', 'Stylish table lamp', 29.99, 15, NULL),
+    (DEFAULT, 4, 'Gaming Keyboard', 'Gaming keyboard with RGB', 99.99, 20, NULL),
+    (DEFAULT, 4, 'Photography', 'Wedding photography package', 99.99, 15, 15),
+    (DEFAULT, 4, 'Training', 'Personal training session', 149.99, 20, 12),
+    (DEFAULT, 4, 'Event Planning', 'Event planning service', 199.99, 10, 7),
+    (DEFAULT, 3, 'Cleaning', 'House cleaning service', 79.99, 25, 17);
 
 -- Solutions
 INSERT INTO solutions (
@@ -149,9 +162,9 @@ VALUES
 -- BudgetItems
 INSERT INTO budget_items (id, category_id, planned_funds)
 VALUES
-    (1, 1, 300.00),
-    (2, 2, 200.00),
-    (3, 3, 500.00);
+    (DEFAULT, 1, 300.00),
+    (DEFAULT, 2, 200.00),
+    (DEFAULT, 3, 500.00);
 
 -- Reserved Items for BudgetItems
 INSERT INTO reserved_items (budget_item_id, solution_id)
@@ -165,11 +178,16 @@ VALUES
 -- Budgets
 INSERT INTO budgets (id, event_id)
 VALUES
-    (1, 1),
-    (2, 2);
+    (DEFAULT, 1),
+    (DEFAULT, 2);
 
 -- Link budget items to budgets (this is implicit via OneToMany + JoinColumn on budgetitems.budget_item_id)
 -- So we add this by updating the foreign key in BudgetItem (assuming the column is budget_id; if not, adjust accordingly)
 
 UPDATE budget_items SET budget_item_id = 1 WHERE id IN (1, 2);
 UPDATE budget_items SET budget_item_id = 2 WHERE id = 3;
+
+-- Insert sample reservations into the Reservations table
+INSERT INTO reservations (selected_event_id, selected_service_id, reservation_start_date_time, reservation_end_date_time, notification_sent) VALUES
+(1, 8, '2026-03-20 15:00:00', '2026-03-20 17:00:00', false);
+
