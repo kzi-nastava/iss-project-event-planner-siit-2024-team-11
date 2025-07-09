@@ -40,6 +40,7 @@ public class BudgetService {
         }
 
         budget.setEvent(relatedEvent);
+        budget.setBudgetedItems(items);
         return budgetRepository.save(budget);
     }
 
