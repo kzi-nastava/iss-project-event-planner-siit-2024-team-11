@@ -3,8 +3,10 @@ package org.example.eventy.events.dtos;
 import org.example.eventy.events.models.BudgetItem;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
 import org.example.eventy.solutions.dtos.SolutionDetailsDTO;
+import org.example.eventy.solutions.dtos.SolutionHistoryDTO;
 import org.example.eventy.solutions.services.SolutionService;
 import org.example.eventy.users.models.User;
+import org.example.eventy.users.services.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,16 +15,16 @@ public class BudgetItemDTO {
     private Long id;
     private String category;
     private double plannedFunds;
-    private List<SolutionDetailsDTO> budgetedEntries;
+    private List<SolutionHistoryDTO> budgetedEntries;
 
     public BudgetItemDTO() {}
 
-    public BudgetItemDTO(BudgetItem budgetItem, SolutionService solutionService, User loggedInUser) {
+    public BudgetItemDTO(BudgetItem budgetItem, UserService userService) {
         this.id = budgetItem.getId();
         this.category = budgetItem.getCategory().getName();
         this.plannedFunds = budgetItem.getPlannedFunds();
         this.budgetedEntries = new ArrayList<>();
-        budgetItem.getReservedItems().forEach(v -> budgetedEntries.add(new SolutionDetailsDTO(v, solutionService.getSolution(v.getSolutionId()),loggedInUser)));
+        budgetItem.getReservedItems().forEach(v -> budgetedEntries.add(new SolutionHistoryDTO(v, userService)));
     }
 
     public Long getId() {
@@ -49,11 +51,11 @@ public class BudgetItemDTO {
         this.plannedFunds = plannedFunds;
     }
 
-    public List<SolutionDetailsDTO> getBudgetedEntries() {
+    public List<SolutionHistoryDTO> getBudgetedEntries() {
         return budgetedEntries;
     }
 
-    public void setBudgetedEntries(List<SolutionDetailsDTO> budgetedEntries) {
+    public void setBudgetedEntries(List<SolutionHistoryDTO> budgetedEntries) {
         this.budgetedEntries = budgetedEntries;
     }
 }

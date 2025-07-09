@@ -3,6 +3,7 @@ package org.example.eventy.events.dtos;
 import org.example.eventy.events.models.Budget;
 import org.example.eventy.solutions.services.SolutionService;
 import org.example.eventy.users.models.User;
+import org.example.eventy.users.services.UserService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,10 +17,10 @@ public class BudgetDTO
 
     public BudgetDTO() {}
 
-    public BudgetDTO(Budget budget, LocalDateTime eventDate, SolutionService solutionService, User loggedInUser) {
+    public BudgetDTO(Budget budget, LocalDateTime eventDate, UserService userService) {
         this.eventDate = eventDate;
         this.categoryItems = new ArrayList<>();
-        budget.getBudgetedItems().forEach(v -> this.categoryItems.add(new BudgetItemDTO(v, solutionService, loggedInUser)));
+        budget.getBudgetedItems().forEach(v -> this.categoryItems.add(new BudgetItemDTO(v, userService)));
     }
 
     public List<BudgetItemDTO> getCategoryItems() {

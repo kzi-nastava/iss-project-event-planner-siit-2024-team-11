@@ -10,7 +10,6 @@ import org.example.eventy.events.services.BudgetService;
 import org.example.eventy.events.services.EventService;
 import org.example.eventy.solutions.models.Category;
 import org.example.eventy.solutions.services.SolutionCategoryService;
-import org.example.eventy.solutions.services.SolutionService;
 import org.example.eventy.users.models.User;
 import org.example.eventy.users.services.UserService;
 import org.example.eventy.util.TokenUtils;
@@ -40,8 +39,6 @@ public class BudgetController {
     private UserService userService;
     @Autowired
     private TokenUtils tokenUtils;
-    @Autowired
-    private SolutionService solutionService;
 
     @GetMapping(value = "/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<BudgetDTO> getBudget(@PathVariable Long eventId, @RequestHeader(value = "Authorization", required = false) String token) {
@@ -66,7 +63,7 @@ public class BudgetController {
             budget = budgetService.createBudget(eventId);
         }
         LocalDateTime eventDate = event.getDate();
-        return new ResponseEntity<>(new BudgetDTO(budget, eventDate, solutionService, user), HttpStatus.OK);
+        return new ResponseEntity<>(new BudgetDTO(budget, eventDate, userService), HttpStatus.OK);
     }
 
     @PostMapping(value = "/{eventId}/item/{categoryId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -87,7 +84,7 @@ public class BudgetController {
         BudgetItem budgetItem = budgetItemService.createBudgetItem(category, allocatedFunds);
         budgetService.addBudgetItem(budget, budgetItem);
 
-        return new ResponseEntity<>(new BudgetItemDTO(budgetItem, solutionService, user), HttpStatus.CREATED);
+        return new ResponseEntity<>(new BudgetItemDTO(budgetItem, userService), HttpStatus.CREATED);
     }
 
     @DeleteMapping(value = "/item/{budgetItemId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -119,12 +116,12 @@ public class BudgetController {
         if (budgetItem == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<BudgetItemDTO>(new BudgetItemDTO(budgetItem, solutionService, user), HttpStatus.OK);
+        return new ResponseEntity<BudgetItemDTO>(new BudgetItemDTO(budgetItem, userService), HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/item/{budgetItemId}/{solutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> removeBudgetItemSolution(@PathVariable Long budgetItemId, @PathVariable Long solutionId) {
-        boolean isDeleted = budgetItemService.deleteBudgetItemSolution(budgetItemId, solutionId);
+    @DeleteMapping(value = "/item/{budgetItemId}/{solutionHistoryId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> removeBudgetItemSolution(@PathVariable Long budgetItemId, @PathVariable Long solutionHistoryId) {
+        boolean isDeleted = budgetItemService.deleteBudgetItemSolution(budgetItemId, solutionHistoryId);
         if (isDeleted) {
             return new ResponseEntity<>(true, HttpStatus.NO_CONTENT);
         }

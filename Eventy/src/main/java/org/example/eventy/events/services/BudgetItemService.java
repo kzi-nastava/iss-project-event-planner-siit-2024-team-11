@@ -35,11 +35,11 @@ public class BudgetItemService {
         return budgetItemRepository.save(budgetItem);
     }
 
-    public boolean deleteBudgetItemSolution(Long id, Long solutionId) {
+    public boolean deleteBudgetItemSolution(Long id, Long solutionHistoryId) {
         BudgetItem budgetItem = budgetItemRepository.findById(id).orElse(null);
         if (budgetItem == null) { return false; }
         int lengthBefore = budgetItem.getReservedItems().size();
-        budgetItem.getReservedItems().stream().filter(v -> v.getSolutionId() != solutionId).toList();
+        budgetItem.getReservedItems().stream().filter(v -> v.getId() != solutionHistoryId).toList();
         budgetItemRepository.save(budgetItem);
         int lengthAfter = budgetItem.getReservedItems().size();
         return lengthBefore != lengthAfter;
