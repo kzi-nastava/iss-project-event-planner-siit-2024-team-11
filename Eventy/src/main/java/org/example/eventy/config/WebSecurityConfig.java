@@ -82,7 +82,8 @@ public class WebSecurityConfig {
          http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
          http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(restAuthenticationEntryPoint));
          http.authorizeHttpRequests(request -> {
-             request.requestMatchers(new AntPathRequestMatcher("/api/users/{userId}")).permitAll()
+             request.requestMatchers(new AntPathRequestMatcher("/api/authentication/**")).permitAll()
+                     .requestMatchers(new AntPathRequestMatcher("/api/users/{userId}")).permitAll()
                      .requestMatchers(new AntPathRequestMatcher("/api/events")).permitAll()
                      .requestMatchers(new AntPathRequestMatcher("/api/events/{eventId}")).permitAll()
                      .requestMatchers(new AntPathRequestMatcher("/api/events/organized/{userId}")).permitAll()
