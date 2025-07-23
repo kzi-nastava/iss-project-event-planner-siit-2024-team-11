@@ -2,11 +2,13 @@ package org.example.eventy.solutions.dtos.services;
 
 import org.example.eventy.events.dtos.EventTypeDTO;
 import org.example.eventy.solutions.dtos.CategoryDTO;
+import org.example.eventy.solutions.validation.annotation.ValidService;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@ValidService
 public class CreateServiceDTO {
 
     private String name;
