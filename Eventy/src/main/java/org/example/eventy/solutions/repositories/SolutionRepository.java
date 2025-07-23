@@ -19,7 +19,8 @@ import java.util.List;
 public interface SolutionRepository extends JpaRepository<Solution, Long> {
     @Query("SELECT s FROM Solution s WHERE s.provider.id = :providerId " +
             "AND (LOWER(s.name) LIKE LOWER(CONCAT('%', :search, '%')) " +
-            "OR LOWER(s.description) LIKE LOWER(CONCAT('%', :search, '%')))")
+            "OR LOWER(s.description) LIKE LOWER(CONCAT('%', :search, '%')))" +
+            "AND s.isDeleted = FALSE")
     Page<Solution> findByProvider(@Param("providerId") Long providerId,
                                 @Param("search") String search,
                                 Pageable pageable);
