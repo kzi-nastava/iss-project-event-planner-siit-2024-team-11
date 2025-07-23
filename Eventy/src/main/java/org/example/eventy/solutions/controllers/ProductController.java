@@ -53,6 +53,7 @@ public class ProductController {
 
     // GET "/api/products/cards/5"
     @GetMapping(value = "/cards/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<SolutionCardDTO> getProductCard(@PathVariable Long productId, @RequestHeader(value = "Authorization", required = false) String token) {
         Solution product = productService.getProduct(productId);
 
@@ -129,24 +130,24 @@ public class ProductController {
 */
 
     // not mine actually, feel free to override
-    @GetMapping(value = "/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ProductDTO> getProduct(@PathVariable Long productId) {
-        ProductDTO productDTO = new ProductDTO();
-        if(productId.equals(5L)) {
-            productDTO.setId(5L);
-            productDTO.setName("Product 5");
-            productDTO.setPrice(5.0);
-            productDTO.setDiscount(7.0);
-            productDTO.setDescription("Product 5 Description");
-            productDTO.setIsAvailable(true);
-            productDTO.setIsVisible(true);
-            productDTO.setImages(new ArrayList<String>());
-            productDTO.setRelatedEventTypes(new ArrayList<EventTypeDTO>());
-            return new ResponseEntity<>(productDTO, HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(productDTO, HttpStatus.NOT_FOUND);
-    }
+//    @GetMapping(value = "/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<ProductDTO> getProduct(@PathVariable Long productId) {
+//        ProductDTO productDTO = new ProductDTO();
+//        if(productId.equals(5L)) {
+//            productDTO.setId(5L);
+//            productDTO.setName("Product 5");
+//            productDTO.setPrice(5.0);
+//            productDTO.setDiscount(7.0);
+//            productDTO.setDescription("Product 5 Description");
+//            productDTO.setIsAvailable(true);
+//            productDTO.setIsVisible(true);
+//            productDTO.setImages(new ArrayList<String>());
+//            productDTO.setRelatedEventTypes(new ArrayList<EventTypeDTO>());
+//            return new ResponseEntity<>(productDTO, HttpStatus.OK);
+//        }
+//
+//        return new ResponseEntity<>(productDTO, HttpStatus.NOT_FOUND);
+//    }
 
     @PutMapping(value = "/{productId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('Provider')")

@@ -110,7 +110,6 @@ public class SolutionController {
     }
 
     @GetMapping(value = "/catalog/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PagedResponse<SolutionCardDTO>> getProviderCatalog(@PathVariable Long userId, @RequestParam(required = false, defaultValue = "") String search,
                                                                              @RequestHeader(value = "Authorization", required = false) String token, Pageable pageable) {
         User user = null;
@@ -205,6 +204,7 @@ public class SolutionController {
 
     // GET "/api/solutions/cards/5"
     @GetMapping(value = "/cards/{solutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Organizer')")
     public ResponseEntity<SolutionCardDTO> getSolutionCard(@PathVariable Long solutionId, @RequestHeader(value = "Authorization", required = false) String token) {
         Solution solution = solutionService.getSolution(solutionId);
 

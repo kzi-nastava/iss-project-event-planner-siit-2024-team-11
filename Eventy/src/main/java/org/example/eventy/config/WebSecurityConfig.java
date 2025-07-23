@@ -76,24 +76,30 @@ public class WebSecurityConfig {
 
  // Definisemo prava pristupa za zahteve ka odredjenim URL-ovima/rutama
  	 @Bean
-     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception { // TO DO: Fix this whole mess here, see what should and what shouldn't be allowed for everyone
+     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
  		 http.cors(Customizer.withDefaults());
  		 http.csrf((csrf) -> csrf.disable());
          http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
          http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(restAuthenticationEntryPoint));
          http.authorizeHttpRequests(request -> {
-             request.requestMatchers(new AntPathRequestMatcher("/api/authentication/**")).permitAll()
-                     //.requestMatchers(new AntPathRequestMatcher("/api/**")).permitAll()
-                     //.requestMatchers(new AntPathRequestMatcher("/**")).permitAll();
-                    //.requestMatchers(new AntPathRequestMatcher("/api/events")).permitAll()
-                     .requestMatchers(new AntPathRequestMatcher("/api/events/featured")).permitAll()
-                    .requestMatchers(new AntPathRequestMatcher("/api/solutions/**")).permitAll()
-                     .requestMatchers(new AntPathRequestMatcher("/api/solutions/featured")).permitAll()
-                     .requestMatchers(new AntPathRequestMatcher("/api/events/pdfs/**")).permitAll()
+             request.requestMatchers(new AntPathRequestMatcher("/api/users/{userId}")).permitAll()
+                     .requestMatchers(new AntPathRequestMatcher("/api/events")).permitAll()
                      .requestMatchers(new AntPathRequestMatcher("/api/events/{eventId}")).permitAll()
-                     .requestMatchers(new AntPathRequestMatcher("/api/chats/**")).permitAll()
-                     .requestMatchers(new AntPathRequestMatcher("/api/reviews/**")).permitAll()
-                     //.requestMatchers(new AntPathRequestMatcher("/api/reservations/**")).permitAll() -- TO DO: Tamara to add JWT token to some test requests
+                     .requestMatchers(new AntPathRequestMatcher("/api/events/organized/{userId}")).permitAll()
+                     .requestMatchers(new AntPathRequestMatcher("/api/events/homepage-routing")).permitAll()
+                     .requestMatchers(new AntPathRequestMatcher("/api/events/details-routing/{eventId}")).permitAll()
+                     .requestMatchers(new AntPathRequestMatcher("/api/events/featured")).permitAll()
+                     .requestMatchers(new AntPathRequestMatcher("/api/events/event-types")).permitAll()
+                     .requestMatchers(new AntPathRequestMatcher("/api/events/locations")).permitAll()
+                     .requestMatchers(new AntPathRequestMatcher("/api/events/pdfs/**")).permitAll()
+                     .requestMatchers(new AntPathRequestMatcher("/api/reviews/solution/{solutionId}")).permitAll()
+                     .requestMatchers(new AntPathRequestMatcher("/api/solutions")).permitAll()
+                     .requestMatchers(new AntPathRequestMatcher("/api/solutions/featured")).permitAll()
+                     .requestMatchers(new AntPathRequestMatcher("/api/solutions/event-types")).permitAll()
+                     .requestMatchers(new AntPathRequestMatcher("/api/solutions/categories")).permitAll()
+                     .requestMatchers(new AntPathRequestMatcher("/api/solutions/companies")).permitAll()
+                     .requestMatchers(new AntPathRequestMatcher("/api/solutions/{id}")).permitAll()
+                     .requestMatchers(new AntPathRequestMatcher("/api/solutions/catalog/{userId}")).permitAll()
                   .requestMatchers(new AntPathRequestMatcher("/api/whoami")).hasRole("USER")
              .anyRequest().authenticated();
          });

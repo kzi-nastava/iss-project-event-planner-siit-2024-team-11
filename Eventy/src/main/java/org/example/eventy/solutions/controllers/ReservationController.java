@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@PreAuthorize("hasRole('Organizer')")
 @RequestMapping("api/reservations")
 public class ReservationController {
     @Autowired
@@ -127,7 +128,6 @@ public class ReservationController {
     */
     // POST "/api/reservations"
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('Organizer')")
     public ResponseEntity<ReservationDTO> createReservation(@Valid @RequestBody ReservationDTO reservationDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             // if there are validation errors, we return a 400 Bad Request response

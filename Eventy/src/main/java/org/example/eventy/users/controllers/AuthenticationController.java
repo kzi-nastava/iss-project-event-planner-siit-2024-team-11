@@ -24,6 +24,7 @@ import java.net.URI;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -62,6 +63,7 @@ public class AuthenticationController {
     private ActiveUserManager activeUserManager;
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("!isAuthenticated()")
     public ResponseEntity<?> login(@RequestBody LoginDTO authenticationRequest, HttpServletResponse response) {
         // Ukoliko kredencijali nisu ispravni, logovanje nece biti uspesno, desice se
         // AuthenticationException
@@ -110,6 +112,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/logout")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7);
@@ -126,6 +129,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/registration", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
+    @PreAuthorize("!isAuthenticated()")
     public ResponseEntity<String> register(@RequestBody RegistrationDTO registrationDTO) {
         User user;
         if(registrationDTO.getName() == null) {
@@ -201,6 +205,7 @@ public class AuthenticationController {
     }
 
     @PutMapping(value="/registration-confirmation/{requestId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("!isAuthenticated()")
     public ResponseEntity<UserTokenState> confirmRegistration(@PathVariable Long requestId, @RequestHeader("User-Agent") String userAgent) {
         RequestUpdateStatus status = registrationRequestService.update(requestId);
 
@@ -250,6 +255,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/confirm-registration-routing/{requestId}")
+    @PreAuthorize("!isAuthenticated()")
     public ResponseEntity<Void> confirmRegistrationRouting(@PathVariable Long requestId, @RequestHeader("User-Agent") String userAgent) {
         // if the device is mobile
         if (userAgent.toLowerCase().contains("android")) {
@@ -266,6 +272,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/fast-registration", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
+    @PreAuthorize("!isAuthenticated()")
     public ResponseEntity<String> fastRegister(@Valid @RequestBody FastRegistrationDTO fastRegistrationDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             // if there are validation errors, we return a 400 Bad Request response
@@ -333,6 +340,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/fast-registration-routing/{encryptedEmail}")
+    @PreAuthorize("!isAuthenticated()")
     public ResponseEntity<Void> fastRegistrationRouting(@PathVariable String encryptedEmail, @RequestHeader("User-Agent") String userAgent) {
         // if the device is mobile
         if (userAgent.toLowerCase().contains("android")) {
@@ -349,6 +357,7 @@ public class AuthenticationController {
     }
 
     @GetMapping(value = "/fast-registration/{encryptedData}", produces = MediaType.TEXT_PLAIN_VALUE)
+    @PreAuthorize("!isAuthenticated()")
     public ResponseEntity<String> decryptEmail(@PathVariable String encryptedData) {
         try {
             String decryptedEmail = EncryptionUtil.decrypt(encryptedData);
@@ -361,6 +370,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/upgrade-profile", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
+    @PreAuthorize("hasRole('AuthenticatedUser')")
     public ResponseEntity<String> upgradeProfile(@Valid @RequestBody UpgradeProfileDTO upgradeProfileDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             // if there are validation errors, we return a 400 Bad Request response
