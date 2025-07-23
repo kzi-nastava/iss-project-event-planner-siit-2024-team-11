@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +35,7 @@ public class ReportController {
 
     // GET "/api/reports/pending"
     @GetMapping(value = "/pending", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<PagedResponse<ReportDTO>> getPendingReports(Pageable pageable) {
         Page<Report> pendingReports = reportService.getPendingReports(pageable);
 
@@ -49,6 +51,7 @@ public class ReportController {
 
     // POST "/api/reports"
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<CreateReportDTO> createReport(@Valid @RequestBody CreateReportDTO createReportDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             // if there are validation errors, we return a 400 Bad Request response
@@ -85,6 +88,7 @@ public class ReportController {
 
     // PUT "/api/reports/{reportId}/accept"
     @PutMapping(value = "/{reportId}/accept", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<ReportDTO> acceptReport(@PathVariable Long reportId) {
         Report report = reportService.getReport(reportId);
         if(report == null) {
@@ -105,6 +109,7 @@ public class ReportController {
 
     // PUT "/api/reports/{reportId}/decline"
     @PutMapping(value = "/{reportId}/decline", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<ReportDTO> declineReport(@PathVariable Long reportId) {
         Report report = reportService.getReport(reportId);
         if(report == null) {

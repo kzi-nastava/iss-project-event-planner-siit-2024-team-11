@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,6 +52,7 @@ public class ReviewController {
 
     // GET "/api/reviews/pending"
     @GetMapping(value = "/pending", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<PagedResponse<ReviewDTO>> getPendingReviews(Pageable pageable) {
         Page<Review> pendingReviews = reviewService.getPendingReviews(pageable);
 
@@ -66,6 +68,7 @@ public class ReviewController {
 
     // GET "/api/reviews/accepted"
     @GetMapping(value = "/accepted", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<PagedResponse<ReviewDTO>> getAcceptedReviews(Pageable pageable) {
         Page<Review> acceptedReviews = reviewService.getAcceptedReviews(pageable);
 
@@ -81,6 +84,7 @@ public class ReviewController {
 
     // GET "/api/reviews/5"
     @GetMapping(value = "/{reviewId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<ReviewDTO> getReview(@PathVariable Long reviewId) {
         Review review = reviewService.getReview(reviewId);
 
@@ -93,6 +97,7 @@ public class ReviewController {
 
     // PUT "/api/reviews/{reviewId}/accept"
     @PutMapping(value = "/{reviewId}/accept", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<ReviewDTO> acceptReview(@PathVariable Long reviewId) {
         Review review = reviewService.getReview(reviewId);
         if(review == null) {
@@ -110,6 +115,7 @@ public class ReviewController {
 
     // PUT "/api/reviews/{reviewId}/decline"
     @PutMapping(value = "/{reviewId}/decline", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<ReviewDTO> declineReview(@PathVariable Long reviewId) {
         Review review = reviewService.getReview(reviewId);
         if(review == null) {
@@ -126,6 +132,7 @@ public class ReviewController {
 
     // DELETE "/api/reviews/5"
     @DeleteMapping(value ="/{reviewId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<ReviewDTO> deleteReview(@PathVariable Long reviewId) {
         Review review = reviewService.getReview(reviewId);
         if(review == null) {
@@ -142,6 +149,7 @@ public class ReviewController {
 
     // POST "/api/reviews"
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<CreateReviewDTO> createReview(@Valid @RequestBody CreateReviewDTO reviewDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             // if there are validation errors, we return a 400 Bad Request response
@@ -227,6 +235,7 @@ public class ReviewController {
 
     // GET "/api/reviews/user/{userId}/solution/{solutionId}"
     @GetMapping(value = "/user/{userId}/solution/{solutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Boolean> isSolutionReviewedByUser(@PathVariable Long userId, @PathVariable Long solutionId) {
         Boolean exists = reviewService.isSolutionReviewedByUser(userId, solutionId);
         return new ResponseEntity<Boolean>(exists, HttpStatus.OK);

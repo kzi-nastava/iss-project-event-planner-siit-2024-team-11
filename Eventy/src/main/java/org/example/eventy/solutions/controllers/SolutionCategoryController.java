@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/categories")
-
 public class SolutionCategoryController {
     @Autowired
     private SolutionCategoryService service;

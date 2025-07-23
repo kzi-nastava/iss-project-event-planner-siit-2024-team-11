@@ -339,6 +339,7 @@ public class EventController {
     }
 
     @GetMapping(value = "/favorite/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PagedResponse<EventCardDTO>> getFavoriteEvents(@PathVariable Long userId, @RequestParam(required = false, defaultValue = "") String search,
                                                                   Pageable pageable, @RequestHeader(value = "Authorization", required = false) String token) {
         User user = null;
@@ -364,7 +365,6 @@ public class EventController {
     }
 
     @GetMapping(value = "/organized/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PagedResponse<EventCardDTO>> getEventsOrganizedByUser(@PathVariable Long userId, @RequestParam(required = false, defaultValue = "") String search,
                                                                                 Pageable pageable, @RequestHeader(value = "Authorization", required = false) String token) {
         User user = null;
@@ -442,6 +442,7 @@ public class EventController {
     }
 
     @GetMapping(value = "/user/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Organizer')")
     public ResponseEntity<PagedResponse<EventCardDTO>> getEventsByUserId(
             @PathVariable Long userId,
             @RequestParam(required = false, defaultValue = "") String search,
@@ -492,6 +493,7 @@ public class EventController {
 
     // GET "/api/events/cards/5"
     @GetMapping(value = "/cards/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Organizer')")
     public ResponseEntity<EventCardDTO> getEventCard(@PathVariable Long eventId, @RequestHeader(value = "Authorization", required = false) String token) {
         Event event = eventService.getEvent(eventId);
 
@@ -569,6 +571,7 @@ public class EventController {
     }
 
     @GetMapping(value = "/unreviewed/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Collection<UnreviewedEventDTO>> getUnreviewedAcceptedEventsByUserId(@PathVariable Long userId) {
         ArrayList<Event> unreviewedAcceptedEvents = eventService.getUnreviewedAcceptedEventsByUserId(userId);
         ArrayList<UnreviewedEventDTO> unreviewedEventDTO = new ArrayList<UnreviewedEventDTO>();
@@ -589,6 +592,7 @@ public class EventController {
     }
 
     @GetMapping(value = "/{eventId}/update", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Organizer')")
     public ResponseEntity<UpdateEventDTO> getEventForUpdate(@PathVariable Long eventId) {
         Event event = eventService.getEvent(eventId);
 

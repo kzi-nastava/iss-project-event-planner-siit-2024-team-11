@@ -18,7 +18,6 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/events/types")
-@PreAuthorize("hasRole('Admin')")
 public class EventTypeController {
     @Autowired
     private EventTypeService eventTypeService;
@@ -26,6 +25,7 @@ public class EventTypeController {
     private SolutionCategoryService solutionCategoryService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<PagedResponse<EventTypeCardDTO>> getTypes(@RequestParam(required = false, defaultValue = "") String search, Pageable pageable) {
         List<EventType> eventTypes = eventTypeService.getTypes(search, pageable);
         List<EventTypeCardDTO> eventTypeDTOs = new ArrayList<EventTypeCardDTO>();
@@ -55,6 +55,7 @@ public class EventTypeController {
     }
 
     @GetMapping(value = "/{eventTypeId}",produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<EventTypeWithActivityDTO> getType(@PathVariable Long eventTypeId) {
         EventType eventType = eventTypeService.get(eventTypeId);
 
@@ -67,6 +68,7 @@ public class EventTypeController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<EventTypeDTO> createType(@RequestBody CreatedEventTypeDTO createdEventTypeDTO) {
         EventType eventType = new EventType();
         eventType.setName(createdEventTypeDTO.getName());
@@ -89,6 +91,7 @@ public class EventTypeController {
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<EventTypeDTO> updateType(@RequestBody UpdateEventTypeDTO updateEventTypeDTO) {
         EventType eventType = eventTypeService.get(updateEventTypeDTO.getId());
         if(eventType == null) {
@@ -115,6 +118,7 @@ public class EventTypeController {
     }
 
     @PutMapping(value = "/{eventTypeId}/activation", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<EventTypeWithActivityDTO> toggleActivate(@PathVariable Long eventTypeId) {
         EventType eventType = eventTypeService.toggleActivation(eventTypeId);
         if(eventType != null) {
