@@ -232,4 +232,11 @@ public class ReviewController {
         return new ResponseEntity<Boolean>(exists, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/solution/{solutionId}")
+    public ResponseEntity<List<ReviewDTO>> getReviewsForSolution(@PathVariable Long solutionId) {
+        List<Review> reviewsForSolution = reviewService.getReviewsForSolution(solutionId);
+        List<ReviewDTO> dtos = reviewsForSolution.stream().map(review -> new ReviewDTO(review)).toList();
+        return new ResponseEntity<>(dtos, HttpStatus.OK);
+    }
+
 }
