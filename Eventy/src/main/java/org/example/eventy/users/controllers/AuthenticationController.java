@@ -126,7 +126,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/registration", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<String> register(@RequestBody RegistrationDTO registrationDTO) {
+    public ResponseEntity<String> register(@Valid @RequestBody RegistrationDTO registrationDTO) {
         User user;
         if(registrationDTO.getName() == null) {
             EventOrganizer newOrganizer = new EventOrganizer();
@@ -142,13 +142,9 @@ public class AuthenticationController {
             newOrganizer.setRole(roleRepository.findByName("ROLE_Organizer"));
             newOrganizer.setImageUrls(this.pictureService.save(registrationDTO.getProfilePictures()));
 
-            if(registrationDTO.getFirstName() == null || registrationDTO.getLastName() == null) {
-                return new ResponseEntity<String>("Organizer validation failed!", HttpStatus.BAD_REQUEST);
-            }
-
             newOrganizer = (EventOrganizer) userService.save(newOrganizer, true);
             if(newOrganizer == null) {
-                return new ResponseEntity<String>("Organizer validation failed!", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<String>("Registering organizer failed!", HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             user = newOrganizer;
@@ -167,13 +163,9 @@ public class AuthenticationController {
             newProvider.setRole(roleRepository.findByName("ROLE_Provider"));
             newProvider.setImageUrls(this.pictureService.save(registrationDTO.getProfilePictures()));
 
-            if(registrationDTO.getName() == null || registrationDTO.getDescription() == null) {
-                return new ResponseEntity<String>("Provider validation failed!", HttpStatus.BAD_REQUEST);
-            }
-
             newProvider = (SolutionProvider) userService.save(newProvider, true);
             if(newProvider == null) {
-                return new ResponseEntity<String>("Provider validation failed!", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<String>("Register provider failed!", HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             user = newProvider;
@@ -181,7 +173,7 @@ public class AuthenticationController {
 
         RegistrationRequest registrationRequest = registrationRequestService.create(user);
         if(registrationRequest == null) {
-            return new ResponseEntity<String>("Creating request failed!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<String>("Creating request failed!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         try {
@@ -194,7 +186,7 @@ public class AuthenticationController {
             );
         }
         catch (Exception e) {
-            return new ResponseEntity<String>("Sending email failed!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<String>("Sending email failed!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return new ResponseEntity<String>("Confirmation email sent to the email address!", HttpStatus.CREATED);
@@ -212,7 +204,7 @@ public class AuthenticationController {
 
             RegistrationRequest registrationRequest = registrationRequestService.create(user);
             if(registrationRequest == null) {
-                return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<UserTokenState>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             try {
@@ -225,8 +217,9 @@ public class AuthenticationController {
                 );
             }
             catch (Exception e) {
-                return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<UserTokenState>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
+
             return new ResponseEntity<UserTokenState>(HttpStatus.BAD_REQUEST);
         }
 
