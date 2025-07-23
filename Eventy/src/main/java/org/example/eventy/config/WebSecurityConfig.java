@@ -92,6 +92,7 @@ public class WebSecurityConfig {
                      .requestMatchers(new AntPathRequestMatcher("/api/events/pdfs/**")).permitAll()
                      .requestMatchers(new AntPathRequestMatcher("/api/events/{eventId}")).permitAll()
                      .requestMatchers(new AntPathRequestMatcher("/api/chats/**")).permitAll()
+                     .requestMatchers(new AntPathRequestMatcher("/api/reviews/**")).permitAll()
                      //.requestMatchers(new AntPathRequestMatcher("/api/reservations/**")).permitAll() -- TO DO: Tamara to add JWT token to some test requests
                   .requestMatchers(new AntPathRequestMatcher("/api/whoami")).hasRole("USER")
              .anyRequest().authenticated();
