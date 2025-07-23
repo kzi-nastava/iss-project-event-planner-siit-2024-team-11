@@ -3,9 +3,9 @@ package org.example.eventy.solutions.validation.validator;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.example.eventy.solutions.dtos.services.CreateServiceDTO;
-import org.example.eventy.solutions.validation.annotation.ValidReservation;
+import org.example.eventy.solutions.validation.annotation.ValidService;
 
-public class ServiceValidator implements ConstraintValidator<ValidReservation, CreateServiceDTO> {
+public class ServiceValidator implements ConstraintValidator<ValidService, CreateServiceDTO> {
     @Override
     public boolean isValid(CreateServiceDTO createServiceDTO, ConstraintValidatorContext constraintValidatorContext) {
         if (createServiceDTO.getName() == null || createServiceDTO.getName().isEmpty()) {
