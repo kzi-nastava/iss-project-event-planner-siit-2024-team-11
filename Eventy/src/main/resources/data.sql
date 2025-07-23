@@ -157,7 +157,12 @@ INSERT INTO user_notifications (user_id, notification_id) VALUES
 INSERT INTO reviews (user_id, event_id, solution_id, comment, grade, status, is_deleted)
 VALUES
     (1, 2, NULL, 'Great event, really enjoyed it!', 5, 'PENDING', false),
-    (1, 3, NULL, 'Great event 2!', 3, 'PENDING', false);
+    (1, 3, NULL, 'Great event 2!', 3, 'PENDING', false),
+    (1, NULL, 1, 'Great solution!', 5, 'ACCEPTED', false),
+    (2, NULL, 1, 'Bad solution!', 1, 'ACCEPTED', false),
+    (4, NULL, 1, 'Whatever.', 2, 'ACCEPTED', false),
+    (5, NULL, 1, 'Nice!', 4, 'ACCEPTED', false),
+    (3, NULL, 1, 'Meh solution.', 3, 'ACCEPTED', false);
 
 -- BudgetItems
 INSERT INTO budget_items (id, category_id, planned_funds)
