@@ -1,5 +1,6 @@
 package org.example.eventy.solutions.controllers;
 
+import jakarta.validation.Valid;
 import org.example.eventy.solutions.dtos.services.*;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
 import org.example.eventy.solutions.models.Service;
@@ -30,7 +31,7 @@ public class ServiceController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('Provider')")
-    public ResponseEntity<ServiceDTO> createService(@RequestBody CreateServiceDTO service) {
+    public ResponseEntity<ServiceDTO> createService(@Valid @RequestBody CreateServiceDTO service) {
         ServiceDTO response = new ServiceDTO(serviceService.createService(service));
 
         return new ResponseEntity<ServiceDTO>(response, HttpStatus.CREATED);
