@@ -139,31 +139,30 @@ public class UserProfileController {
     @GetMapping(value="/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> getProfile(@PathVariable Long userId,
                                               @RequestHeader(value = "Authorization", required = false) String token) {
-        if (token == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        User loggedInUser;
-        try {
-            token = token.substring(7);
-            loggedInUser = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
-
-            if(loggedInUser == null) {
-                throw new Exception();
-            }
-        }
-        catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
         User user = userService.get(userId);
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        if (!user.getId().equals(loggedInUser.getId())) {
-            if (loggedInUser.getBlocked().contains(user)) {
-                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        if (token != null) {
+            User loggedInUser = null;
+
+            try {
+                token = token.substring(7);
+                loggedInUser = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+
+                if(loggedInUser == null) {
+                    throw new Exception();
+                }
+            }
+            catch (Exception e) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            if (!user.getId().equals(loggedInUser.getId())) {
+                if (loggedInUser.getBlocked().contains(user)) {
+                    return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+                }
             }
         }
 
