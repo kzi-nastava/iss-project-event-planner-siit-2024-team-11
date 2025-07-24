@@ -1,6 +1,10 @@
 package org.example.eventy.solutions.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.common.services.PictureService;
 import org.example.eventy.events.dtos.EventTypeDTO;
@@ -10,12 +14,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ProductDTO {
+    @NotNull
     private Long id;
+    @NotEmpty(message = "Name cannot be empty")
     private String name;
+    @NotEmpty(message = "Description cannot be empty")
     private String description;
+    @Min(0)
     private double price;
+    @Min(0)
+    @Max(100)
     private double discount;
+    @NotNull(message = "Related event types cannot be null")
     private List<EventTypeDTO> relatedEventTypes;
+    @NotNull(message = "Images cannot be null")
     private List<String> images;
     @JsonProperty("isVisible")
     private boolean isVisible;
