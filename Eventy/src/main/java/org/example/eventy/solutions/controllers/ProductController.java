@@ -219,6 +219,7 @@ public class ProductController {
         BudgetItem budgetItem = budget.getBudgetedItems().stream().filter(v -> v.getCategory() == product.getCategory()).findFirst().orElse(null);
         if (budgetItem == null) {
             budgetItem = budgetItemService.createBudgetItem(product.getCategory(), 0.0);
+            budgetService.addBudgetItem(budget, budgetItem);
         }
         budgetItem = budgetItemService.addBudgetItemSolution(budgetItem, productToBuy);
 
