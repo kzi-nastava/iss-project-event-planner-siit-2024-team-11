@@ -44,7 +44,6 @@ public class RegistrationValidator implements ConstraintValidator<ValidRegistrat
     }
 
     private boolean isEmail(String email) {
-        return email.matches("/^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\n" +
-                "(?:\\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*$/i");
+        return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
     }
 }
