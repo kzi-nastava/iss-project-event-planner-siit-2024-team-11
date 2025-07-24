@@ -33,7 +33,7 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
 
     @Modifying
     @Transactional
-    @Query("UPDATE Solution s SET s.category = :newCategory WHERE s.category = :oldCategory")
+    @Query("UPDATE Solution s SET s.category = :newCategory, s.isVisible = TRUE WHERE s.category = :oldCategory")
     int updateCategoryForAllSolutions(@Param("oldCategory") Category oldCategory, @Param("newCategory") Category newCategory);
 
     List<Solution> findByCategory(Category category);
@@ -226,4 +226,7 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
     ArrayList<String> findAllUniqueCompanyNamesForSolutions();
 
     List<Solution> findByIsDeletedFalse();
+
+    @Query("SELECT s FROM Solution s WHERE s.category.id = :categoryId")
+    List<Solution> findAllByCategoryId(@Param("categoryId") Long categoryId);
 }

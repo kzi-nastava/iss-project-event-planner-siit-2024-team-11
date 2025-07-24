@@ -7,7 +7,9 @@ import org.example.eventy.solutions.dtos.CategoryDTO;
 import org.example.eventy.solutions.dtos.categories.CreateCategoryDTO;
 import org.example.eventy.solutions.dtos.categories.CategoryWithIDDTO;
 import org.example.eventy.solutions.models.Category;
+import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.repositories.SolutionCategoryRepository;
+import org.example.eventy.solutions.repositories.SolutionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
@@ -22,6 +24,10 @@ public class SolutionCategoryService {
 
     @Autowired
     private SolutionCategoryRepository solutionCategoryRepository;
+    @Autowired
+    private SolutionService solutionService;
+    @Autowired
+    private SolutionRepository solutionRepository;
 
     public long getAcceptedCategoryCount() {
         return solutionCategoryRepository.countByStatus(Status.ACCEPTED);
@@ -92,6 +98,7 @@ public class SolutionCategoryService {
                 return null;
             }
             acceptedCategory.setStatus(Status.ACCEPTED);
+            makeAffectedSolutionsVisible(acceptedCategory.getId());
             return solutionCategoryRepository.save(acceptedCategory);
         }
         return null;
@@ -107,6 +114,7 @@ public class SolutionCategoryService {
             category.setName(newCategory.getName());
             category.setDescription(newCategory.getDescription());
             category.setStatus(Status.ACCEPTED);
+            makeAffectedSolutionsVisible(category.getId());
             return solutionCategoryRepository.save(category);
         }
         return null;
@@ -118,5 +126,13 @@ public class SolutionCategoryService {
             existingCategoryIds.add(item.getCategory().getId());
         }
         return solutionCategoryRepository.findAllExceptFollowingIds(existingCategoryIds);
+    }
+
+    private void makeAffectedSolutionsVisible(Long categoryId) {
+        List<Solution> affectedSolutions = solutionService.getAllByCategoryId(categoryId);
+        for (Solution solution: affectedSolutions) {
+            solution.setVisible(true);
+            solutionRepository.save(solution);
+        }
     }
 }

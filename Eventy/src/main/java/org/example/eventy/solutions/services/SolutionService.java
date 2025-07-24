@@ -152,4 +152,8 @@ public class SolutionService {
     public List<Solution> getSolutionsByProviderUnpaged(Long providerId) {
         return solutionRepository.findByProviderUnpaged(providerId);
     }
+
+    public List<Solution> getAllByCategoryId(Long categoryId) {
+        return solutionRepository.findAllByCategoryId(categoryId);
+    }
 }
