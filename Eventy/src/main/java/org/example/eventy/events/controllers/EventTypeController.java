@@ -1,5 +1,6 @@
 package org.example.eventy.events.controllers;
 
+import jakarta.validation.Valid;
 import org.example.eventy.common.models.PagedResponse;
 import org.example.eventy.events.dtos.*;
 import org.example.eventy.events.models.EventType;
@@ -67,7 +68,7 @@ public class EventTypeController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EventTypeDTO> createType(@RequestBody CreatedEventTypeDTO createdEventTypeDTO) {
+    public ResponseEntity<EventTypeDTO> createType(@Valid @RequestBody CreatedEventTypeDTO createdEventTypeDTO) {
         EventType eventType = new EventType();
         eventType.setName(createdEventTypeDTO.getName());
         eventType.setDescription(createdEventTypeDTO.getDescription());
@@ -89,7 +90,7 @@ public class EventTypeController {
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EventTypeDTO> updateType(@RequestBody UpdateEventTypeDTO updateEventTypeDTO) {
+    public ResponseEntity<EventTypeDTO> updateType(@Valid @RequestBody UpdateEventTypeDTO updateEventTypeDTO) {
         EventType eventType = eventTypeService.get(updateEventTypeDTO.getId());
         if(eventType == null) {
             return new ResponseEntity<EventTypeDTO>(HttpStatus.NOT_FOUND);
@@ -108,7 +109,7 @@ public class EventTypeController {
         eventType = eventTypeService.save(eventType);
 
         if(eventType != null) {
-            return new ResponseEntity<EventTypeDTO>(new EventTypeDTO(eventType), HttpStatus.CREATED);
+            return new ResponseEntity<EventTypeDTO>(new EventTypeDTO(eventType), HttpStatus.OK);
         }
 
         return new ResponseEntity<EventTypeDTO>(HttpStatus.BAD_REQUEST);

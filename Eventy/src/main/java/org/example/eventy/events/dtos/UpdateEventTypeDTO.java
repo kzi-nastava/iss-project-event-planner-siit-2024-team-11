@@ -1,5 +1,7 @@
 package org.example.eventy.events.dtos;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.example.eventy.events.models.EventType;
 import org.example.eventy.solutions.models.Category;
 
@@ -7,8 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UpdateEventTypeDTO {
+    @NotNull(message = "Id cannot be null")
     private Long id;
+    @NotEmpty(message = "Event type name cannot be empty!")
     private String name;
+    @NotEmpty(message = "Event type description cannot be empty!")
     private String description;
     private List<Long> recommendedSolutionCategoriesIds;
 
