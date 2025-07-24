@@ -57,6 +57,19 @@ VALUES
     (DEFAULT, 'Photography', 'Services for capturing memories of events.', 0, false),
     (DEFAULT, 'Catering', 'Food and drink services for events.', 0, false);
 
+INSERT INTO event_types_recommended_solution_categories (event_type_id, recommended_category_id)
+VALUES
+    (2, 1), -- Party recommends Decorations
+    (2, 2), -- Party recommends Photography
+    (2, 3), -- Party recommends Catering
+    (3, 2), -- Graduation recommends Photography
+    (3, 3), -- Graduation recommends Catering
+    (4, 1), -- Luxury recommends Decorations
+    (4, 2), -- Luxury recommends Photography
+    (5, 1), -- Workout recommends Decorations
+    (5, 3), -- Workout recommends Catering
+    (1, 2); -- Tech recommends Photography
+
 -- SolutionHistory
 INSERT INTO solution_history (id, provider_id, name, description, price, discount, cancellation_deadline)
 VALUES
