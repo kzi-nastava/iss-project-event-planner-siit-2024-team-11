@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
-@PreAuthorize("isAuthenticated()")
 public class UserProfileController {
     @Autowired
     private UserService userService;
@@ -48,6 +47,7 @@ public class UserProfileController {
     private TokenUtils tokenUtils;
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserDTO> updateProfile(@Valid @RequestBody UpdateUserProfileDTO updateUserProfileDTO) {
         User user = userService.get(updateUserProfileDTO.getId());
 
@@ -102,6 +102,7 @@ public class UserProfileController {
     }
 
     @DeleteMapping(value="/{userId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deactivateProfile(@PathVariable Long userId) {
         User user = userService.get(userId);
 
@@ -136,44 +137,43 @@ public class UserProfileController {
         return !reservationService.getReservationByProviderBetween(user.getId(), LocalDate.now(), LocalDate.of(9999, 12, 31)).isEmpty();
     }
 
-    @PostMapping(value="/{userId}/upgrade", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
-    @PreAuthorize("hasRole('AuthenticatedUser')")
-    public ResponseEntity<String> upgradeProfile(@RequestBody RegistrationDTO registrationDTO, @PathVariable Long userId) {
-        if(registrationDTO.getEmail().equals("good@gmail.com")) {
-            return new ResponseEntity<String>("Confirmation email sent!", HttpStatus.OK);
-        }
-
-        return new ResponseEntity<String>("Validation failed", HttpStatus.BAD_REQUEST);
-    }
+//    @PostMapping(value="/{userId}/upgrade", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
+//    @PreAuthorize("hasRole('AuthenticatedUser')")
+//    public ResponseEntity<String> upgradeProfile(@RequestBody RegistrationDTO registrationDTO, @PathVariable Long userId) {
+//        if(registrationDTO.getEmail().equals("good@gmail.com")) {
+//            return new ResponseEntity<String>("Confirmation email sent!", HttpStatus.OK);
+//        }
+//
+//        return new ResponseEntity<String>("Validation failed", HttpStatus.BAD_REQUEST);
+//    }
 
     @GetMapping(value="/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> getProfile(@PathVariable Long userId,
                                               @RequestHeader(value = "Authorization", required = false) String token) {
-        if (token == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        User loggedInUser;
-        try {
-            token = token.substring(7);
-            loggedInUser = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
-
-            if(loggedInUser == null) {
-                throw new Exception();
-            }
-        }
-        catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
         User user = userService.get(userId);
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        if (!user.getId().equals(loggedInUser.getId())) {
-            if (loggedInUser.getBlocked().contains(user)) {
-                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        if (token != null) {
+            User loggedInUser = null;
+
+            try {
+                token = token.substring(7);
+                loggedInUser = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+
+                if(loggedInUser == null) {
+                    throw new Exception();
+                }
+            }
+            catch (Exception e) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            if (!user.getId().equals(loggedInUser.getId())) {
+                if (loggedInUser.getBlocked().contains(user)) {
+                    return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+                }
             }
         }
 
@@ -185,6 +185,7 @@ public class UserProfileController {
     }
 
     @GetMapping(value = "/{userId}/calendar", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<CalendarOccupancyDTO>> getCalendar(@PathVariable Long userId,
                                                                   @RequestParam(required = false) LocalDate startDate,
                                                                   @RequestParam(required = false) LocalDate endDate) {
@@ -216,6 +217,7 @@ public class UserProfileController {
     }
 
     @GetMapping(value = "/{userId}/notifications-info", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserNotificationInfoDTO> getUserNotificationsInfo(@PathVariable Long userId) {
         User user = userService.get(userId);
 
@@ -230,6 +232,7 @@ public class UserProfileController {
     }
 
     @PutMapping(value = "/{userId}/notifications-info", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Boolean> toggleNotifications(@PathVariable Long userId,
                                                        @RequestBody Boolean toggleValue) {
         User user = userService.get(userId);
@@ -249,6 +252,7 @@ public class UserProfileController {
     }
 
     @PutMapping(value = "/{userId}/last-read-notifications", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<LocalDateTime> updateLastReadNotifications(@PathVariable Long userId) {
         User user = userService.get(userId);
 
@@ -268,6 +272,7 @@ public class UserProfileController {
 
     // POST "/api/users/block"
     @PostMapping(value = "/block", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<BlockUserDTO> blockUser(@Valid @RequestBody BlockUserDTO blockUserDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             // if there are validation errors, we return a 400 Bad Request response

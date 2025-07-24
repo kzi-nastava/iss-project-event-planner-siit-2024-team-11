@@ -20,4 +20,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Integer> findAllGradesForEvent(@Param("eventId") Long eventId);
   
     Boolean existsByGraderIdAndSolutionId(Long userId, Long solutionId);
+
+    @Query("SELECT r FROM Review r WHERE r.solution.id = :solutionId")
+    List<Review> findAllBySolutionId(@Param("solutionId") Long solutionId);
 }

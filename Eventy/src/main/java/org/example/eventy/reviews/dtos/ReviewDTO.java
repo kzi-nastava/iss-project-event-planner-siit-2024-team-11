@@ -1,7 +1,14 @@
 package org.example.eventy.reviews.dtos;
 
+import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.common.models.Status;
+import org.example.eventy.common.services.PictureService;
 import org.example.eventy.reviews.models.Review;
+import org.example.eventy.users.models.Admin;
+import org.example.eventy.users.models.EventOrganizer;
+import org.example.eventy.users.models.SolutionProvider;
+
+import java.util.stream.Collectors;
 
 public class ReviewDTO {
     private Long id;
@@ -12,6 +19,8 @@ public class ReviewDTO {
     private String title; // event/product/service name
     private Status status;
     private Boolean isDeleted;
+    private String senderName;
+    private String senderAvatar;
 
     public ReviewDTO() {
 
@@ -37,6 +46,14 @@ public class ReviewDTO {
         this.title = review.getSolution() == null ? review.getEvent().getName() : review.getSolution().getName();
         this.status = review.getStatus();
         this.isDeleted = review.getDeleted();
+        if (review.getGrader() instanceof SolutionProvider) {
+            this.senderName = ((SolutionProvider) review.getGrader()).getName();
+        } else if (review.getGrader() instanceof EventOrganizer) {
+            this.senderName = ((EventOrganizer) review.getGrader()).getFirstName() + " " + ((EventOrganizer) review.getGrader()).getLastName();
+        } else {
+            this.senderName = ((Admin) review.getGrader()).getFirstName() + " " + ((Admin) review.getGrader()).getLastName();
+        }
+        this.senderAvatar = PictureService.getImage(review.getGrader().getImageUrls().get(0).getPath());
     }
 
     public Long getId() {
@@ -102,5 +119,21 @@ public class ReviewDTO {
 
     public void setDeleted(Boolean deleted) {
         isDeleted = deleted;
+    }
+
+    public String getSenderName() {
+        return senderName;
+    }
+
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
+    }
+
+    public String getSenderAvatar() {
+        return senderAvatar;
+    }
+
+    public void setSenderAvatar(String senderAvatar) {
+        this.senderAvatar = senderAvatar;
     }
 }

@@ -1,5 +1,6 @@
 package org.example.eventy.solutions.controllers;
 
+import jakarta.validation.Valid;
 import org.example.eventy.solutions.dtos.services.*;
 import org.example.eventy.solutions.dtos.SolutionCardDTO;
 import org.example.eventy.solutions.models.Service;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -28,13 +30,15 @@ public class ServiceController {
     private TokenUtils tokenUtils;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ServiceDTO> createService(@RequestBody CreateServiceDTO service) {
+    @PreAuthorize("hasRole('Provider')")
+    public ResponseEntity<ServiceDTO> createService(@Valid @RequestBody CreateServiceDTO service) {
         ServiceDTO response = new ServiceDTO(serviceService.createService(service));
 
         return new ResponseEntity<ServiceDTO>(response, HttpStatus.CREATED);
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Provider')")
     public ResponseEntity<ServiceDTO> getService(@PathVariable("id") long id) {
         Service service = (Service) serviceService.getService(id);
         if (service == null) {
@@ -44,6 +48,7 @@ public class ServiceController {
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('Provider')")
     public ResponseEntity<ServiceDTO> updateService(@RequestBody UpdateServiceDTO service) {
         Service updatedService = serviceService.updateService(service);
         if (updatedService == null) {
@@ -54,6 +59,7 @@ public class ServiceController {
 
     // GET "/api/services/cards/5"
     @GetMapping(value = "/cards/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<SolutionCardDTO> getServiceCard(@PathVariable Long serviceId, @RequestHeader(value = "Authorization", required = false) String token) {
         Solution service = serviceService.getService(serviceId);
 
