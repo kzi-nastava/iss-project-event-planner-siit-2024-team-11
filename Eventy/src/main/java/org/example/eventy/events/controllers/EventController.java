@@ -88,7 +88,7 @@ public class EventController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('Organizer')")
     public ResponseEntity<EventDTO> organizeEvent(@Valid @RequestBody OrganizeEventDTO organizeEventDTO, BindingResult bindingResult, @RequestHeader(value = "Authorization", required = true) String token) {
-        if (organizeEventDTO.getOrganizerId() == null || !organizeEventDTO.getOrganizerId().equals(tokenUtils.getIdFromToken(token.substring(7)))) {
+        if (!organizeEventDTO.getOrganizerId().equals(tokenUtils.getIdFromToken(token.substring(7)))) {
             return new ResponseEntity("Invalid Organizer ID!", HttpStatus.BAD_REQUEST);
         }
 
@@ -100,13 +100,6 @@ public class EventController {
             return new ResponseEntity(errorMessages, HttpStatus.BAD_REQUEST);
         }
 
-        for(CreateActivityDTO activityDTO : organizeEventDTO.getAgenda()) {
-            if(activityDTO.getStartTime().isAfter(activityDTO.getEndTime()) || activityDTO.getStartTime().isEqual(activityDTO.getEndTime()) ||
-            activityDTO.getStartTime().isBefore(organizeEventDTO.getDate()) || activityDTO.getEndTime().isAfter(organizeEventDTO.getDate().plusDays(1))) {
-                return new ResponseEntity("Agenda timeline is not possible!", HttpStatus.BAD_REQUEST);
-            }
-        }
-
         Event event = new Event();
         event.setName(organizeEventDTO.getName());
         event.setDescription(organizeEventDTO.getDescription());
@@ -115,10 +108,6 @@ public class EventController {
         event.setDate(organizeEventDTO.getDate());
         event.setOrganiser((EventOrganizer) userService.get(organizeEventDTO.getOrganizerId()));
         EventType eventType = eventTypeService.get(organizeEventDTO.getEventTypeId());
-
-        if(eventType == null) {
-            return new ResponseEntity("Event type doesn't exist!", HttpStatus.BAD_REQUEST);
-        }
 
         event.setType(eventType);
 
@@ -156,7 +145,7 @@ public class EventController {
             return new ResponseEntity<EventDTO>(eventDTO, HttpStatus.CREATED);
         }
 
-        return new ResponseEntity<EventDTO>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<EventDTO>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

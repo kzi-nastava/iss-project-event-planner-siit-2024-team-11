@@ -1,5 +1,6 @@
 package org.example.eventy.solutions.controllers;
 
+import jakarta.validation.Valid;
 import org.example.eventy.common.services.PictureService;
 import org.example.eventy.events.dtos.EventTypeDTO;
 import org.example.eventy.events.models.Budget;
@@ -77,7 +78,7 @@ public class ProductController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('Provider')")
-    public ResponseEntity<ProductDTO> createProduct(@RequestBody CreateProductDTO createProductDTO,
+    public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody CreateProductDTO createProductDTO,
                                                     @RequestHeader(value = "Authorization", required = false) String token) {
         Product product = new Product();
 
@@ -151,7 +152,7 @@ public class ProductController {
 
     @PutMapping(value = "/{productId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('Provider')")
-    public ResponseEntity<ProductDTO> updateProduct(@RequestBody ProductDTO productDTO, @PathVariable Long productId) {
+    public ResponseEntity<ProductDTO> updateProduct(@Valid @RequestBody ProductDTO productDTO, @PathVariable Long productId) {
         Product product = productService.getProduct(productId);
 
         if (product == null) {

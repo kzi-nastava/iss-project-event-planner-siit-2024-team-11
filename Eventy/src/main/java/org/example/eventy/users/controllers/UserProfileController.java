@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -47,7 +48,7 @@ public class UserProfileController {
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<UserDTO> updateProfile(@RequestBody UpdateUserProfileDTO updateUserProfileDTO) {
+    public ResponseEntity<UserDTO> updateProfile(@Valid @RequestBody UpdateUserProfileDTO updateUserProfileDTO) {
         User user = userService.get(updateUserProfileDTO.getId());
 
         if(user == null) {
@@ -58,33 +59,43 @@ public class UserProfileController {
             return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
         }
 
-        user.setEmail(updateUserProfileDTO.getEmail());
+        if(!user.getEmail().equals(updateUserProfileDTO.getEmail())) {
+            return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
+        }
+
         user.setAddress(updateUserProfileDTO.getAddress());
         user.setPhoneNumber(updateUserProfileDTO.getPhoneNumber());
         if(!updateUserProfileDTO.getPassword().isEmpty()) user.setPassword(updateUserProfileDTO.getPassword());
-        user.setImageUrls(pictureService.save(updateUserProfileDTO.getProfilePictures())); // update!
+        user.setImageUrls(pictureService.save(updateUserProfileDTO.getProfilePictures()));
 
         UserType userType = userService.getUserType(user);
         if(userType == UserType.PROVIDER) {
+            if (updateUserProfileDTO.getName().isEmpty() || updateUserProfileDTO.getDescription().isEmpty()) {
+                return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
+            }
+
             ((SolutionProvider) user).setName(updateUserProfileDTO.getName());
             ((SolutionProvider) user).setDescription(updateUserProfileDTO.getDescription());
         } else if (userType == UserType.ORGANIZER) {
+            if (updateUserProfileDTO.getFirstName().isEmpty() || updateUserProfileDTO.getLastName().isEmpty()) {
+                return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
+            }
+
             ((EventOrganizer) user).setFirstName(updateUserProfileDTO.getFirstName());
             ((EventOrganizer) user).setLastName(updateUserProfileDTO.getLastName());
         } else if (userType == UserType.ADMIN) {
+            if (updateUserProfileDTO.getFirstName().isEmpty() || updateUserProfileDTO.getLastName().isEmpty()) {
+                return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
+            }
+
             ((Admin) user).setFirstName(updateUserProfileDTO.getFirstName());
             ((Admin) user).setLastName(updateUserProfileDTO.getLastName());
-        } else {
-            //((AuthenticatedUser) user).setFirstName(updateUserProfileDTO.getFirstName());
-            //((AuthenticatedUser) user).setLastName(updateUserProfileDTO.getLastName());
-            // <> <> <> NOTE: AuthenticatedUser does not have first nor last name - Tamara
-
         }
 
         user = userService.save(user, !updateUserProfileDTO.getPassword().isEmpty());
 
         if(user == null) {
-            return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<UserDTO>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return new ResponseEntity<UserDTO>(new UserDTO(user, userType), HttpStatus.OK);
