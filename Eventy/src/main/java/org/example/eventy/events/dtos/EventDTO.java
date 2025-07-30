@@ -1,33 +1,60 @@
 package org.example.eventy.events.dtos;
 
+import org.example.eventy.events.models.Event;
+import org.example.eventy.events.models.PrivacyType;
+
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class EventDTO {
+    private Long id;
     private String name;
     private String description;
     private int maxNumberParticipants;
-    private boolean isOpen;
+    private boolean isPublic;
     private EventTypeDTO eventType;
-    private String location;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocationDTO location;
+    private LocalDateTime date;
     private List<ActivityDTO> agenda;
+    private Long organizerId;
 
     public EventDTO() {
 
     }
 
-    public EventDTO(String name, String description, int maxNumberParticipants, boolean isOpen, EventTypeDTO eventType, String location, LocalDateTime startDate, LocalDateTime endDate, List<ActivityDTO> agenda) {
+    public EventDTO(Event event) {
+        this.id = event.getId();
+        this.name = event.getName();
+        this.description = event.getDescription();
+        this.maxNumberParticipants = event.getMaxNumberParticipants();
+        this.isPublic = event.getPrivacy() == PrivacyType.PUBLIC;
+        this.eventType = new EventTypeDTO(event.getType());
+        this.location = new LocationDTO(event.getLocation());
+        this.date = event.getDate();
+        this.agenda = event.getAgenda().stream().map(ActivityDTO::new).collect(Collectors.toList());
+        this.organizerId = event.getOrganiser().getId();
+    }
+
+    public EventDTO(Long id, String name, String description, int maxNumberParticipants, boolean isPublic, EventTypeDTO eventType, LocationDTO location, LocalDateTime date, List<ActivityDTO> agenda, Long organizerId) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.maxNumberParticipants = maxNumberParticipants;
-        this.isOpen = isOpen;
+        this.isPublic = isPublic;
         this.eventType = eventType;
         this.location = location;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.date = date;
         this.agenda = agenda;
+        this.organizerId = organizerId;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -54,12 +81,12 @@ public class EventDTO {
         this.maxNumberParticipants = maxNumberParticipants;
     }
 
-    public boolean isOpen() {
-        return isOpen;
+    public boolean isPublic() {
+        return isPublic;
     }
 
-    public void setOpen(boolean open) {
-        isOpen = open;
+    public void setPublic(boolean aPublic) {
+        isPublic = aPublic;
     }
 
     public EventTypeDTO getEventType() {
@@ -70,28 +97,20 @@ public class EventDTO {
         this.eventType = eventType;
     }
 
-    public String getLocation() {
+    public LocationDTO getLocation() {
         return location;
     }
 
-    public void setLocation(String location) {
+    public void setLocation(LocationDTO location) {
         this.location = location;
     }
 
-    public LocalDateTime getStartDate() {
-        return startDate;
+    public LocalDateTime getDate() {
+        return date;
     }
 
-    public void setStartDate(LocalDateTime startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDateTime getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDateTime endDate) {
-        this.endDate = endDate;
+    public void setDate(LocalDateTime date) {
+        this.date = date;
     }
 
     public List<ActivityDTO> getAgenda() {
@@ -100,5 +119,13 @@ public class EventDTO {
 
     public void setAgenda(List<ActivityDTO> agenda) {
         this.agenda = agenda;
+    }
+
+    public Long getOrganizerId() {
+        return organizerId;
+    }
+
+    public void setOrganizerId(Long organizerId) {
+        this.organizerId = organizerId;
     }
 }

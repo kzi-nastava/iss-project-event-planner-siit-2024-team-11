@@ -1,8 +1,11 @@
 package org.example.eventy.events.dtos;
 
+import org.example.eventy.events.models.Activity;
+
 import java.time.LocalDateTime;
 
 public class ActivityDTO {
+    private Long id;
     private String name;
     private String description;
     private String location;
@@ -13,12 +16,30 @@ public class ActivityDTO {
 
     }
 
-    public ActivityDTO(String name, String description, String location, LocalDateTime startTime, LocalDateTime endTime) {
+    public ActivityDTO(Activity activity) {
+        this.id = activity.getId();
+        this.name = activity.getName();
+        this.description = activity.getDescription();
+        this.location = activity.getLocation();
+        this.startTime = activity.getStartTime();
+        this.endTime = activity.getEndTime();
+    }
+
+    public ActivityDTO(Long id, String name, String description, String location, LocalDateTime startTime, LocalDateTime endTime) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.location = location;
         this.startTime = startTime;
         this.endTime = endTime;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {

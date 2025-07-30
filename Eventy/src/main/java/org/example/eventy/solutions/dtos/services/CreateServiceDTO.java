@@ -2,25 +2,29 @@ package org.example.eventy.solutions.dtos.services;
 
 import org.example.eventy.events.dtos.EventTypeDTO;
 import org.example.eventy.solutions.dtos.CategoryDTO;
+import org.example.eventy.solutions.validation.annotation.ValidService;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
+@ValidService
 public class CreateServiceDTO {
 
     private String name;
     private String description;
-    private double price;
-    private int discount;
+    private Double price;
+    private Double discount;
     private ArrayList<String> imageUrls;
-    private CategoryDTO category;
-    private Collection<EventTypeDTO> relatedEventTypes;
+    private Long providerId;
+    private Long categoryId;
+    private List<Long> relatedEventTypeIds;
     private String specifics;
-    private int minReservationTime;
-    private int maxReservationTime;
-    private int reservationDeadline;
-    private int cancellationDeadline;
-    private boolean automaticReservationAcceptance;
+    private Integer minReservationTime;
+    private Integer maxReservationTime;
+    private Integer reservationDeadline;
+    private Integer cancellationDeadline;
+    private Boolean automaticReservationAcceptance;
 
     public CreateServiceDTO() { super(); }
 
@@ -40,19 +44,19 @@ public class CreateServiceDTO {
         this.description = description;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
-    public int getDiscount() {
+    public Double getDiscount() {
         return discount;
     }
 
-    public void setDiscount(int discount) {
+    public void setDiscount(Double discount) {
         this.discount = discount;
     }
 
@@ -64,20 +68,28 @@ public class CreateServiceDTO {
         this.imageUrls = imageUrls;
     }
 
-    public CategoryDTO getCategory() {
-        return category;
+    public Long getProviderId() {
+        return providerId;
     }
 
-    public void setCategory(CategoryDTO category) {
-        this.category = category;
+    public void setProviderId(Long providerId) {
+        this.providerId = providerId;
     }
 
-    public Collection<EventTypeDTO> getRelatedEventTypes() {
-        return relatedEventTypes;
+    public Long getCategoryId() {
+        return categoryId;
     }
 
-    public void setRelatedEventTypes(Collection<EventTypeDTO> relatedEventTypes) {
-        this.relatedEventTypes = relatedEventTypes;
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public List<Long> getRelatedEventTypeIds() {
+        return relatedEventTypeIds;
+    }
+
+    public void setRelatedEventTypeIds(List<Long> relatedEventTypeIds) {
+        this.relatedEventTypeIds = relatedEventTypeIds;
     }
 
     public String getSpecifics() {
@@ -88,43 +100,43 @@ public class CreateServiceDTO {
         this.specifics = specifics;
     }
 
-    public int getMinReservationTime() {
+    public Integer getMinReservationTime() {
         return minReservationTime;
     }
 
-    public void setMinReservationTime(int minReservationTime) {
+    public void setMinReservationTime(Integer minReservationTime) {
         this.minReservationTime = minReservationTime;
     }
 
-    public int getMaxReservationTime() {
+    public Integer getMaxReservationTime() {
         return maxReservationTime;
     }
 
-    public void setMaxReservationTime(int maxReservationTime) {
+    public void setMaxReservationTime(Integer maxReservationTime) {
         this.maxReservationTime = maxReservationTime;
     }
 
-    public int getReservationDeadline() {
+    public Integer getReservationDeadline() {
         return reservationDeadline;
     }
 
-    public void setReservationDeadline(int reservationDeadline) {
+    public void setReservationDeadline(Integer reservationDeadline) {
         this.reservationDeadline = reservationDeadline;
     }
 
-    public int getCancellationDeadline() {
+    public Integer getCancellationDeadline() {
         return cancellationDeadline;
     }
 
-    public void setCancellationDeadline(int cancellationDeadline) {
+    public void setCancellationDeadline(Integer cancellationDeadline) {
         this.cancellationDeadline = cancellationDeadline;
     }
 
-    public boolean getAutomaticReservationAcceptance() {
+    public Boolean getAutomaticReservationAcceptance() {
         return automaticReservationAcceptance;
     }
 
-    public void setAutomaticReservationAcceptance(boolean automaticReservationAcceptance) {
+    public void setAutomaticReservationAcceptance(Boolean automaticReservationAcceptance) {
         this.automaticReservationAcceptance = automaticReservationAcceptance;
     }
 }

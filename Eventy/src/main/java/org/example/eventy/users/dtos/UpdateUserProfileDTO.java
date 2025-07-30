@@ -1,11 +1,21 @@
 package org.example.eventy.users.dtos;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import org.example.eventy.users.validation.annotation.ValidUpdateUserProfile;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
+@ValidUpdateUserProfile
 public class UpdateUserProfileDTO {
+    @NotNull(message = "Id cannot be null")
     private Long id;
+    @NotNull(message = "Profile picture or profile pictures cannot be null")
     private List<String> profilePictures;
+    @NotEmpty(message = "Email cannot be empty")
     private String email;
+    @NotEmpty(message = "Old password cannot be empty")
     private String oldPassword;
     private String password;
     private String confirmedPassword;
@@ -13,7 +23,9 @@ public class UpdateUserProfileDTO {
     private String lastName;
     private String name;
     private String description;
+    @NotEmpty(message = "Address cannot be empty")
     private String address;
+    @NotEmpty(message = "Phone number cannot be empty")
     private String phoneNumber;
 
     public UpdateUserProfileDTO() {

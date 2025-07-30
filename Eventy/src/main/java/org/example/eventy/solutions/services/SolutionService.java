@@ -1,93 +1,159 @@
 package org.example.eventy.solutions.services;
 
-import org.example.eventy.events.models.EventType;
 import org.example.eventy.solutions.models.Category;
-import org.example.eventy.solutions.models.Product;
-import org.example.eventy.solutions.models.Service;
 import org.example.eventy.solutions.models.Solution;
-import org.example.eventy.users.models.SolutionProvider;
+import org.example.eventy.solutions.repositories.SolutionRepository;
+import org.example.eventy.users.models.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
-
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 @org.springframework.stereotype.Service
 public class SolutionService {
-    /*@Autowired
-    // will be changed probably..
-    private SolutionRepository solutionRepository;*/
+    @Autowired
+    private SolutionRepository solutionRepository;
 
-    public ArrayList<Solution> getSolutions(String search, String type, String category, ArrayList<String> eventTypes, String company, double minPrice, double maxPrice, LocalDate startDate, LocalDate endDate, Boolean isAvailable, Pageable pageable) {
-        ArrayList<Solution> solutions = generateSolutionExamples(1);
-        return solutions;
-        //return solutionRepository.findFilteredSolutions(search, type, category, eventTypes, company, minPrice, maxPrice, startDate, endDate, isAvailable, pageable);
-    }
+    public Page<Solution> getSolutions(String search, String type, String categories, String eventTypes, String company, double minPrice, double maxPrice, LocalDateTime startDate, LocalDateTime endDate, Boolean isAvailable, User user, Pageable pageable) {
+        int page = pageable.getPageNumber();
+        if (page < 0) page = 0;
 
-    public ArrayList<Solution> getFeaturedSolutions() {
-        ArrayList<Solution> featuredSolutions = generateSolutionExamples(2);
-        return featuredSolutions;
+        int pageSize = pageable.getPageSize();
+        if (pageSize != 1 && pageSize != 2 && pageSize != 5 && pageSize != 10) pageSize = 5;
+
+        String sortField = pageable.getSort().isEmpty() ? "id" : pageable.getSort().iterator().next().getProperty();
+        String sortDirection = pageable.getSort().isEmpty() ? "asc" : pageable.getSort().iterator().next().getDirection().name();
+        String sort = (sortField + "," + sortDirection).toLowerCase();
+
+        StringBuilder blockedUsersConcatenated = new StringBuilder();
+
+        if (user != null) {
+            List<User> blockedUsers = user.getBlocked();
+            if (blockedUsers != null && !blockedUsers.isEmpty()) {
+                for (User blockedUser : blockedUsers) {
+                    blockedUsersConcatenated.append(blockedUser.getId()).append(",");
+                }
+                blockedUsersConcatenated.deleteCharAt(blockedUsersConcatenated.length() - 1);
+            }
+        }
+
+        List<Solution> solutions = solutionRepository.findAll(search, type, categories, eventTypes, company, minPrice, maxPrice, startDate, endDate, isAvailable, blockedUsersConcatenated.toString(), page, pageSize, sort);
+        int total = solutionRepository.findTotalCount(search, type, categories, eventTypes, company, minPrice, maxPrice, startDate, endDate, isAvailable, blockedUsersConcatenated.toString());
+
+        return new PageImpl<>(solutions, PageRequest.of(page, pageSize), total);
+
     }
 
     public Solution getSolution(Long solutionId) {
-        ArrayList<Solution> solutions = generateSolutionExamples(1);
-        Solution solution = solutions.get(0);
-        solution.setId(solutionId);
-
-        return solution;
+        return solutionRepository.findById(solutionId).orElse(null);
     }
 
-    public ArrayList<Solution> generateSolutionExamples(int type) {
-        Category category1 = new Category();
-        category1.setName("Catering");
-        ArrayList<EventType> eventTypes = new ArrayList<EventType>();
-        EventType eventType1 = new EventType();
-        eventType1.setName("Wedding");
-        EventType eventType2 = new EventType();
-        eventType2.setName("Birthday");
-        eventTypes.add(eventType1);
-        eventTypes.add(eventType2);
-        ArrayList<String> imageUrls = new ArrayList<String>();
-        imageUrls.add("https://example.com/solution.png");
-        SolutionProvider provider = new SolutionProvider();
-        provider.setName("TacTac");
-        provider.setEmail("cakes.luxury@gmail.com");
-        provider.setImageUrls(imageUrls);
+    public ArrayList<Solution> getFeaturedSolutions(User user) {
+        Pageable pageable = PageRequest.of(0, 5);
 
-        Product product1 = new Product();
-        product1.setId(1L);
-        product1.setName(type == 1 ? "Luxury Wedding Cake" : "FEATURED - Luxury Wedding Cake");
-        product1.setCategory(category1);
-        product1.setDescription("A handcrafted 3-tier wedding cake with customizable flavors.");
-        product1.setEventTypes(eventTypes);
-        product1.setPrice(150.00);
-        product1.setDiscount(10);
-        product1.setImageUrls(imageUrls);
-        product1.setAvailable(true);
-        product1.setProvider(provider);
+        StringBuilder blockedUsersConcatenated = new StringBuilder();
 
-        Category category2 = new Category();
-        category2.setName("Entertainment");
-        provider.setEmail("exit.festival@gmail.com");
+        if (user != null) {
+            List<User> blockedUsers = user.getBlocked();
+            if (blockedUsers != null && !blockedUsers.isEmpty()) {
+                for (User blockedUser : blockedUsers) {
+                    blockedUsersConcatenated.append(blockedUser.getId()).append(",");
+                }
+                blockedUsersConcatenated.deleteCharAt(blockedUsersConcatenated.length() - 1);
+            }
+        }
 
-        Service service1 = new Service();
-        service1.setId(2L);
-        service1.setName(type == 1 ? "DJ Services" : "FEATURED - DJ Services");
-        service1.setCategory(category2);
-        service1.setMinReservationTime(2);
-        service1.setMaxReservationTime(6);
-        service1.setDescription(null);
-        service1.setEventTypes(eventTypes);
-        service1.setPrice(150.00);
-        service1.setDiscount(10);
-        service1.setImageUrls(imageUrls);
-        service1.setAvailable(true);
-        service1.setProvider(provider);
+        return solutionRepository.findFeaturedSolutions(blockedUsersConcatenated.toString(), pageable);
+    }
 
-        ArrayList<Solution> solutions = new ArrayList<Solution>();
-        solutions.add(product1);
-        solutions.add(service1);
+    public List<Solution> getSolutionsByProvider(Long providerId, String search, Pageable pageable) {
+        return solutionRepository.findByProvider(providerId, search, pageable).getContent();
+    }
 
-        return solutions;
+    public long getSolutionsByProviderCount(Long providerId) {
+        return solutionRepository.countByProviderId(providerId);
+    }
+
+    public List<Solution> getFavoriteSolutionsByUser(Long userId, String search, Pageable pageable) {
+        return solutionRepository.findUsersFavoriteSolutions(userId, search, pageable).getContent();
+    }
+
+    public long getFavoriteSolutionsByUserCount(Long userId) {
+        return solutionRepository.countUsersFavoriteSolutions(userId);
+    }
+
+    public ArrayList<String> getAllUniqueEventTypesForSolutions() {
+        return solutionRepository.findAllUniqueEventTypeNamesForSolutions();
+    }
+
+    public ArrayList<String> getAllUniqueCategoriesForSolutions() {
+        return solutionRepository.findAllUniqueCategoryNamesForSolutions();
+    }
+
+    public ArrayList<String> getAllUniqueCompaniesForSolutions() {
+        return solutionRepository.findAllUniqueCompanyNamesForSolutions();
+    }
+
+    public boolean replaceCategoryForSolutionsWithOldCategory(Category oldCategory, Category newCategory) {
+        return solutionRepository.updateCategoryForAllSolutions(oldCategory, newCategory) == 1;
+    }
+
+    public Solution findSolutionWithPendingCategory(Category category) {
+        List<Solution> wanted = solutionRepository.findByCategory(category);
+        if (wanted.isEmpty()) return null;
+        return wanted.get(0);
+    }
+
+    public List<Solution> findAllByCategory(Category category) {
+        return solutionRepository.findByCategory(category);
+    }
+
+    public Solution toggleAvailability(Long solutionId) {
+        try {
+            Solution solution = getSolution(solutionId);
+            solution.setAvailable(!solution.isAvailable());
+            return solutionRepository.save(solution);
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
+    public Solution toggleVisible(Long solutionId) {
+        try {
+            Solution solution = getSolution(solutionId);
+            solution.setVisible(!solution.isVisible());
+            return solutionRepository.save(solution);
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
+    public Solution delete(Long solutionId) {
+        try {
+            Solution solution = getSolution(solutionId);
+            solution.setDeleted(true);
+            return solutionRepository.save(solution);
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
+    public List<Solution> getAllSolutions() {
+        return solutionRepository.findByIsDeletedFalse();
+    }
+
+    public List<Solution> getSolutionsByProviderUnpaged(Long providerId) {
+        return solutionRepository.findByProviderUnpaged(providerId);
+    }
+
+    public List<Solution> getAllByCategoryId(Long categoryId) {
+        return solutionRepository.findAllByCategoryId(categoryId);
     }
 }

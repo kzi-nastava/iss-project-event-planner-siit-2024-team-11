@@ -1,0 +1,158 @@
+package org.example.eventy.events.repositories;
+
+import org.example.eventy.events.models.Event;
+import org.example.eventy.events.models.PrivacyType;
+import org.example.eventy.users.models.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Repository
+public interface EventRepository extends JpaRepository<Event, Long> {
+    @Query("SELECT e FROM Event e WHERE e.organiser.id = :eventOrganizerId " +
+            "AND (LOWER(e.name) LIKE LOWER(CONCAT('%', :search, '%')) " +
+            "OR LOWER(e.description) LIKE LOWER(CONCAT('%', :search, '%')))")
+    Page<Event> findByOrganizer(@Param("eventOrganizerId") Long eventOrganizerId,
+                                              @Param("search") String search,
+                                              Pageable pageable);
+
+    @Query("SELECT COUNT(e) FROM Event e WHERE e.organiser.id = :eventOrganizerId")
+    long countByEventOrganizerId(@Param("eventOrganizerId") Long eventOrganizerId);
+
+    @Query("SELECT e FROM Event e WHERE e.id IN " +
+            "(SELECT ue.id FROM User u JOIN u.favoriteEvents ue WHERE u.id = :userId)" +
+            "AND (LOWER(e.name) LIKE LOWER(CONCAT('%', :search, '%')) " +
+            "OR LOWER(e.description) LIKE LOWER(CONCAT('%', :search, '%')))")
+    Page<Event> findUsersFavoriteEvents(@Param("userId") Long userId,
+                                               @Param("search") String search,
+                                               Pageable pageable);
+
+    @Query("SELECT COUNT(e) FROM Event e WHERE e.id IN " +
+            "(SELECT ue.id FROM User u JOIN u.favoriteEvents ue WHERE u.id = :userId)")
+    long countUsersFavoriteEvents(@Param("userId") Long userId);
+
+    @Query("SELECT e FROM Event e " +
+            "WHERE e.organiser.id = :userId " +
+            "AND DATE(e.date) BETWEEN :startDate AND :endDate")
+    List<Event> findOrganizedEventsByUserBetween(
+            @Param("userId") Long userId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
+    @Query("SELECT e FROM User u JOIN u.acceptedEvents e " +
+            "WHERE u.id = :userId AND DATE(e.date) BETWEEN :startDate AND :endDate")
+    List<Event> findAttendingEventsByUserBetween(@Param("userId") Long userId,
+                                                 @Param("startDate") LocalDate startDate,
+                                                 @Param("endDate")LocalDate endDate);
+
+    @Query("SELECT e FROM Event e " +
+            "WHERE ((:search IS NULL OR :search = '' OR e.name ILIKE ('%' || :search || '%')) " +
+            "   OR (:search IS NULL OR :search = '' OR e.description ILIKE ('%' || :search || '%'))) " +
+            "AND (:maxParticipants IS NULL OR e.maxNumberParticipants <= :maxParticipants) " +
+            "AND (:location IS NULL OR :location = '' OR LOWER(e.location.name) = LOWER(:location)) " +
+            "AND (CAST(:startDate AS timestamp) IS NULL OR CAST(:endDate AS timestamp) IS NULL OR ((e.date >= CAST(:startDate AS timestamp)) AND (e.date <= CAST(:endDate AS timestamp)))) " +
+            "AND (:eventTypes IS NULL OR e.type.name IN :eventTypes) " +
+            "AND (e.privacy = :privacy) " +
+            "AND e.date > :dateNow " +
+            "AND (:blocked IS NULL OR :blocked = '' OR NOT :blocked ILIKE ('%' || e.organiser.id || '%')) ")
+    Page<Event> findAll(@Param("search") String search,
+                        @Param("eventTypes") ArrayList<String> eventTypes,
+                        @Param("maxParticipants") Integer maxParticipants,
+                        @Param("location") String location,
+                        @Param("startDate") LocalDateTime startDate,
+                        @Param("endDate") LocalDateTime endDate,
+                        @Param("privacy") PrivacyType privacy,
+                        @Param("blocked") String blocked,
+                        @Param("dateNow") LocalDateTime dateNow,
+                        Pageable pageable);
+
+  @Query("SELECT e FROM Event e " +
+         "WHERE ((:search IS NULL OR :search = '' OR e.name ILIKE ('%' || :search || '%')) " +
+         "   OR (:search IS NULL OR :search = '' OR e.description ILIKE ('%' || :search || '%'))) " +
+         "AND (:maxParticipants IS NULL OR e.maxNumberParticipants <= :maxParticipants) " +
+         "AND (:location IS NULL OR :location = '' OR LOWER(e.location.name) = LOWER(:location)) " +
+         "AND (CAST(:startDate AS timestamp) IS NULL OR CAST(:endDate AS timestamp) IS NULL OR e.date BETWEEN CAST(:startDate AS timestamp) AND CAST(:endDate AS timestamp)) " +
+         "AND (:eventTypes IS NULL OR e.type.name IN :eventTypes) " +
+         "AND (e.organiser.id = :userId) ")
+    Page<Event> findAllByUserId(@Param("userId") Long userId,
+                                @Param("search") String search,
+                                @Param("eventTypes") ArrayList<String> eventTypes,
+                                @Param("maxParticipants") Integer maxParticipants,
+                                @Param("location") String location,
+                                @Param("startDate") LocalDateTime startDate,
+                                @Param("endDate") LocalDateTime endDate,
+                                Pageable pageable);
+  
+    @Query("SELECT e FROM Event e " +
+           "WHERE ((:search IS NULL OR :search = '' OR e.name ILIKE ('%' || :search || '%')) " +
+           "   OR (:search IS NULL OR :search = '' OR e.description ILIKE ('%' || :search || '%'))) " +
+           "AND (:maxParticipants IS NULL OR e.maxNumberParticipants <= :maxParticipants) " +
+           "AND (:location IS NULL OR :location = '' OR LOWER(e.location.name) = LOWER(:location)) " +
+           "AND (CAST(:startDate AS timestamp) IS NULL OR CAST(:endDate AS timestamp) IS NULL OR e.date BETWEEN CAST(:startDate AS timestamp) AND CAST(:endDate AS timestamp)) " +
+           "AND (:eventTypes IS NULL OR e.type.name IN :eventTypes)" +
+           "AND e.privacy = org.example.eventy.events.models.PrivacyType.PUBLIC")
+    Page<Event> findAllPublic(@Param("search") String search,
+                        @Param("eventTypes") ArrayList<String> eventTypes,
+                        @Param("maxParticipants") Integer maxParticipants,
+                        @Param("location") String location,
+                        @Param("startDate") LocalDateTime startDate,
+                        @Param("endDate") LocalDateTime endDate,
+                        Pageable pageable);
+
+    @Query("SELECT e FROM Event e " +
+           "WHERE ((:search IS NULL OR :search = '' OR e.name ILIKE ('%' || :search || '%')) " +
+           "   OR (:search IS NULL OR :search = '' OR e.description ILIKE ('%' || :search || '%'))) " +
+           "AND (:maxParticipants IS NULL OR e.maxNumberParticipants <= :maxParticipants) " +
+           "AND (:location IS NULL OR :location = '' OR LOWER(e.location.name) = LOWER(:location)) " +
+           "AND (CAST(:startDate AS timestamp) IS NULL OR CAST(:endDate AS timestamp) IS NULL OR e.date BETWEEN CAST(:startDate AS timestamp) AND CAST(:endDate AS timestamp)) " +
+           "AND (:eventTypes IS NULL OR e.type.name IN :eventTypes)" +
+           "AND e.privacy = org.example.eventy.events.models.PrivacyType.PUBLIC " +
+           "AND e.organiser = :user")
+    Page<Event> findAllPublicForUser(@Param("search") String search,
+                              @Param("eventTypes") ArrayList<String> eventTypes,
+                              @Param("maxParticipants") Integer maxParticipants,
+                              @Param("location") String location,
+                              @Param("startDate") LocalDateTime startDate,
+                              @Param("endDate") LocalDateTime endDate,
+                              @Param("user") User user,
+                              Pageable pageable);
+  
+    @Query("SELECT e FROM Event e " +
+           "WHERE e.privacy = :privacy " +
+           "AND (:blocked IS NULL OR :blocked = '' OR NOT :blocked ILIKE ('%' || e.organiser.id || '%')) " +
+           "AND e.date > :dateNow " +
+           "ORDER BY e.id DESC ")
+    ArrayList<Event> findFeaturedEvents(@Param("privacy") PrivacyType privacy,
+                                        @Param("blocked") String blocked,
+                                        @Param("dateNow") LocalDateTime dateNow,
+                                        Pageable pageable);
+
+    @Query("SELECT DISTINCT et.name FROM EventType et JOIN Event e ON et.id = e.type.id ORDER BY et.name ASC")
+    ArrayList<String> findAllUniqueEventTypeNamesForEvents();
+
+    @Query("SELECT DISTINCT l.name FROM Location l JOIN Event e ON l.id = e.location.id ORDER BY l.name ASC")
+    ArrayList<String> findAllUniqueLocationNamesForEvents();
+
+    @Query("SELECT u FROM User u JOIN u.acceptedEvents e WHERE e.id = :eventId")
+    List<User> findAttendingUsersByEvent(@Param("eventId") Long eventId);
+  
+    @Query("SELECT e FROM User u " +
+           "JOIN u.acceptedEvents e " +
+           "LEFT JOIN Review r ON r.event = e AND r.grader.id = :userId " +
+           "WHERE u.id = :userId " + "AND r.id IS NULL " +
+           "AND e.date < :dateTime ")
+    ArrayList<Event> findUnreviewedAcceptedEvents(@Param("userId") Long userId,
+                                                  @Param("dateTime") LocalDateTime dateTime);
+
+    @Query("SELECT u.id FROM User u JOIN u.blocked b WHERE b.id = :userId AND u.role.name = 'ROLE_Organizer'")
+    List<Long> findAllOrganizerIdsWhoBlockedUserId(@Param("userId") Long userId);
+}

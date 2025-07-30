@@ -1,27 +1,55 @@
 package org.example.eventy.reviews.models;
 
+import jakarta.persistence.*;
 import org.example.eventy.common.models.Status;
 import org.example.eventy.events.models.Event;
-import org.example.eventy.solutions.models.Service;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.users.models.User;
 
+@Entity
+@Table(name = "Reviews",
+       uniqueConstraints = {
+          @UniqueConstraint(columnNames = {"user_id", "event_id"}),
+          @UniqueConstraint(columnNames = {"user_id", "solution_id"})
+       })
 public class Review {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private User sender;
+
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = true)
+    private User grader;
+
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "event_id", referencedColumnName = "id", nullable = true)
     private Event event;
+
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "solution_id", referencedColumnName = "id", nullable = true)
     private Solution solution;
+
+    @Column(nullable = false)
     private String comment;
+
+    @Column()
     private Integer grade;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING) // save as string values (e.g., "ACCEPTED")
     private Status status;
+
+    @Column()
     private Boolean isDeleted;
+
+    ////////////////////////////////////
 
     public Review() {
     }
 
-    public Review(Long id, User sender, Event event, Solution solution, String comment, Integer grade, Status status, Boolean isDeleted) {
+    public Review(Long id, User grader, Event event, Solution solution, String comment, Integer grade, Status status, Boolean isDeleted) {
         this.id = id;
-        this.sender = sender;
+        this.grader = grader;
         this.event = event;
         this.solution = solution;
         this.comment = comment;
@@ -34,12 +62,12 @@ public class Review {
 
     public void setId(Long id) { this.id = id; }
 
-    public User getSender() {
-        return sender;
+    public User getGrader() {
+        return grader;
     }
 
-    public void setSender(User sender) {
-        this.sender = sender;
+    public void setGrader(User sender) {
+        this.grader = sender;
     }
 
     public Event getEvent() {

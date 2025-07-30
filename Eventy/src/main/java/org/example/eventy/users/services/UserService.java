@@ -1,27 +1,112 @@
 package org.example.eventy.users.services;
 
-import org.example.eventy.users.dtos.ReportDTO;
+import org.example.eventy.events.models.Event;
+import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.users.dtos.UserDTO;
+import org.example.eventy.users.dtos.UserType;
+import org.example.eventy.users.models.Admin;
+import org.example.eventy.users.models.EventOrganizer;
+import org.example.eventy.users.models.SolutionProvider;
 import org.example.eventy.users.models.User;
+import org.example.eventy.users.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
+@Transactional
 public class UserService {
-    /*@Autowired
-    private UserRepository userRepository;*/
+    @Autowired
+    private UserRepository userRepository;
 
-    public boolean suspendUser(String userEmail, int daysDuration) {
-        UserDTO user = getUserByEmail(userEmail);
-        user.setName("SUSPENDED!");
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-        return true;
+    public User findByEmail(String email) throws UsernameNotFoundException {
+        return userRepository.findByEmail(email);
     }
 
-    public UserDTO getUserByEmail(String userEmail) {
-        UserDTO user = new UserDTO();
-        user.setEmail(userEmail);
+    public User get(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
+    public User save(User user, boolean changedPassword) {
+        try {
+            if(changedPassword) {
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+            }
+
+            return userRepository.save(user);
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
+    public void deletePhysicallyById(long userId) {
+        userRepository.deleteById(userId);
+    }
+
+    public User suspendUser(String userEmail, int daysDuration) {
+        User user = getUserByEmail(userEmail);
+        //user.setSuspensionDeadline();
 
         return user;
     }
 
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public User getUserByPhoneNumber(String phoneNumber) throws UsernameNotFoundException {
+        return userRepository.findByPhoneNumber(phoneNumber);
+    }
+
+    public UserType getUserType(User user) {
+        if(user instanceof EventOrganizer) {
+            return UserType.ORGANIZER;
+        } else if(user instanceof SolutionProvider) {
+            return UserType.PROVIDER;
+        } else if(user instanceof Admin) {
+            return UserType.ADMIN;
+        }
+
+        return UserType.AUTHENTICATED;
+    }
+
+    public User upgradeUserToOrganizer(Long userId, String firstName, String lastName, String userType) {
+        userRepository.upgradeUserToOrganizer(userId, firstName, lastName, userType);
+        User upgradedUser = get(userId);
+
+        return save(upgradedUser, false);
+    }
+
+    public User upgradeUserToProvider(Long userId, String name, String description, String userType) {
+        userRepository.upgradeUserToProvider(userId, name, description, userType);
+        User upgradedUser = get(userId);
+
+        return save(upgradedUser, false);
+    }
+
+    @Transactional
+    public void toggleFavoriteEvent(User user, Event event) {
+        if (!user.getFavoriteEvents().remove(event)) {
+            user.getFavoriteEvents().add(event);
+        }
+    }
+
+    @Transactional
+    public void toggleFavoriteSolution(User user, Solution solution) {
+        if (!user.getFavoriteSolutions().remove(solution)) {
+            user.getFavoriteSolutions().add(solution);
+        }
+    }
+
+    public List<Long> findUserIdsByAcceptedEventId(Long id) {
+        return userRepository.findUserIdsByAcceptedEventId(id);
+    }
 }

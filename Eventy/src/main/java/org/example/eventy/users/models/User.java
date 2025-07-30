@@ -1,34 +1,93 @@
 package org.example.eventy.users.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.events.models.Event;
+import org.example.eventy.interactions.model.Notification;
 import org.example.eventy.solutions.models.Solution;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-public class User {
+@Entity
+@Table(name = "Users")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
+public abstract class User implements UserDetails {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private ArrayList<String> imageUrls;
+
+    @ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+    @JoinTable(name = "UsersProfilePictures", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "picture_id", referencedColumnName = "id"))
+    private List<PicturePath> imageUrls;
+
+    @Column(unique = true, nullable = false)
     private String email;
+
+    @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
     private String address;
+
+    @Column(nullable = false)
     private String phoneNumber;
+
+    @Column(nullable = false)
     private boolean isActive;
+
+    @Column(nullable = false)
     private boolean isDeactivated;
+
+    @Column(nullable = false)
     private boolean hasSilencedNotifications;
+
+    @Column()
+    private LocalDateTime lastReadNotifications;
+
+    @ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "UserNotifications",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "notification_id", referencedColumnName = "id")
+    )
+    @JsonBackReference
+    private List<Notification> notifications = new ArrayList<>();
+
+    @Column()
     private LocalDateTime suspensionDeadline;
+
+    @ManyToMany(cascade = CascadeType.REFRESH)
+    @JoinTable(name = "BlockedUsers", joinColumns = @JoinColumn(name = "blocker_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "blocked_id", referencedColumnName = "id"))
     private List<User> blocked;
-    private RegistrationRequest registrationRequest;
+
+    @ManyToMany(cascade = CascadeType.REFRESH)
+    @JoinTable(name = "UsersAttendingEvents", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id"))
     private List<Event> acceptedEvents;
+
+    @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE})
+    @JoinTable(name = "UsersFavoriteEvents", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id"))
     private List<Event> favoriteEvents;
+
+    @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE})
+    @JoinTable(name = "UsersFavoriteSolutions", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "solution_id", referencedColumnName = "id"))
     private List<Solution> favoriteSolutions;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id", referencedColumnName = "id")
+    private Role role;
 
     public User() {
 
     }
 
-    public User(Long id, ArrayList<String> imageUrls, String email, String password, String address, String phoneNumber, boolean isActive, boolean isDeactivated, boolean hasSilencedNotifications, LocalDateTime suspensionDeadline) {
+    public User(Long id, ArrayList<PicturePath> imageUrls, String email, String password, String address, String phoneNumber, boolean isActive, boolean isDeactivated, boolean hasSilencedNotifications, LocalDateTime suspensionDeadline) {
         this.id = id;
         this.imageUrls = imageUrls;
         this.email = email;
@@ -45,7 +104,7 @@ public class User {
         this.favoriteSolutions = new ArrayList<>();
     }
 
-    public User(Long id, ArrayList<String> imageUrls, String email, String password, String address, String phoneNumber, boolean isActive, boolean isDeactivated, boolean hasSilencedNotifications, LocalDateTime suspensionDeadline, List<User> blocked, RegistrationRequest registrationRequest, List<Event> acceptedEvents, List<Event> favoriteEvents, List<Solution> favoriteSolutions) {
+    public User(Long id, ArrayList<PicturePath> imageUrls, String email, String password, String address, String phoneNumber, boolean isActive, boolean isDeactivated, boolean hasSilencedNotifications, LocalDateTime suspensionDeadline, List<User> blocked, RegistrationRequest registrationRequest, List<Event> acceptedEvents, List<Event> favoriteEvents, List<Solution> favoriteSolutions) {
         this.id = id;
         this.imageUrls = imageUrls;
         this.email = email;
@@ -57,7 +116,6 @@ public class User {
         this.hasSilencedNotifications = hasSilencedNotifications;
         this.suspensionDeadline = suspensionDeadline;
         this.blocked = blocked;
-        this.registrationRequest = registrationRequest;
         this.acceptedEvents = acceptedEvents;
         this.favoriteEvents = favoriteEvents;
         this.favoriteSolutions = favoriteSolutions;
@@ -71,11 +129,11 @@ public class User {
         this.id = id;
     }
 
-    public ArrayList<String> getImageUrls() {
+    public List<PicturePath> getImageUrls() {
         return imageUrls;
     }
 
-    public void setImageUrls(ArrayList<String> imageUrls) {
+    public void setImageUrls(List<PicturePath> imageUrls) {
         this.imageUrls = imageUrls;
     }
 
@@ -92,6 +150,8 @@ public class User {
     }
 
     public void setPassword(String password) {
+        Timestamp now = new Timestamp(new Date().getTime());
+        this.setLastPasswordResetDate(now);
         this.password = password;
     }
 
@@ -135,6 +195,22 @@ public class User {
         this.hasSilencedNotifications = hasSilencedNotifications;
     }
 
+    public LocalDateTime getLastReadNotifications() {
+        return lastReadNotifications;
+    }
+
+    public void setLastReadNotifications(LocalDateTime lastReadNotifications) {
+        this.lastReadNotifications = lastReadNotifications;
+    }
+
+    public List<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(List<Notification> notifications) {
+        this.notifications = notifications;
+    }
+
     public LocalDateTime getSuspensionDeadline() {
         return suspensionDeadline;
     }
@@ -149,14 +225,6 @@ public class User {
 
     public void setBlocked(List<User> blocked) {
         this.blocked = blocked;
-    }
-
-    public RegistrationRequest getRegistrationRequest() {
-        return registrationRequest;
-    }
-
-    public void setRegistrationRequest(RegistrationRequest registrationRequest) {
-        this.registrationRequest = registrationRequest;
     }
 
     public List<Event> getAcceptedEvents() {
@@ -181,5 +249,65 @@ public class User {
 
     public void setFavoriteSolutions(List<Solution> favoriteSolutions) {
         this.favoriteSolutions = favoriteSolutions;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    @JsonIgnore
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return new ArrayList<>(Collections.singletonList(this.getRole()));
+    }
+
+    @Column(name = "enabled")
+    private boolean enabled;
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    @Column(name = "last_password_reset_date")
+    private Timestamp lastPasswordResetDate;
+
+    public Timestamp getLastPasswordResetDate() {
+        return lastPasswordResetDate;
+    }
+
+    public void setLastPasswordResetDate(Timestamp lastPasswordResetDate) {
+        this.lastPasswordResetDate = lastPasswordResetDate;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
     }
 }

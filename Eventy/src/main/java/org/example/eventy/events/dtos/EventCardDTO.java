@@ -1,6 +1,10 @@
 package org.example.eventy.events.dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.example.eventy.common.services.PictureService;
 import org.example.eventy.events.models.Event;
+import org.example.eventy.events.models.PrivacyType;
+import org.example.eventy.users.models.User;
 
 import java.time.LocalDateTime;
 
@@ -17,38 +21,25 @@ public class EventCardDTO {
     private Long organiserId; // when we click on picture/name it shows organiser profile
     private String organiserName;
     private String organiserImage;
+    @JsonProperty("isFavorite")
+    private boolean isFavorite;
 
     public EventCardDTO() {
     }
 
-    public EventCardDTO(Event event) {
+    public EventCardDTO(Event event, User loggedInUser) {
         this.eventId = event.getId();
         this.name = event.getName();
         this.description = event.getDescription();
         this.maxNumberParticipants = event.getMaxNumberParticipants();
-        this.isOpen = event.getPrivacy().equals("PUBLIC");
+        this.isOpen = event.getPrivacy().equals(PrivacyType.PUBLIC);
         this.eventTypeName = event.getType().getName();
         this.locationName = event.getLocation().getName();
-        this.startDate = event.getStartDate();
-        this.endDate = event.getEndDate();
+        this.startDate = event.getDate();
         this.organiserId = event.getOrganiser().getId();
         this.organiserName = event.getOrganiser().getFirstName() + " " + event.getOrganiser().getLastName();
-        this.organiserImage = event.getOrganiser().getImageUrls().get(0);
-    }
-
-    public EventCardDTO(Long eventId, String name, String description, int maxNumberParticipants, boolean isOpen, String eventTypeName, String locationName, LocalDateTime startDate, LocalDateTime endDate, Long organiserId, String organiserName, String organiserImage) {
-        this.eventId = eventId;
-        this.name = name;
-        this.description = description;
-        this.maxNumberParticipants = maxNumberParticipants;
-        this.isOpen = isOpen;
-        this.eventTypeName = eventTypeName;
-        this.locationName = locationName;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.organiserId = organiserId;
-        this.organiserName = organiserName;
-        this.organiserImage = organiserImage;
+        this.organiserImage = event.getOrganiser().getImageUrls() != null ? PictureService.getImage(event.getOrganiser().getImageUrls().get(0).getPath()) : "none";
+        this.isFavorite = loggedInUser != null && loggedInUser.getFavoriteEvents().contains(event);
     }
 
     public Long getEventId() {
@@ -83,11 +74,11 @@ public class EventCardDTO {
         this.maxNumberParticipants = maxNumberParticipants;
     }
 
-    public boolean isOpen() {
+    public boolean getIsOpen() {
         return isOpen;
     }
 
-    public void setOpen(boolean open) {
+    public void setIsOpen(boolean open) {
         isOpen = open;
     }
 
@@ -147,6 +138,14 @@ public class EventCardDTO {
         this.organiserImage = organiserImage;
     }
 
+    public boolean getIsFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
+    }
+
     @Override
     public String toString() {
         return "EventCardDTO{" +
@@ -162,6 +161,7 @@ public class EventCardDTO {
                 ", organiserId=" + organiserId +
                 ", organiserName='" + organiserName + '\'' +
                 ", organiserImage='" + organiserImage + '\'' +
+                ", isFavorite=" + isFavorite + '\'' +
                 '}';
     }
 }

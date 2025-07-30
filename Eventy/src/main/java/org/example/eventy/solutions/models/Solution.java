@@ -1,30 +1,66 @@
 package org.example.eventy.solutions.models;
 
+import jakarta.persistence.*;
+import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.events.models.EventType;
 import org.example.eventy.users.models.SolutionProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Solution {
+@Entity
+@Table(name = "Solutions")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
+public abstract class Solution {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String name;
+
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
     private Category category;
+
+    @Column(nullable = false)
     private String description;
+
+    @Column(nullable = false)
     private double price;
+
+    @Column(nullable = false)
     private int discount;
-    private ArrayList<String> imageUrls;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "solution_id", referencedColumnName = "id")
+    private List<PicturePath> imageUrls;
+
+    @Column(nullable = false)
     private boolean isVisible;
+
+    @Column(nullable = false)
     private boolean isAvailable;
+
+    @Column(nullable = false)
     private boolean isDeleted;
+
+    @ManyToMany()
+    @JoinTable(name = "SuggestedEventTypes", joinColumns = @JoinColumn(name = "solution_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "event_type_id", referencedColumnName = "id"))
     private List<EventType> eventTypes;
+
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "provider_id", referencedColumnName = "id", nullable = false)
     private SolutionProvider provider;
+
+    /////////////////////////////////////////////////
 
     public Solution() {
 
     }
 
-    public Solution(Long id, String name, String description, double price, int discount, ArrayList<String> imageUrls, boolean isVisible, boolean isAvailable, boolean isDeleted, Category category, List<EventType> eventTypes, SolutionProvider provider) {
+    public Solution(Long id, String name, String description, double price, int discount, List<PicturePath> imageUrls, boolean isVisible, boolean isAvailable, boolean isDeleted, Category category, List<EventType> eventTypes, SolutionProvider provider) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -79,11 +115,11 @@ public class Solution {
         this.discount = discount;
     }
 
-    public ArrayList<String> getImageUrls() {
+    public List<PicturePath> getImageUrls() {
         return imageUrls;
     }
 
-    public void setImageUrls(ArrayList<String> imageUrls) {
+    public void setImageUrls(List<PicturePath> imageUrls) {
         this.imageUrls = imageUrls;
     }
 

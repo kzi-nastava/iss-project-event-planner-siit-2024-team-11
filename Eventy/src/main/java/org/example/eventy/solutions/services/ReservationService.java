@@ -2,27 +2,60 @@ package org.example.eventy.solutions.services;
 
 import org.example.eventy.events.models.Event;
 import org.example.eventy.events.services.EventService;
+import org.example.eventy.interactions.dtos.NotificationDTO;
+import org.example.eventy.interactions.model.Notification;
+import org.example.eventy.interactions.model.NotificationType;
+import org.example.eventy.interactions.services.NotificationService;
 import org.example.eventy.solutions.dtos.ReservationDTO;
 import org.example.eventy.solutions.models.Reservation;
 import org.example.eventy.solutions.models.Solution;
+import org.example.eventy.users.models.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.example.eventy.solutions.repositories.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.List;
 
 @Service
 public class ReservationService {
-    // @Autowired
-    // private reservationRepository reservationRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
     @Autowired
     private EventService eventService;
     @Autowired
     private ServiceService serviceService;
+    @Autowired
+    private NotificationService notificationService;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
+    public Reservation getReservation(Long reservationId) {
+        return reservationRepository.findById(reservationId).orElse(null);
+    }
+
+    public ArrayList<Reservation> getReservationsByServiceId(Long serviceId) {
+        Solution service = serviceService.getService(serviceId);
+        return reservationRepository.findAllBySelectedService(service);
+    }
+
+    public ArrayList<Reservation> getReservationsByEventId(Long eventId) {
+        Event event = eventService.getEvent(eventId);
+        return reservationRepository.findAllBySelectedEvent(event);
+    }
+
+    public Page<Reservation> getReservationsByUserId(Long userId, Pageable pageable) {
+        return reservationRepository.findAllByUserId(userId, pageable);
+    }
 
     public Reservation createReservation(ReservationDTO reservation) {
         Reservation newReservation = new Reservation();
-        newReservation.setId(reservation.getId());
         newReservation.setSelectedEvent(eventService.getEvent(reservation.getSelectedEventId()));
         newReservation.setSelectedService(serviceService.getService(reservation.getSelectedServiceId()));
         newReservation.setReservationStartDateTime(reservation.getReservationStartDateTime());
@@ -31,70 +64,58 @@ public class ReservationService {
         return saveReservation(newReservation);
     }
 
-    public Reservation getReservation(Long reservationId) {
-        Calendar startDateTime = Calendar.getInstance();
-        startDateTime.set(2024, Calendar.JUNE, 15, 14, 0);
-        Calendar endDateTime = Calendar.getInstance();
-        endDateTime.set(2024, Calendar.JUNE, 15, 17, 0);
-
-        Long serviceId = 2L;
-        Reservation reservation = new Reservation(
-                reservationId, eventService.getEvent(1L), serviceService.getService(serviceId), startDateTime, endDateTime
-        );
-
-        return reservation;
-    }
-
-    public ArrayList<Reservation> getReservationsByServiceId(Long serviceId) {
-        Calendar startDateTime = Calendar.getInstance();
-        startDateTime.set(2024, Calendar.JUNE, 15, 14, 30);
-        Calendar endDateTime = Calendar.getInstance();
-        endDateTime.set(2024, Calendar.JUNE, 15, 17, 15);
-
-        Reservation reservation1 = new Reservation(
-            1L, eventService.getEvent(2L), serviceService.getService(serviceId), startDateTime, endDateTime
-        );
-
-        startDateTime.set(2025, Calendar.JANUARY, 10, 8, 0);
-        endDateTime.set(2025, Calendar.JANUARY, 10, 11, 30);
-
-        Reservation reservation2 = new Reservation(
-            2L, eventService.getEvent(3L), serviceService.getService(serviceId), startDateTime, endDateTime
-        );
-
-        ArrayList<Reservation> reservations = new ArrayList<>();
-        reservations.add(reservation1);
-        reservations.add(reservation2);
-
-        return reservations;
-    }
-
-    public ArrayList<Reservation> getReservationsByEventId(Long eventId) {
-        Calendar startDateTime = Calendar.getInstance();
-        startDateTime.set(2027, Calendar.MAY, 1, 21, 30);
-        Calendar endDateTime = Calendar.getInstance();
-        endDateTime.set(2027, Calendar.MAY, 1, 22, 15);
-
-        Long serviceId = 3L;
-        Reservation reservation1 = new Reservation(
-            1L, eventService.getEvent(eventId), serviceService.getService(serviceId), startDateTime, endDateTime
-        );
-
-        startDateTime.set(2035, Calendar.DECEMBER, 24, 8, 0);
-        endDateTime.set(2035, Calendar.DECEMBER, 24, 11, 30);
-
-        Reservation reservation2 = new Reservation(
-            2L, eventService.getEvent(eventId), serviceService.getService(serviceId), startDateTime, endDateTime
-        );
-
-        ArrayList<Reservation> reservations = new ArrayList<>();
-        reservations.add(reservation1);
-        reservations.add(reservation2);
-
-        return reservations;
+    public List<Reservation> findOverlappingReservations(ReservationDTO newReservation) {
+        LocalDateTime start = newReservation.getReservationStartDateTime();
+        LocalDateTime end = newReservation.getReservationEndDateTime();
+        Solution selectedService = serviceService.getService(newReservation.getSelectedServiceId());
+        return reservationRepository.findByReservationStartDateTimeBeforeAndReservationEndDateTimeAfterAndSelectedService(
+                end, start, selectedService);
     }
 
     public Reservation saveReservation(Reservation reservation) {
-        return reservation;
+        try {
+            return reservationRepository.save(reservation);
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
+    public List<Reservation> getReservationByProviderBetween(Long providerId, LocalDate startDateTime, LocalDate endDateTime) {
+        return reservationRepository.findReservationsByProvider(providerId, startDateTime.atStartOfDay(), endDateTime.atStartOfDay());
+    }
+
+    @Scheduled(fixedRate = 60000) // 1 minute
+    public void checkReservationsAndNotify() {
+        List<Reservation> reservationsToNotify = reservationRepository.findReservationsToNotify();
+
+        for (Reservation reservation : reservationsToNotify) {
+            NotificationType type = NotificationType.REMINDER_SERVICE;
+            Long redirectionId = reservation.getSelectedEvent().getId();
+            String title = "Upcoming Service REMINDER";
+            User owner = reservation.getSelectedEvent().getOrganiser();
+            User grader = null;
+            Integer grade = null;
+            String message = "Your reserved service \"" + reservation.getSelectedService().getName() +
+                             "\" for event \"" + reservation.getSelectedEvent().getName() + "\"" +
+                             " will begin in 1 hour. Tap to see more!";
+            LocalDateTime timestamp = LocalDateTime.now();
+            Notification notification = new Notification(type, redirectionId, title, message, grader, grade, timestamp);
+
+            notificationService.saveNotification(owner.getId(), notification);
+            sendNotificationToWeb(owner.getId(), notification);
+            sendNotificationToMobile(owner.getId(), notification);
+
+            reservation.setNotificationSent(true);
+            reservationRepository.save(reservation);
+        }
+    }
+
+    private void sendNotificationToWeb(Long userId, Notification notification) {
+        messagingTemplate.convertAndSend("/topic/web/" + userId, new NotificationDTO(notification));
+    }
+
+    private void sendNotificationToMobile(Long userId, Notification notification) {
+        messagingTemplate.convertAndSend("/topic/mobile/" + userId, new NotificationDTO(notification));
     }
 }

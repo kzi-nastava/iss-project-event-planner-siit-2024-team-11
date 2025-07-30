@@ -1,13 +1,28 @@
 package org.example.eventy.events.models;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
+import org.aspectj.lang.annotation.After;
+
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "Agenda")
 public class Activity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private String description;
+    @Column(nullable = false)
+    @Future
     private LocalDateTime startTime;
+    @Column(nullable = false)
+    @Future
     private LocalDateTime endTime;
+    @Column(nullable = false)
     private String location;
 
     public Activity() {

@@ -1,10 +1,23 @@
 package org.example.eventy.events.models;
 
+import jakarta.persistence.*;
+import org.hibernate.validator.constraints.Range;
+
+@Entity
+@Table(name = "Locations")
 public class Location {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private String address;
+    @Column(nullable = false)
+    @Range(min = -90, max = 90)
     private double latitude;
+    @Column(nullable = false)
+    @Range(min = -180, max = 180)
     private double longitude;
 
     public Location() {

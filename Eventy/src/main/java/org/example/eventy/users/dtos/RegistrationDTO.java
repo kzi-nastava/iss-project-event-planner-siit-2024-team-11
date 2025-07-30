@@ -1,17 +1,29 @@
 package org.example.eventy.users.dtos;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import org.example.eventy.users.validation.annotation.ValidRegistration;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
+@ValidRegistration
 public class RegistrationDTO {
+    @NotNull(message = "Profile picture or profile pictures cannot be null")
     private List<String> profilePictures;
+    @NotEmpty(message = "Email cannot be null")
     private String email;
+    @NotEmpty(message = "Password cannot be null")
     private String password;
+    @NotEmpty(message = "Confirmed password cannot be null")
     private String confirmedPassword;
     private String firstName;
     private String lastName;
     private String name;
     private String description;
+    @NotEmpty(message = "Address cannot be null")
     private String address;
+    @NotEmpty(message = "Phone number cannot be null")
     private String phoneNumber;
 
     public RegistrationDTO() {

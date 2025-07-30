@@ -1,39 +1,76 @@
 package org.example.eventy.events.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Positive;
 import org.example.eventy.users.models.EventOrganizer;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Entity
+@Table(name = "Events")
 public class Event {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String description;
+
+    @Column(nullable = false)
+    @Positive
     private int maxNumberParticipants;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private PrivacyType privacy;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+
+    @Column(nullable = false)
+    @Future
+    private LocalDateTime date;
+
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "event_type_id", referencedColumnName = "id", nullable = false)
     private EventType type;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "location_id", referencedColumnName = "id", nullable = false)
     private Location location;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "event_id", referencedColumnName = "id")
     private List<Activity> agenda;
+
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "organizer_id", referencedColumnName = "id", nullable = false)
     private EventOrganizer organiser;
+
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonManagedReference // prevents infinite loop
+    private List<Invitation> invitations;
+
 
     public Event() {
 
     }
 
-    public Event(Long id, String name, String description, int maxNumberParticipants, PrivacyType privacy, LocalDateTime startDate, LocalDateTime endDate, EventType type, Location location, List<Activity> agenda, EventOrganizer organiser) {
+    public Event(Long id, String name, String description, int maxNumberParticipants, PrivacyType privacy, LocalDateTime date, EventType type, Location location, List<Activity> agenda, EventOrganizer organiser, List<Invitation> invitations) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.maxNumberParticipants = maxNumberParticipants;
         this.privacy = privacy;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.date = date;
         this.type = type;
         this.location = location;
         this.agenda = agenda;
         this.organiser = organiser;
+        this.invitations = invitations;
     }
 
     public Long getId() {
@@ -76,20 +113,12 @@ public class Event {
         this.privacy = privacy;
     }
 
-    public LocalDateTime getStartDate() {
-        return startDate;
+    public LocalDateTime getDate() {
+        return date;
     }
 
-    public void setStartDate(LocalDateTime startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDateTime getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDateTime endDate) {
-        this.endDate = endDate;
+    public void setDate(LocalDateTime date) {
+        this.date = date;
     }
 
     public EventType getType() {
@@ -122,5 +151,30 @@ public class Event {
 
     public void setOrganiser(EventOrganizer organiser) {
         this.organiser = organiser;
+    }
+
+    public List<Invitation> getInvitations() {
+        return invitations;
+    }
+
+    public void setInvitations(List<Invitation> invitations) {
+        this.invitations = invitations;
+    }
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", maxNumberParticipants=" + maxNumberParticipants +
+                ", privacy=" + privacy +
+                ", date=" + date +
+                ", type=" + type +
+                ", location=" + location +
+                ", agenda=" + agenda +
+                ", organiser=" + organiser +
+                ", invitations=" + invitations +
+                '}';
     }
 }

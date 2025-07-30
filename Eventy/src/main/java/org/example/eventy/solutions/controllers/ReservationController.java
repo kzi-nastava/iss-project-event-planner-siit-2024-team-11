@@ -1,27 +1,125 @@
 package org.example.eventy.solutions.controllers;
 
+import jakarta.validation.Valid;
+import org.example.eventy.common.models.PagedResponse;
+import org.example.eventy.common.services.EmailService;
+import org.example.eventy.events.models.Budget;
+import org.example.eventy.events.models.BudgetItem;
+import org.example.eventy.events.services.BudgetItemService;
+import org.example.eventy.events.services.BudgetService;
 import org.example.eventy.solutions.dtos.ReservationDTO;
 import org.example.eventy.solutions.models.Reservation;
+import org.example.eventy.solutions.models.Service;
+import org.example.eventy.solutions.models.Solution;
+import org.example.eventy.solutions.models.SolutionHistory;
 import org.example.eventy.solutions.services.ReservationService;
+import org.example.eventy.solutions.services.ServiceService;
+import org.example.eventy.solutions.services.SolutionHistoryService;
+import org.example.eventy.solutions.services.SolutionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
+@PreAuthorize("hasRole('Organizer')")
 @RequestMapping("api/reservations")
 public class ReservationController {
-
     @Autowired
     private ReservationService reservationService;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private BudgetService budgetService;
+    @Autowired
+    private SolutionService solutionService;
+    @Autowired
+    private SolutionHistoryService solutionHistoryService;
+    @Autowired
+    private ServiceService serviceService;
+    @Autowired
+    private BudgetItemService budgetItemService;
+
+    // GET "/api/reservations/5"
+    @GetMapping(value = "/{reservationId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ReservationDTO> getReservation(@PathVariable Long reservationId) {
+        Reservation reservation = reservationService.getReservation(reservationId);
+
+        if (reservation != null) {
+            ReservationDTO reservationDTO = new ReservationDTO(reservation);
+            return new ResponseEntity<ReservationDTO>(reservationDTO, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<ReservationDTO>(HttpStatus.NOT_FOUND);
+    }
+
+    // NOTE: IDK if this method is even needed... if it is, though, Pageable needs to be added!
+    // GET "/api/reservations/service/5"
+    @GetMapping(value = "/service/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<ReservationDTO>> getReservationsByServiceId(@PathVariable Long serviceId) {
+        ArrayList<Reservation> reservations = reservationService.getReservationsByServiceId(serviceId);
+
+        if (reservations != null) {
+            ArrayList<ReservationDTO> reservationsDTO = new ArrayList<>();
+            for (Reservation reservation : reservations) {
+                reservationsDTO.add(new ReservationDTO(reservation));
+            }
+
+            return new ResponseEntity<Collection<ReservationDTO>>(reservationsDTO, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<Collection<ReservationDTO>>(HttpStatus.NOT_FOUND);
+    }
+
+    // NOTE: IDK if this method is even needed... if it is, though, Pageable needs to be added!
+    // GET "/api/reservations/event/5"
+    @GetMapping(value = "/event/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<ReservationDTO>> getReservationsByEventId(@PathVariable Long eventId) {
+        ArrayList<Reservation> reservations = reservationService.getReservationsByEventId(eventId);
+
+        if (reservations != null) {
+            ArrayList<ReservationDTO> reservationsDTO = new ArrayList<>();
+            for (Reservation reservation : reservations) {
+                reservationsDTO.add(new ReservationDTO(reservation));
+            }
+
+            return new ResponseEntity<Collection<ReservationDTO>>(reservationsDTO, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<Collection<ReservationDTO>>(HttpStatus.NOT_FOUND);
+    }
+
+    // GET "/api/reservations/user/5"
+    @GetMapping(value = "/user/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PagedResponse<ReservationDTO>> getReservationsByUserId(@PathVariable Long userId, Pageable pageable) {
+        Page<Reservation> reservations = reservationService.getReservationsByUserId(userId, pageable);
+
+        if (reservations != null) {
+            ArrayList<ReservationDTO> reservationsDTO = new ArrayList<>();
+            for (Reservation reservation : reservations) {
+                reservationsDTO.add(new ReservationDTO(reservation));
+            }
+            long count = reservations.getTotalElements();
+
+            PagedResponse<ReservationDTO> response = new PagedResponse<>(reservationsDTO, (int) Math.ceil((double) count / pageable.getPageSize()), count);
+            return new ResponseEntity<PagedResponse<ReservationDTO>>(response, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<PagedResponse<ReservationDTO>>(HttpStatus.NOT_FOUND);
+    }
 
     /*
     {
-        "id": 5,
         "selectedEventId": 3,
         "selectedServiceId": 12,
         "reservationStartDateTime": "2024-12-01T14:00:00",
@@ -30,61 +128,43 @@ public class ReservationController {
     */
     // POST "/api/reservations"
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ReservationDTO> createReservation(@RequestBody ReservationDTO reservation) {
-        if (reservation.getId() == 5) {
-            Reservation newReservationModel = reservationService.createReservation(reservation);
-            ReservationDTO newReservation = new ReservationDTO(newReservationModel);
-
-            return new ResponseEntity<>(newReservation, HttpStatus.CREATED);
+    public ResponseEntity<ReservationDTO> createReservation(@Valid @RequestBody ReservationDTO reservationDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // if there are validation errors, we return a 400 Bad Request response
+            List<String> errorMessages = bindingResult.getFieldErrors().stream()
+                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                    .collect(Collectors.toList());
+            return new ResponseEntity(errorMessages, HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Reservation reservation = reservationService.createReservation(reservationDTO);
+
+        if (reservation != null) {
+            addReservationInfoToBudget(reservationDTO);
+            emailService.sendReservationConfirmation(reservation);
+            return new ResponseEntity<ReservationDTO>(new ReservationDTO(reservation), HttpStatus.CREATED);
+        }
+
+        return new ResponseEntity<ReservationDTO>(HttpStatus.BAD_REQUEST);
     }
 
-    // GET "/api/reservations/5"
-    @GetMapping(value = "/{reservationId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ReservationDTO> getReservation(@PathVariable Long reservationId) {
-        if (reservationId == 5) {
-            Reservation reservationModel = reservationService.getReservation(reservationId);
-            ReservationDTO reservation = new ReservationDTO(reservationModel);
+    private void addReservationInfoToBudget(ReservationDTO reservationDTO) {
+        Budget budget = budgetService.getBudget(reservationDTO.getSelectedEventId());
+        Service service = (Service) solutionService.getSolution(reservationDTO.getSelectedServiceId());
 
-            return new ResponseEntity<ReservationDTO>(reservation, HttpStatus.OK);
+        SolutionHistory serviceToReserve = service.getCurrentService();
+        if (serviceToReserve == null) {
+            serviceToReserve = solutionHistoryService.save(new SolutionHistory(service));
+            service.setCurrentService(serviceToReserve);
+            serviceService.save(service);
         }
 
-        return new ResponseEntity<ReservationDTO>(HttpStatus.NOT_FOUND);
-    }
-
-    // GET "/api/reservations/service/5"
-    @GetMapping(value = "/service/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<ReservationDTO>> getReservationsByServiceId(@PathVariable Long serviceId) {
-        if (serviceId == 5) {
-            ArrayList<Reservation> reservationModels = reservationService.getReservationsByServiceId(serviceId);
-
-            ArrayList<ReservationDTO> reservations = new ArrayList<>();
-            for (Reservation reservation : reservationModels) {
-                reservations.add(new ReservationDTO(reservation));
-            }
-
-            return new ResponseEntity<Collection<ReservationDTO>>(reservations, HttpStatus.OK);
+        BudgetItem budgetItem = budget.getBudgetedItems().stream().filter(v -> v.getCategory() == service.getCategory()).findFirst().orElse(null);
+        if (budgetItem == null) {
+            budgetItem = budgetItemService.createBudgetItem(service.getCategory(), 0.0);
+            budgetService.addBudgetItem(budget, budgetItem);
         }
+        budgetItem = budgetItemService.addBudgetItemSolution(budgetItem, serviceToReserve);
 
-        return new ResponseEntity<Collection<ReservationDTO>>(HttpStatus.NOT_FOUND);
-    }
-
-    // GET "/api/reservations/event/5"
-    @GetMapping(value = "/event/{eventId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<ReservationDTO>> getReservationsByEventId(@PathVariable Long eventId) {
-        if (eventId == 5) {
-            ArrayList<Reservation> reservationModels = reservationService.getReservationsByEventId(eventId);
-
-            ArrayList<ReservationDTO> reservations = new ArrayList<>();
-            for (Reservation reservation : reservationModels) {
-                reservations.add(new ReservationDTO(reservation));
-            }
-
-            return new ResponseEntity<Collection<ReservationDTO>>(reservations, HttpStatus.OK);
-        }
-
-        return new ResponseEntity<Collection<ReservationDTO>>(HttpStatus.NOT_FOUND);
     }
 }

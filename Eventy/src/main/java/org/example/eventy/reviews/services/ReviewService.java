@@ -4,51 +4,51 @@ import org.example.eventy.common.models.Status;
 import org.example.eventy.events.models.Event;
 import org.example.eventy.reviews.dtos.UpdateReviewDTO;
 import org.example.eventy.reviews.models.Review;
+import org.example.eventy.reviews.repositories.ReviewRepository;
+import org.example.eventy.solutions.models.Product;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.users.models.EventOrganizer;
 import org.example.eventy.users.models.SolutionProvider;
 import org.example.eventy.users.models.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReviewService {
+    @Autowired
+    private ReviewRepository reviewRepository;
 
-    /*@Autowired
-    private ReviewRepository reviewRepository;*/
-
-    public ArrayList<Review> getPendingReviews() {
-        ArrayList<Review> pendingReviews = generateReviewExamples(1);
-        return pendingReviews;
+    public Page<Review> getPendingReviews(Pageable pageable) {
+        return reviewRepository.findAllByStatusOrderByIdDesc(pageable, Status.PENDING);
     }
 
-    public ArrayList<Review> getAcceptedReviews() {
-        ArrayList<Review> acceptedReviews = generateReviewExamples(2);
-        return acceptedReviews;
+    public Page<Review> getAcceptedReviews(Pageable pageable) {
+        return reviewRepository.findAllByStatusOrderByIdDesc(pageable, Status.ACCEPTED);
     }
 
     public Review getReview(Long reviewId) {
-        ArrayList<Review> reviews = generateReviewExamples(3);
-        Review review = reviews.get(0);
-        review.setId(reviewId);
-
-        return review;
+        return reviewRepository.findById(reviewId).orElse(null);
     }
 
-    public Review updateReview(Long reviewId, UpdateReviewDTO updatedReview) {
-        Review review = getReview(reviewId);
-
-        review.setComment(updatedReview.getComment());
-        review.setGrade(updatedReview.getGrade());
-        review.setStatus(updatedReview.getStatus());
-
+    public Review acceptReview(Review review) {
+        review.setStatus(Status.ACCEPTED);
         return saveReview(review);
     }
 
-    public Review deleteReview(Long reviewId) {
-        Review review = getReview(reviewId);
+    public Review declineReview(Review review) {
+        review.setStatus(Status.DENIED);
+        review.setDeleted(true);
+        return saveReview(review);
+    }
 
+    public Review deleteReview(Review review) {
         review.setStatus(Status.DENIED);
         review.setDeleted(true);
 
@@ -56,47 +56,23 @@ public class ReviewService {
     }
 
     public Review saveReview(Review review) {
-        return review;
+        try {
+            return reviewRepository.save(review);
+        }
+        catch (Exception e) {
+            return null;
+        }
     }
 
-    public ArrayList<Review> generateReviewExamples(int type) {
-        Event event = new Event();
-        Solution solution = new Solution();
-        EventOrganizer organizer = new EventOrganizer();
-        organizer.setEmail("johndoe123@gmail.com");
-        event.setOrganiser(organizer);
-        SolutionProvider provider = new SolutionProvider();
-        provider.setEmail("exit.festival@gmail.com");
-        solution.setProvider(provider);
-        User user = new User();
-        user.setEmail("sender@gmail.com");
+    public List<Integer> getGradesForEvent(Long eventId) {
+        return reviewRepository.findAllGradesForEvent(eventId);
+    }
+  
+    public Boolean isSolutionReviewedByUser(Long userId, Long solutionId) {
+        return reviewRepository.existsByGraderIdAndSolutionId(userId, solutionId);
+    }
 
-        Review review1 = new Review(
-            1L,
-            user,
-            null,
-            solution,
-            type == 1? "PENDING - Great event, well-organized and fun!" : type == 2 ? "ACCEPTED - Great event, well-organized and fun!" : "Great event, well-organized and fun!",
-            5,
-            type == 1 ? Status.PENDING : Status.ACCEPTED,
-            false
-        );
-
-        Review review2 = new Review(
-            2L,
-            user,
-            event,
-            null,
-            type == 1? "PENDING - The cake was decent, but there is room for improvement." : type == 2 ? "ACCEPTED - The cake was decent, but there is room for improvement." : "The cake was decent, but there is room for improvement.",
-            3,
-            type == 1 ? Status.PENDING : Status.ACCEPTED,
-            false
-        );
-
-        ArrayList<Review> reviews = new ArrayList<>();
-        reviews.add(review1);
-        reviews.add(review2);
-
-        return reviews;
+    public List<Review> getReviewsForSolution(Long solutionId) {
+        return reviewRepository.findAllBySolutionId(solutionId);
     }
 }

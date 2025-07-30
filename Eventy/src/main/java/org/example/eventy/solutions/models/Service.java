@@ -1,26 +1,49 @@
 package org.example.eventy.solutions.models;
 
+import jakarta.persistence.*;
+import org.example.eventy.common.models.PicturePath;
 import org.example.eventy.common.models.ReservationConfirmationType;
 import org.example.eventy.events.models.EventType;
 import org.example.eventy.users.models.SolutionProvider;
 
-import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@DiscriminatorValue("Service")
 public class Service extends Solution {
+
+    // NOTE: we cannot put @Column(nullable = FALSE) because of SingeTable,
+    //       so these will all be NULL if it's Product
+
+    @Column
     private String specifics;
+
+    @Column
     private Integer minReservationTime;
+
+    @Column
     private Integer maxReservationTime;
+
+    @Column
     private Integer reservationDeadline;
+
+    @Column
     private Integer cancellationDeadline;
+
+    @Column
     private ReservationConfirmationType reservationType;
-    private ServiceHistory currentService;
+
+    @OneToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "solution_history_id", referencedColumnName = "id")
+    private SolutionHistory currentService;
+
+    ////////////////////////////////////////////
 
     public Service() {
 
     }
 
-    public Service(Long id, String name, String description, double price, int discount, ArrayList<String> imageUrls, boolean isVisible, boolean isAvailable, boolean isDeleted, Category category, List<EventType> relatedEventTypes, SolutionProvider provider, String specifics, Integer minReservationTime, Integer maxReservationTime, Integer reservationDeadline, Integer cancellationDeadline, ReservationConfirmationType reservationType, ServiceHistory currentService) {
+    public Service(Long id, String name, String description, double price, int discount, List<PicturePath> imageUrls, boolean isVisible, boolean isAvailable, boolean isDeleted, Category category, List<EventType> relatedEventTypes, SolutionProvider provider, String specifics, Integer minReservationTime, Integer maxReservationTime, Integer reservationDeadline, Integer cancellationDeadline, ReservationConfirmationType reservationType, SolutionHistory currentService) {
         super(id, name, description, price, discount, imageUrls, isVisible, isAvailable, isDeleted, category, relatedEventTypes, provider);
         this.specifics = specifics;
         this.minReservationTime = minReservationTime;
@@ -79,11 +102,11 @@ public class Service extends Solution {
         this.reservationType = reservationType;
     }
 
-    public ServiceHistory getCurrentService() {
+    public SolutionHistory getCurrentService() {
         return currentService;
     }
 
-    public void setCurrentService(ServiceHistory currentService) {
+    public void setCurrentService(SolutionHistory currentService) {
         this.currentService = currentService;
     }
 }
