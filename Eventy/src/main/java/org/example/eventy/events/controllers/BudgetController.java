@@ -87,16 +87,13 @@ public class BudgetController {
         return new ResponseEntity<>(new BudgetItemDTO(budgetItem, userService), HttpStatus.CREATED);
     }
 
-    @DeleteMapping(value = "/item/{budgetItemId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> removeBudgetItem(@PathVariable Long eventId, @PathVariable Long budgetItemId) {
+    @DeleteMapping(value = "/{eventId}/item/{budgetItemId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> removeBudgetItem(@PathVariable Long eventId, @PathVariable Long budgetItemId, @RequestHeader(value = "Authorization", required = false) String token) {
         Budget budget = budgetService.getBudget(eventId);
-        boolean isDeletedFromBudget = budgetService.deleteBudgetItemFromBudget(budget, budgetItemId);
-        boolean isDeletedFromRepository = budgetItemService.deleteBudgetItem(budgetItemId);
+        budgetService.deleteBudgetItemFromBudget(budget, budgetItemId);
+        budgetItemService.deleteBudgetItem(budgetItemId);
 
-        if (isDeletedFromBudget && isDeletedFromRepository) {
-            return new ResponseEntity<>(true, HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping(value = "/item/{budgetItemId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -119,11 +116,11 @@ public class BudgetController {
         return new ResponseEntity<BudgetItemDTO>(new BudgetItemDTO(budgetItem, userService), HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/item/{budgetItemId}/{solutionHistoryId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/item/{budgetItemId}/solution/{solutionHistoryId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Boolean> removeBudgetItemSolution(@PathVariable Long budgetItemId, @PathVariable Long solutionHistoryId) {
         boolean isDeleted = budgetItemService.deleteBudgetItemSolution(budgetItemId, solutionHistoryId);
         if (isDeleted) {
-            return new ResponseEntity<>(true, HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
     }

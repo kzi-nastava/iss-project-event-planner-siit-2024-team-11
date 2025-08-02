@@ -5,5 +5,6 @@ import org.example.eventy.solutions.models.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BudgetItemRepository extends JpaRepository<BudgetItem, Long> {
-    boolean removeById(Long id);
+
+    int removeById(Long id);
 }
