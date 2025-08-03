@@ -7,6 +7,7 @@ import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.models.SolutionHistory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 
@@ -39,13 +40,14 @@ public class BudgetItemService {
         BudgetItem budgetItem = budgetItemRepository.findById(id).orElse(null);
         if (budgetItem == null) { return false; }
         int lengthBefore = budgetItem.getReservedItems().size();
-        budgetItem.getReservedItems().stream().filter(v -> v.getId() != solutionHistoryId).toList();
+        budgetItem.getReservedItems().removeIf(v -> v.getId() == solutionHistoryId);
         budgetItemRepository.save(budgetItem);
         int lengthAfter = budgetItem.getReservedItems().size();
         return lengthBefore != lengthAfter;
     }
 
-    public boolean deleteBudgetItem(Long id) {
-        return budgetItemRepository.removeById(id);
+    @Transactional
+    public void deleteBudgetItem(Long id) {
+        budgetItemRepository.deleteById(id);
     }
 }

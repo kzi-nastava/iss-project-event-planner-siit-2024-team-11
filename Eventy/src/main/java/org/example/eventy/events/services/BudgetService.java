@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BudgetService {
@@ -54,10 +55,9 @@ public class BudgetService {
     }
 
     public boolean deleteBudgetItemFromBudget(Budget budget, Long budgetItemId) {
-        int previousLength = budget.getBudgetedItems().size();
-        budget.getBudgetedItems().stream().filter(v -> v.getId() != budgetItemId).toList();
+        List<BudgetItem> items = budget.getBudgetedItems();
+        items.removeIf(v -> v.getId().equals(budgetItemId));
         budgetRepository.save(budget);
-        int currentLength = budget.getBudgetedItems().size();
-        return previousLength != currentLength;
+        return true;
     }
 }
