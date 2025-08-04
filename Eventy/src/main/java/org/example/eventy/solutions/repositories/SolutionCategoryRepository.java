@@ -19,6 +19,6 @@ public interface SolutionCategoryRepository extends JpaRepository<Category, Long
 
     public long countByStatus(Status status);
 
-    @Query("SELECT c FROM Category c WHERE c.id NOT IN (:ids)")
-    public List<Category> findAllExceptFollowingIds(List<Long> ids);
+    @Query("SELECT c FROM Category c WHERE c.id NOT IN (:ids) AND c.status = :status")
+    public List<Category> findAllExceptFollowingIds(List<Long> ids, Status status);
 }

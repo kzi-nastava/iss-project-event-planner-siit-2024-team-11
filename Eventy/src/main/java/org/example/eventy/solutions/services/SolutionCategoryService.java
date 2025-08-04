@@ -125,7 +125,7 @@ public class SolutionCategoryService {
         for (BudgetItem item: budget.getBudgetedItems()) {
             existingCategoryIds.add(item.getCategory().getId());
         }
-        return solutionCategoryRepository.findAllExceptFollowingIds(existingCategoryIds);
+        return solutionCategoryRepository.findAllExceptFollowingIds(existingCategoryIds, Status.ACCEPTED);
     }
 
     private void makeAffectedSolutionsVisible(Long categoryId) {
