@@ -257,8 +257,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -302,7 +302,7 @@ public class EventManagementControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(newEvent)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$").value("Event type doesn't exist!"));
+                .andExpect(jsonPath("$").value("eventTypeId: Selected event type does not exist"));
     }
 
     @Test
@@ -401,8 +401,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -433,8 +433,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -465,8 +465,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -497,8 +497,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -529,8 +529,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -609,8 +609,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -641,8 +641,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().minusDays(1).plusHours(1),
+                        LocalDateTime.now().minusDays(1).plusHours(3)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -705,8 +705,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -737,8 +737,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -769,8 +769,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -801,8 +801,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -833,8 +833,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -865,8 +865,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -897,8 +897,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -1025,8 +1025,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -1057,8 +1057,8 @@ public class EventManagementControllerTest {
                         "Activity 1",
                         "Activity description",
                         "Activity Location",
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2)
+                        LocalDateTime.now().plusHours(25),
+                        LocalDateTime.now().plusHours(27)
                 )
         ));
         newEvent.setEmails(new ArrayList<>());
@@ -1502,7 +1502,7 @@ public class EventManagementControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(newEvent)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$").value("Agenda timeline is not possible!"));
+                .andExpect(jsonPath("$").value("Agenda: Agenda timeline is not possible!"));
     }
 
     @Test
@@ -1534,7 +1534,7 @@ public class EventManagementControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(newEvent)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$").value("Agenda timeline is not possible!"));
+                .andExpect(jsonPath("$").value("Agenda: Agenda timeline is not possible!"));
     }
 
     @Test
@@ -1566,7 +1566,7 @@ public class EventManagementControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(newEvent)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$").value("Agenda timeline is not possible!"));
+                .andExpect(jsonPath("$").value("Agenda: Agenda timeline is not possible!"));
     }
 
     @Test
@@ -1599,7 +1599,7 @@ public class EventManagementControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(newEvent)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$").value("Agenda timeline is not possible!"));
+                .andExpect(jsonPath("$").value("Agenda: Agenda timeline is not possible!"));
     }
 
     @Test
