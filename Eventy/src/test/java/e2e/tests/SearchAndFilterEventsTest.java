@@ -2,12 +2,15 @@ package e2e.tests;
 
 import e2e.base.ChromeTestBase;
 import e2e.pages.HomePage;
+import org.example.eventy.EventyApplication;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.test.context.ActiveProfiles;
 
 import javax.sql.DataSource;
 import java.sql.Timestamp;
@@ -18,6 +21,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@SpringBootTest(classes = EventyApplication.class)
+@ActiveProfiles("test") // if you use application-test.properties
 public class SearchAndFilterEventsTest extends ChromeTestBase {
     private JdbcTemplate jdbcTemplate;
 

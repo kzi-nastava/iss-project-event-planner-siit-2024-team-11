@@ -32,11 +32,11 @@ public class OrganizedEventValidator implements ConstraintValidator<ValidOrganiz
     public boolean isValid(OrganizeEventDTO organizeEventDTO, ConstraintValidatorContext context) {
                     // NOTE: return early "false" if something is not valid!
 
-        if (organizeEventDTO.getName().length() > 20) {
+        if (organizeEventDTO.getName() == null || organizeEventDTO.getName().length() > 20) {
             return false;
         }
 
-        if(eventTypeService.get(organizeEventDTO.getEventTypeId()) == null) {
+        if(organizeEventDTO.getEventTypeId() != null && eventTypeService.get(organizeEventDTO.getEventTypeId()) == null) {
             context.buildConstraintViolationWithTemplate("Selected event type does not exist")
                     .addPropertyNode("eventTypeId")
                     .addConstraintViolation();
@@ -44,10 +44,15 @@ public class OrganizedEventValidator implements ConstraintValidator<ValidOrganiz
         }
 
         // 8. Check if "agenda" is okay - @NotNull is already checked in OrganizeEventDTO
-        for(CreateActivityDTO activityDTO : organizeEventDTO.getAgenda()) {
-            if(activityDTO.getStartTime().isAfter(activityDTO.getEndTime()) || activityDTO.getStartTime().isEqual(activityDTO.getEndTime()) ||
-                    activityDTO.getStartTime().isBefore(organizeEventDTO.getDate()) || activityDTO.getEndTime().isAfter(organizeEventDTO.getDate().plusDays(1))) {
-                return false;
+        if (organizeEventDTO.getDate() != null && organizeEventDTO.getAgenda() != null) {
+            for(CreateActivityDTO activityDTO : organizeEventDTO.getAgenda()) {
+                if(activityDTO.getStartTime() != null && activityDTO.getEndTime() != null && (activityDTO.getStartTime().isAfter(activityDTO.getEndTime()) || activityDTO.getStartTime().isEqual(activityDTO.getEndTime()) ||
+                        activityDTO.getStartTime().isBefore(organizeEventDTO.getDate()) || activityDTO.getEndTime().isAfter(organizeEventDTO.getDate().plusDays(1)))) {
+                    context.buildConstraintViolationWithTemplate("Agenda timeline is not possible!")
+                            .addPropertyNode("Agenda")
+                            .addConstraintViolation();
+                    return false;
+                }
             }
         }
 
