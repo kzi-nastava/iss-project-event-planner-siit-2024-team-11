@@ -4,12 +4,15 @@ import e2e.base.ChromeTestBase;
 import e2e.pages.EventOrganizationPage;
 import e2e.pages.HomePage;
 import e2e.pages.LoginPage;
+import org.example.eventy.EventyApplication;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -18,6 +21,8 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@SpringBootTest(classes = EventyApplication.class)
+@ActiveProfiles("test") // if you use application-test.properties
 public class EventManagementTest extends ChromeTestBase {
     private LoginPage loginPage;
     private EventOrganizationPage eventOrganizationPage;
@@ -25,7 +30,7 @@ public class EventManagementTest extends ChromeTestBase {
     @BeforeEach
     public void setupTest() {
         loginPage = new LoginPage(driver);
-        loginPage.login("ves@gmail.com", "admin");
+        loginPage.login("tac@gmail.com", "admin");
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
         wait.until(ExpectedConditions.urlToBe("http://localhost:4200/"));
@@ -46,14 +51,14 @@ public class EventManagementTest extends ChromeTestBase {
         eventOrganizationPage.setEventPrivacy("Public");
         eventOrganizationPage.setEventType("Party");
         eventOrganizationPage.setMapPin();
-        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 10, 7));
 
         eventOrganizationPage.pressContinueButton();
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
         wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#activity-name-input")));
 
-        eventOrganizationPage.addActivity("Activity 1", "This is a sample activity description.", "Activity Location", LocalDateTime.of(2025, 7, 7, 10, 0, 0), LocalDateTime.of(2025, 7, 7, 12, 0, 0));
+        eventOrganizationPage.addActivity("Activity 1", "This is a sample activity description.", "Activity Location", LocalDateTime.of(2025, 10, 7, 10, 0, 0), LocalDateTime.of(2025, 10, 7, 12, 0, 0));
 
         eventOrganizationPage.pressContinueButton();
 
@@ -64,7 +69,7 @@ public class EventManagementTest extends ChromeTestBase {
         assertEquals("This is a sample event description.", homePage.getFirstFeaturedEventDescription());
         assertEquals("100", homePage.getFirstFeaturedEventMaxParticipants());
         assertEquals("Party", homePage.getFirstFeaturedEventType());
-        assertEquals("July 7, 2025", homePage.getFirstFeaturedEventDate());
+        assertEquals("October 7, 2025", homePage.getFirstFeaturedEventDate());
     }
 
     @Test
@@ -74,7 +79,7 @@ public class EventManagementTest extends ChromeTestBase {
         eventOrganizationPage.setEventPrivacy("Public");
         eventOrganizationPage.setEventType("Party");
         eventOrganizationPage.setMapPin();
-        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 10, 7));
 
         eventOrganizationPage.pressContinueButton();
 
@@ -89,7 +94,7 @@ public class EventManagementTest extends ChromeTestBase {
         eventOrganizationPage.setEventPrivacy("Public");
         eventOrganizationPage.setEventType("Party");
         eventOrganizationPage.setMapPin();
-        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 10, 7));
 
         eventOrganizationPage.pressContinueButton();
 
@@ -103,7 +108,7 @@ public class EventManagementTest extends ChromeTestBase {
         eventOrganizationPage.setEventPrivacy("Public");
         eventOrganizationPage.setEventType("Party");
         eventOrganizationPage.setMapPin();
-        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 10, 7));
 
         eventOrganizationPage.pressContinueButton();
 
@@ -118,7 +123,7 @@ public class EventManagementTest extends ChromeTestBase {
         eventOrganizationPage.setEventPrivacy("Public");
         eventOrganizationPage.setEventType("Party");
         eventOrganizationPage.setMapPin();
-        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 10, 7));
 
         eventOrganizationPage.pressContinueButton();
 
@@ -132,7 +137,7 @@ public class EventManagementTest extends ChromeTestBase {
         eventOrganizationPage.setEventPrivacy("Public");
         eventOrganizationPage.setEventType("Party");
         eventOrganizationPage.setMapPin();
-        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 10, 7));
 
         eventOrganizationPage.pressContinueButton();
 
@@ -147,7 +152,7 @@ public class EventManagementTest extends ChromeTestBase {
         eventOrganizationPage.setEventPrivacy("Public");
         eventOrganizationPage.setEventType("Party");
         eventOrganizationPage.setMapPin();
-        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 10, 7));
 
         eventOrganizationPage.pressContinueButton();
 
@@ -162,7 +167,7 @@ public class EventManagementTest extends ChromeTestBase {
         eventOrganizationPage.setEventPrivacy("Public");
         eventOrganizationPage.setEventType("Party");
         eventOrganizationPage.setMapPin();
-        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 10, 7));
 
         eventOrganizationPage.pressContinueButton();
 
@@ -177,7 +182,7 @@ public class EventManagementTest extends ChromeTestBase {
         eventOrganizationPage.setEventPrivacy("Public");
         eventOrganizationPage.setEventType("Party");
         eventOrganizationPage.setMapPin();
-        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 10, 7));
 
         eventOrganizationPage.pressContinueButton();
 
@@ -192,7 +197,7 @@ public class EventManagementTest extends ChromeTestBase {
         eventOrganizationPage.setEventPrivacy("Public");
         eventOrganizationPage.setEventType("Party");
         eventOrganizationPage.setMapPin();
-        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 10, 7));
 
         eventOrganizationPage.pressContinueButton();
 
@@ -207,7 +212,7 @@ public class EventManagementTest extends ChromeTestBase {
         eventOrganizationPage.setEventPrivacy("Public");
         eventOrganizationPage.setEventType("Party");
         eventOrganizationPage.setMapPin();
-        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 10, 7));
 
         eventOrganizationPage.pressContinueButton();
 
@@ -221,7 +226,7 @@ public class EventManagementTest extends ChromeTestBase {
         eventOrganizationPage.setEventMaxParticipants("100");
         eventOrganizationPage.setEventPrivacy("Public");
         eventOrganizationPage.setEventType("Party");
-        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 10, 7));
 
         assertTrue(eventOrganizationPage.hasLocationError());
     }
@@ -233,7 +238,7 @@ public class EventManagementTest extends ChromeTestBase {
         eventOrganizationPage.setEventMaxParticipants("100");
         eventOrganizationPage.setEventPrivacy("Public");
         eventOrganizationPage.setMapPin();
-        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 10, 7));
 
         eventOrganizationPage.pressContinueButton();
 
@@ -262,7 +267,7 @@ public class EventManagementTest extends ChromeTestBase {
         eventOrganizationPage.setEventPrivacy("Public");
         eventOrganizationPage.setEventType("Party");
         eventOrganizationPage.setMapPin();
-        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 10, 7));
 
         eventOrganizationPage.pressContinueButton();
 
@@ -284,14 +289,14 @@ public class EventManagementTest extends ChromeTestBase {
         eventOrganizationPage.setEventPrivacy("Public");
         eventOrganizationPage.setEventType("Party");
         eventOrganizationPage.setMapPin();
-        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 10, 7));
 
         eventOrganizationPage.pressContinueButton();
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
         wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#activity-name-input")));
 
-        eventOrganizationPage.addActivity("", "This is a sample activity description.", "Activity Location", LocalDateTime.of(2025, 7, 7, 10, 0, 0), LocalDateTime.of(2025, 7, 7, 12, 0, 0));
+        eventOrganizationPage.addActivity("", "This is a sample activity description.", "Activity Location", LocalDateTime.of(2025, 10, 7, 10, 0, 0), LocalDateTime.of(2025, 10, 7, 12, 0, 0));
 
         assertTrue(eventOrganizationPage.hasActivityNameError());
     }
@@ -304,14 +309,14 @@ public class EventManagementTest extends ChromeTestBase {
         eventOrganizationPage.setEventPrivacy("Public");
         eventOrganizationPage.setEventType("Party");
         eventOrganizationPage.setMapPin();
-        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 10, 7));
 
         eventOrganizationPage.pressContinueButton();
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
         wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#activity-name-input")));
 
-        eventOrganizationPage.addActivity("Activity 1", "", "Activity Location", LocalDateTime.of(2025, 7, 7, 10, 0, 0), LocalDateTime.of(2025, 7, 7, 12, 0, 0));
+        eventOrganizationPage.addActivity("Activity 1", "", "Activity Location", LocalDateTime.of(2025, 10, 7, 10, 0, 0), LocalDateTime.of(2025, 10, 7, 12, 0, 0));
 
         assertTrue(eventOrganizationPage.hasActivityDescriptionError());
     }
@@ -324,14 +329,14 @@ public class EventManagementTest extends ChromeTestBase {
         eventOrganizationPage.setEventPrivacy("Public");
         eventOrganizationPage.setEventType("Party");
         eventOrganizationPage.setMapPin();
-        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 10, 7));
 
         eventOrganizationPage.pressContinueButton();
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
         wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#activity-name-input")));
 
-        eventOrganizationPage.addActivity("Activity 1", "This is a sample activity description.", "", LocalDateTime.of(2025, 7, 7, 10, 0, 0), LocalDateTime.of(2025, 7, 7, 12, 0, 0));
+        eventOrganizationPage.addActivity("Activity 1", "This is a sample activity description.", "", LocalDateTime.of(2025, 10, 7, 10, 0, 0), LocalDateTime.of(2025, 10, 7, 12, 0, 0));
 
         assertTrue(eventOrganizationPage.hasActivityLocationError());
     }
@@ -344,7 +349,7 @@ public class EventManagementTest extends ChromeTestBase {
         eventOrganizationPage.setEventPrivacy("Public");
         eventOrganizationPage.setEventType("Party");
         eventOrganizationPage.setMapPin();
-        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 10, 7));
 
         eventOrganizationPage.pressContinueButton();
 
@@ -364,14 +369,14 @@ public class EventManagementTest extends ChromeTestBase {
         eventOrganizationPage.setEventPrivacy("Public");
         eventOrganizationPage.setEventType("Party");
         eventOrganizationPage.setMapPin();
-        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 10, 7));
 
         eventOrganizationPage.pressContinueButton();
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
         wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#activity-name-input")));
 
-        eventOrganizationPage.addActivity("Activity 1", "This is a sample activity description.", "Activity Location", LocalDateTime.of(2025, 7, 7, 10, 0, 0), null);
+        eventOrganizationPage.addActivity("Activity 1", "This is a sample activity description.", "Activity Location", LocalDateTime.of(2025, 10, 7, 10, 0, 0), null);
 
         assertTrue(eventOrganizationPage.hasActivityEndTimeRequiredError());
     }
@@ -384,14 +389,14 @@ public class EventManagementTest extends ChromeTestBase {
         eventOrganizationPage.setEventPrivacy("Public");
         eventOrganizationPage.setEventType("Party");
         eventOrganizationPage.setMapPin();
-        eventOrganizationPage.setEventDate(LocalDate.of(2025, 7, 7));
+        eventOrganizationPage.setEventDate(LocalDate.of(2025, 10, 7));
 
         eventOrganizationPage.pressContinueButton();
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
         wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#activity-name-input")));
 
-        eventOrganizationPage.addActivity("Activity 1", "This is a sample activity description.", "Activity Location", LocalDateTime.of(2025, 7, 7, 10, 0, 0), LocalDateTime.of(2025, 7, 7, 10, 0, 0));
+        eventOrganizationPage.addActivity("Activity 1", "This is a sample activity description.", "Activity Location", LocalDateTime.of(2025, 10, 7, 10, 0, 0), LocalDateTime.of(2025, 10, 7, 10, 0, 0));
 
         assertTrue(eventOrganizationPage.hasActivityEndTimeRequiredError());
     }

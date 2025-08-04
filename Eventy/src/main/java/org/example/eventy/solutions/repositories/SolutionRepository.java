@@ -215,7 +215,7 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
                 FROM suggested_event_types st
                 LEFT JOIN event_types et ON st.event_type_id = et.id
                 ORDER BY et.id
-            );
+            ) AS temp;
            """, nativeQuery = true)
     ArrayList<String> findAllUniqueEventTypeNamesForSolutions();
 
