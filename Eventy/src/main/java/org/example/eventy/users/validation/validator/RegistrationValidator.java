@@ -1,7 +1,6 @@
 package org.example.eventy.users.validation.validator;
 
 import jakarta.validation.ConstraintValidator;
-import kotlin.text.Regex;
 import org.example.eventy.users.dtos.RegistrationDTO;
 import org.example.eventy.users.validation.annotation.ValidRegistration;
 
