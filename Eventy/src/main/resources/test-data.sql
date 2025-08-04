@@ -10,13 +10,13 @@ INSERT INTO users (
     id, user_type, email, password, address, phone_number, is_active, is_deactivated, enabled, has_silenced_notifications, suspension_deadline, role_id, last_password_reset_date, last_read_notifications, description, first_name, last_name, name
 )
 VALUES
-    (DEFAULT, 'Organizer', 'tac@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 3, NOW(), '2023-10-30 00:00:00', NULL, 'Tac Tac', 'Jezickovic', NULL),
-    (DEFAULT, 'Organizer', 'ves@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3815361', TRUE, FALSE, TRUE, FALSE, NULL, 3, NOW(), '2024-10-30 00:00:00', NULL, 'Ves Ves', 'Jezickovic', NULL),
-    (DEFAULT, 'Provider', 'provider@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), '2000-01-01 00:00:00', 'Description', NULL, NULL, 'VIT DOO'),
-    (DEFAULT, 'Provider', 'provider2@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, NOW(), '2000-01-01 00:00:00', 'Description', NULL, NULL, 'Lidl'),
-    (DEFAULT, 'Admin', 'admin@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', 'Cara Dusana 72, Novi Sad', '+381 65 31 43 240', TRUE, FALSE, TRUE, FALSE, NULL, 1, NOW(), '2000-01-01 00:00:00', NULL, 'Veselin', 'Roganovic', NULL),
-    (DEFAULT, 'AuthenticatedUser', 'auth@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 2, NOW(), '2000-01-01 00:00:00', NULL, NULL, NULL, NULL),
-    (DEFAULT, 'AuthenticatedUser', 'c.tamara333@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 2, NOW(), '2000-01-01 00:00:00', NULL, NULL, NULL, NULL);
+    (DEFAULT, 'Organizer', 'tac@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 3,'2000-01-01 00:00:00', '2023-10-30 00:00:00', NULL, 'Tac Tac', 'Jezickovic', NULL),
+    (DEFAULT, 'Organizer', 'ves@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3815361', TRUE, FALSE, TRUE, FALSE, NULL, 3, '2000-01-01 00:00:00', '2024-10-30 00:00:00', NULL, 'Ves Ves', 'Jezickovic', NULL),
+    (DEFAULT, 'Provider', 'provider@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, '2000-01-01 00:00:00', '2000-01-01 00:00:00', 'Description', NULL, NULL, 'VIT DOO'),
+    (DEFAULT, 'Provider', 'provider2@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, '2000-01-01 00:00:00', '2000-01-01 00:00:00', 'Description', NULL, NULL, 'Lidl'),
+    (DEFAULT, 'Admin', 'admin@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', 'Cara Dusana 72, Novi Sad', '+381 65 31 43 240', TRUE, FALSE, TRUE, FALSE, NULL, 1, '2000-01-01 00:00:00', '2000-01-01 00:00:00', NULL, 'Veselin', 'Roganovic', NULL),
+    (DEFAULT, 'AuthenticatedUser', 'auth@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 2, '2000-01-01 00:00:00', '2000-01-01 00:00:00', NULL, NULL, NULL, NULL),
+    (DEFAULT, 'AuthenticatedUser', 'c.tamara333@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 2, '2000-01-01 00:00:00', '2000-01-01 00:00:00', NULL, NULL, NULL, NULL);
 
 -- Locations
 INSERT INTO locations(latitude, longitude, id, address, name)
@@ -77,22 +77,34 @@ VALUES
     (DEFAULT, 'Photography', 'Services for capturing memories of events.', 0, false),
     (DEFAULT, 'Catering', 'Food and drink services for events.', 0, false);
 
+-- SolutionHistory
+INSERT INTO solution_history (id, provider_id, name, description, price, discount, cancellation_deadline)
+VALUES
+    (DEFAULT, 3, 'Dumbbell', 'High-quality gym dumbbell', 19.99, 10, NULL),
+    (DEFAULT, 4, 'Office Chair', 'Ergonomic office chair', 49.99, 5, NULL),
+    (DEFAULT, 3, 'Table Lamp', 'Stylish table lamp', 29.99, 15, NULL),
+    (DEFAULT, 4, 'Gaming Keyboard', 'Gaming keyboard with RGB', 99.99, 20, NULL),
+    (DEFAULT, 4, 'Photography', 'Wedding photography package', 99.99, 15, 15),
+    (DEFAULT, 4, 'Training', 'Personal training session', 149.99, 20, 12),
+    (DEFAULT, 4, 'Event Planning', 'Event planning service', 199.99, 10, 7),
+    (DEFAULT, 3, 'Cleaning', 'House cleaning service', 79.99, 25, 17);
+
 -- Solutions
 INSERT INTO solutions (
     cancellation_deadline, discount, is_available, is_deleted, is_visible, max_reservation_time, min_reservation_time, price,
-    reservation_deadline, reservation_type, category_id, id, product_history_id, provider_id, service_history_id, type, description, name, specifics)
+    reservation_deadline, reservation_type, category_id, id, solution_history_id, provider_id, type, description, name, specifics)
 VALUES
     -- Products
-    (NULL, 10, TRUE, FALSE, TRUE, NULL, NULL, 19.99, NULL, NULL, 1, DEFAULT, NULL, 3, NULL, 'Product', 'High-quality gym dumbbell', 'Dumbbell', NULL),
-    (NULL, 5, FALSE, FALSE, TRUE, NULL, NULL, 49.99, NULL, NULL, 2, DEFAULT, NULL, 4, NULL, 'Product', 'Ergonomic office chair', 'Office Chair', NULL),
-    (NULL, 15, TRUE, FALSE, TRUE, NULL, NULL, 29.99, NULL, NULL, 3, DEFAULT, NULL, 3, NULL, 'Product', 'Stylish table lamp', 'Table Lamp', NULL),
-    (NULL, 20, TRUE, FALSE, TRUE, NULL, NULL, 99.99, NULL, NULL, 1, DEFAULT, NULL, 4, NULL, 'Product', 'Gaming keyboard with RGB', 'Gaming Keyboard', NULL),
+    (NULL, 10, TRUE, FALSE, TRUE, NULL, NULL, 19.99, NULL, NULL, 1, DEFAULT, 1, 3, 'Product', 'High-quality gym dumbbell', 'Dumbbell', NULL),
+    (NULL, 5, FALSE, FALSE, TRUE, NULL, NULL, 49.99, NULL, NULL, 2, DEFAULT, 2, 4, 'Product', 'Ergonomic office chair', 'Office Chair', NULL),
+    (NULL, 15, TRUE, FALSE, TRUE, NULL, NULL, 29.99, NULL, NULL, 3, DEFAULT, 3, 3, 'Product', 'Stylish table lamp', 'Table Lamp', NULL),
+    (NULL, 20, TRUE, FALSE, TRUE, NULL, NULL, 99.99, NULL, NULL, 1, DEFAULT, 4, 4, 'Product', 'Gaming keyboard with RGB', 'Gaming Keyboard', NULL),
 
     -- Services
-    (15, 15, FALSE, FALSE, TRUE, 240, 60, 99.99, 7, 0, 2, DEFAULT, NULL, 4, NULL, 'Service', 'Wedding photography package', 'Photography', 'Includes editing and delivery in 2 weeks'),
-    (12, 20, TRUE, FALSE, TRUE, 180, 30, 149.99, 0, 1, 3, DEFAULT, NULL, 4, NULL, 'Service', 'Personal training session', 'Training', 'One-on-one session with certified trainer'),
-    (7, 10, TRUE, FALSE, TRUE, 300, 90, 199.99, 14, 1, 2, DEFAULT, NULL, 4, NULL, 'Service', 'Event planning service', 'Event Planning', 'Full-service planning and coordination'),
-    (17, 25, TRUE, FALSE, TRUE, 120, 30, 79.99, 14, 0, 3, DEFAULT, NULL, 3, NULL, 'Service', 'House cleaning service', 'Cleaning', 'Deep cleaning for apartments and houses');
+    (15, 15, FALSE, FALSE, TRUE, 240, 60, 99.99, 7, 0, 2, DEFAULT, 5, 4, 'Service', 'Wedding photography package', 'Photography', 'Includes editing and delivery in 2 weeks'),
+    (12, 20, TRUE, FALSE, TRUE, 180, 30, 149.99, 0, 1, 3, DEFAULT, 6, 4, 'Service', 'Personal training session', 'Training', 'One-on-one session with certified trainer'),
+    (7, 10, TRUE, FALSE, TRUE, 300, 90, 199.99, 14, 1, 2, DEFAULT, 7, 4, 'Service', 'Event planning service', 'Event Planning', 'Full-service planning and coordination'),
+    (17, 25, TRUE, FALSE, TRUE, 120, 30, 79.99, 14, 0, 3, DEFAULT, 8, 3, 'Service', 'House cleaning service', 'Cleaning', 'Deep cleaning for apartments and houses');
 
 -- Pictures
 INSERT INTO pictures
@@ -166,3 +178,28 @@ INSERT INTO reviews (user_id, event_id, solution_id, comment, grade, status, is_
 VALUES
     (1, 2, NULL, 'Great event, really enjoyed it!', 5, 'PENDING', false),
     (1, 3, NULL, 'Great event 2!', 3, 'PENDING', false);
+
+-- BudgetItems
+INSERT INTO budget_items (id, category_id, planned_funds)
+VALUES
+    (DEFAULT, 1, 300.00),
+    (DEFAULT, 2, 200.00),
+    (DEFAULT, 3, 500.00);
+
+-- Budgets
+INSERT INTO budgets (id, event_id)
+VALUES
+    (DEFAULT, 1),
+    (DEFAULT, 2),
+    (DEFAULT, 3),
+    (DEFAULT, 4),
+    (DEFAULT, 5),
+    (DEFAULT, 6),
+    (DEFAULT, 7),
+    (DEFAULT, 8),
+    (DEFAULT, 9),
+    (DEFAULT, 10),
+    (DEFAULT, 11);
+
+UPDATE budget_items SET budget_item_id = 1 WHERE id IN (1, 2);
+UPDATE budget_items SET budget_item_id = 2 WHERE id = 3;

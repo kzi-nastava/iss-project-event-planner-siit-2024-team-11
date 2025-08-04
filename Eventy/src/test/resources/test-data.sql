@@ -67,22 +67,34 @@ VALUES
     (DEFAULT, 'Photography', 'Services for capturing memories of events.', 0, false),
     (DEFAULT, 'Catering', 'Food and drink services for events.', 0, false);
 
+-- SolutionHistory
+INSERT INTO solution_history (id, provider_id, name, description, price, discount, cancellation_deadline)
+VALUES
+    (DEFAULT, 3, 'Dumbbell', 'High-quality gym dumbbell', 19.99, 10, NULL),
+    (DEFAULT, 4, 'Office Chair', 'Ergonomic office chair', 49.99, 5, NULL),
+    (DEFAULT, 3, 'Table Lamp', 'Stylish table lamp', 29.99, 15, NULL),
+    (DEFAULT, 4, 'Gaming Keyboard', 'Gaming keyboard with RGB', 99.99, 20, NULL),
+    (DEFAULT, 4, 'Photography', 'Wedding photography package', 99.99, 15, 15),
+    (DEFAULT, 4, 'Training', 'Personal training session', 149.99, 20, 12),
+    (DEFAULT, 4, 'Event Planning', 'Event planning service', 199.99, 10, 7),
+    (DEFAULT, 3, 'Cleaning', 'House cleaning service', 79.99, 25, 17);
+
 -- Solutions
 INSERT INTO solutions (
     cancellation_deadline, discount, is_available, is_deleted, is_visible, max_reservation_time, min_reservation_time, price,
-    reservation_deadline, reservation_type, category_id, id, product_history_id, provider_id, service_history_id, type, description, name, specifics)
+    reservation_deadline, reservation_type, category_id, id, solution_history_id, provider_id, type, description, name, specifics)
 VALUES
     -- Products
-    (NULL, 10, TRUE, FALSE, TRUE, NULL, NULL, 19.99, NULL, NULL, 1, DEFAULT, NULL, 3, NULL, 'Product', 'High-quality gym dumbbell', 'Dumbbell', NULL),
-    (NULL, 5, FALSE, FALSE, TRUE, NULL, NULL, 49.99, NULL, NULL, 2, DEFAULT, NULL, 4, NULL, 'Product', 'Ergonomic office chair', 'Office Chair', NULL),
-    (NULL, 15, TRUE, FALSE, TRUE, NULL, NULL, 29.99, NULL, NULL, 3, DEFAULT, NULL, 3, NULL, 'Product', 'Stylish table lamp', 'Table Lamp', NULL),
-    (NULL, 20, TRUE, FALSE, TRUE, NULL, NULL, 99.99, NULL, NULL, 1, DEFAULT, NULL, 4, NULL, 'Product', 'Gaming keyboard with RGB', 'Gaming Keyboard', NULL),
+    (NULL, 10, TRUE, FALSE, TRUE, NULL, NULL, 19.99, NULL, NULL, 1, DEFAULT, 1, 3, 'Product', 'High-quality gym dumbbell', 'Dumbbell', NULL),
+    (NULL, 5, FALSE, FALSE, TRUE, NULL, NULL, 49.99, NULL, NULL, 2, DEFAULT, 2, 4, 'Product', 'Ergonomic office chair', 'Office Chair', NULL),
+    (NULL, 15, TRUE, FALSE, TRUE, NULL, NULL, 29.99, NULL, NULL, 3, DEFAULT, 3, 3, 'Product', 'Stylish table lamp', 'Table Lamp', NULL),
+    (NULL, 20, TRUE, FALSE, TRUE, NULL, NULL, 99.99, NULL, NULL, 1, DEFAULT, 4, 4, 'Product', 'Gaming keyboard with RGB', 'Gaming Keyboard', NULL),
 
     -- Services
-    (15, 15, FALSE, FALSE, TRUE, 240, 60, 99.99, 7, 0, 2, DEFAULT, NULL, 4, NULL, 'Service', 'Wedding photography package', 'Photography', 'Includes editing and delivery in 2 weeks'),
-    (12, 20, TRUE, FALSE, TRUE, 180, 30, 149.99, 0, 1, 3, DEFAULT, NULL, 4, NULL, 'Service', 'Personal training session', 'Training', 'One-on-one session with certified trainer'),
-    (7, 10, TRUE, FALSE, TRUE, 300, 90, 199.99, 14, 1, 2, DEFAULT, NULL, 4, NULL, 'Service', 'Event planning service', 'Event Planning', 'Full-service planning and coordination'),
-    (17, 25, TRUE, FALSE, TRUE, 120, 30, 79.99, 14, 0, 3, DEFAULT, NULL, 3, NULL, 'Service', 'House cleaning service', 'Cleaning', 'Deep cleaning for apartments and houses');
+    (15, 15, FALSE, FALSE, TRUE, 240, 60, 99.99, 7, 0, 2, DEFAULT, 5, 4, 'Service', 'Wedding photography package', 'Photography', 'Includes editing and delivery in 2 weeks'),
+    (12, 20, TRUE, FALSE, TRUE, 180, 30, 149.99, 0, 1, 3, DEFAULT, 6, 4, 'Service', 'Personal training session', 'Training', 'One-on-one session with certified trainer'),
+    (7, 10, TRUE, FALSE, TRUE, 300, 90, 199.99, 14, 1, 2, DEFAULT, 7, 4, 'Service', 'Event planning service', 'Event Planning', 'Full-service planning and coordination'),
+    (17, 25, TRUE, FALSE, TRUE, 120, 30, 79.99, 14, 0, 3, DEFAULT, 8, 3, 'Service', 'House cleaning service', 'Cleaning', 'Deep cleaning for apartments and houses');
 
 -- Pictures
 INSERT INTO pictures
@@ -156,3 +168,25 @@ INSERT INTO reviews (user_id, event_id, solution_id, comment, grade, status, is_
 VALUES
     (1, 2, NULL, 'Great event, really enjoyed it!', 5, 'PENDING', false),
     (1, 3, NULL, 'Great event 2!', 3, 'PENDING', false);
+
+-- BudgetItems
+INSERT INTO budget_items (id, category_id, planned_funds)
+VALUES
+    (DEFAULT, 1, 300.00),
+    (DEFAULT, 2, 200.00),
+    (DEFAULT, 3, 500.00);
+
+-- Budgets
+INSERT INTO budgets (id, event_id)
+VALUES
+    (DEFAULT, 1),
+    (DEFAULT, 2),
+    (DEFAULT, 3),
+    (DEFAULT, 4),
+    (DEFAULT, 5),
+    (DEFAULT, 6),
+    (DEFAULT, 7),
+    (DEFAULT, 8);
+
+UPDATE budget_items SET budget_item_id = 1 WHERE id IN (1, 2);
+UPDATE budget_items SET budget_item_id = 2 WHERE id = 3;
