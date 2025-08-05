@@ -59,7 +59,6 @@ public class ReservationControllerTest {
     @BeforeAll
     void setupTestData() throws Exception {
         login();
-        logout();
 
         Event event1 = eventService.getEvent(1L);
         Event event2 = eventService.getEvent(2L);
@@ -81,11 +80,14 @@ public class ReservationControllerTest {
         }
     }
 
+    @AfterAll
+    void tearDownTestData() throws Exception {
+        logout();
+    }
+
     @Test
     @Transactional
     public void createReservation_ValidInput_ReturnsCreatedReservation() throws Exception {
-        login();
-
         Event event = eventService.getEvent(1L);
         event.setDate(LocalDateTime.now().plusDays(20));
         event = eventService.save(event);
@@ -109,15 +111,11 @@ public class ReservationControllerTest {
             .andExpect(jsonPath("$.selectedServiceId").value(newReservationDTO.getSelectedServiceId().intValue()));
 
         Mockito.verify(emailService, Mockito.times(1)).sendReservationConfirmation(Mockito.any(Reservation.class));
-
-        logout();
     }
 
     @Test
     @Transactional
     public void createReservation_NonexistentEvent_ReturnsBadRequest() throws Exception {
-        login();
-
         Service service = (Service) solutionService.getSolution(6L);
 
         ReservationDTO newReservationDTO = new ReservationDTO();
@@ -140,15 +138,11 @@ public class ReservationControllerTest {
 
         assertTrue(errorMessages.contains("selectedEventId: Selected event does not exist."));
         Mockito.verify(emailService, Mockito.times(0)).sendReservationConfirmation(Mockito.any(Reservation.class));
-
-        logout();
     }
 
     @Test
     @Transactional
     public void createReservation_NonexistentService_ReturnsBadRequest() throws Exception {
-        login();
-
         Event event = eventService.getEvent(1L);
 
         ReservationDTO newReservationDTO = new ReservationDTO();
@@ -171,15 +165,11 @@ public class ReservationControllerTest {
 
         assertTrue(errorMessages.contains("selectedServiceId: Selected service does not exist."));
         Mockito.verify(emailService, Mockito.times(0)).sendReservationConfirmation(Mockito.any(Reservation.class));
-
-        logout();
     }
 
     @Test
     @Transactional
     public void createReservation_ServiceUnavailable_ReturnsBadRequest() throws Exception {
-        login();
-
         Event event = eventService.getEvent(1L);
         Service service = (Service) solutionService.getSolution(5L);
 
@@ -203,15 +193,11 @@ public class ReservationControllerTest {
 
         assertTrue(errorMessages.contains("selectedServiceId: Selected service is not available."));
         Mockito.verify(emailService, Mockito.times(0)).sendReservationConfirmation(Mockito.any(Reservation.class));
-
-        logout();
     }
 
     @Test
     @Transactional
     public void createReservation_StartTimeInPast_ReturnsBadRequest() throws Exception {
-        login();
-
         Event event = eventService.getEvent(1L);
         event.setDate(LocalDateTime.now());
         event = eventService.save(event);
@@ -238,15 +224,11 @@ public class ReservationControllerTest {
 
         assertTrue(errorMessages.contains("reservationStartDateTime: It's too late to make a reservation."));
         Mockito.verify(emailService, Mockito.times(0)).sendReservationConfirmation(Mockito.any(Reservation.class));
-
-        logout();
     }
 
     @Test
     @Transactional
     public void createReservation_EndTimeBeforeStartTime_ReturnsBadRequest() throws Exception {
-        login();
-
         Event event = eventService.getEvent(1L);
         event.setDate(LocalDateTime.now().plusDays(20));
         event = eventService.save(event);
@@ -272,15 +254,11 @@ public class ReservationControllerTest {
 
         assertTrue(errorMessages.contains("reservationEndDateTime: Reservation end time must be after start time."));
         Mockito.verify(emailService, Mockito.times(0)).sendReservationConfirmation(Mockito.any(Reservation.class));
-
-        logout();
     }
 
     @Test
     @Transactional
     public void createReservation_DurationTooShort_ReturnsBadRequest() throws Exception {
-        login();
-
         Event event = eventService.getEvent(1L);
         event.setDate(LocalDateTime.now().plusDays(20));
         event = eventService.save(event);
@@ -306,15 +284,11 @@ public class ReservationControllerTest {
 
         assertTrue(errorMessages.contains("reservationStartDateTime: " + "Reservation duration must be between " + service.getMinReservationTime() + " and " + service.getMaxReservationTime() + " minutes."));
         Mockito.verify(emailService, Mockito.times(0)).sendReservationConfirmation(Mockito.any(Reservation.class));
-
-        logout();
     }
 
     @Test
     @Transactional
     public void createReservation_DurationTooLong_ReturnsBadRequest() throws Exception {
-        login();
-
         Event event = eventService.getEvent(1L);
         event.setDate(LocalDateTime.now().plusDays(20));
         event = eventService.save(event);
@@ -340,15 +314,11 @@ public class ReservationControllerTest {
 
         assertTrue(errorMessages.contains("reservationStartDateTime: " + "Reservation duration must be between " + service.getMinReservationTime() + " and " + service.getMaxReservationTime() + " minutes."));
         Mockito.verify(emailService, Mockito.times(0)).sendReservationConfirmation(Mockito.any(Reservation.class));
-
-        logout();
     }
 
     @Test
     @Transactional
     public void createReservation_ReservationOverlapsAfter_ReturnsBadRequest() throws Exception {
-        login();
-
         Event event = eventService.getEvent(1L);
         Service service = (Service) solutionService.getSolution(6L);
 
@@ -372,15 +342,11 @@ public class ReservationControllerTest {
 
         assertTrue(errorMessages.contains("reservationStartDateTime: The selected time overlaps with an existing reservation."));
         Mockito.verify(emailService, Mockito.times(0)).sendReservationConfirmation(Mockito.any(Reservation.class));
-
-        logout();
     }
 
     @Test
     @Transactional
     public void createReservation_ReservationOverlapsBefore_ReturnsBadRequest() throws Exception {
-        login();
-
         Event event = eventService.getEvent(1L);
         Service service = (Service) solutionService.getSolution(6L);
 
@@ -404,15 +370,11 @@ public class ReservationControllerTest {
 
         assertTrue(errorMessages.contains("reservationStartDateTime: The selected time overlaps with an existing reservation."));
         Mockito.verify(emailService, Mockito.times(0)).sendReservationConfirmation(Mockito.any(Reservation.class));
-
-        logout();
     }
 
     @Test
     @Transactional
     public void createReservation_ReservationOverlapsBeforeAndAfter_ReturnsBadRequest() throws Exception {
-        login();
-
         Event event = eventService.getEvent(1L);
         Service service = (Service) solutionService.getSolution(6L);
 
@@ -436,15 +398,11 @@ public class ReservationControllerTest {
 
         assertTrue(errorMessages.contains("reservationStartDateTime: The selected time overlaps with an existing reservation."));
         Mockito.verify(emailService, Mockito.times(0)).sendReservationConfirmation(Mockito.any(Reservation.class));
-
-        logout();
     }
 
     @Test
     @Transactional
     public void createReservation_ReservationOverlapsWithDifferentServiceReservations_ReturnsCreatedReservation() throws Exception {
-        login();
-
         Event event = eventService.getEvent(1L);
         event.setDate(LocalDateTime.of(2027, 8, 13, 13, 0));
         eventService.save(event);
@@ -484,15 +442,11 @@ public class ReservationControllerTest {
                 .andExpect(jsonPath("$.selectedServiceId").value(newReservationDTO.getSelectedServiceId().intValue()));
 
         Mockito.verify(emailService, Mockito.times(1)).sendReservationConfirmation(Mockito.any(Reservation.class));
-
-        logout();
     }
 
     @Test
     @Transactional
     public void createReservation_ReservationNotOnEventDate_ReturnsBadRequest() throws Exception {
-        login();
-
         Event event = eventService.getEvent(1L);
         event.setDate(LocalDateTime.now().plusDays(20));
         event = eventService.save(event);
@@ -518,8 +472,6 @@ public class ReservationControllerTest {
 
         assertTrue(errorMessages.contains("reservationStartDateTime: Reservation must be the same day as the event start date."));
         Mockito.verify(emailService, Mockito.times(0)).sendReservationConfirmation(Mockito.any(Reservation.class));
-
-        logout();
     }
 
     private void login() throws Exception {
