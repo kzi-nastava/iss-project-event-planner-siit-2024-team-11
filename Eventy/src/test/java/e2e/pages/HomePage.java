@@ -131,7 +131,7 @@ public class HomePage {
     }
 
     public List<WebElement> getEventCardDescriptions() {
-        return driver.findElements(By.cssSelector(".card_container > .description"));
+        return driver.findElements(By.cssSelector(".card_container > #description"));
     }
 
     public List<WebElement> getEventCardEventTypes() {
