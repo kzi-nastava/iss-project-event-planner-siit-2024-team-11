@@ -37,6 +37,7 @@ VALUES
 -- Event Types
 INSERT INTO event_types(is_active, id, description, name)
 VALUES
+    (TRUE, 0, 'ALL', 'All'),
     (TRUE, DEFAULT, 'You know what we want? A HUGE PARTY!', 'Party'),
     (TRUE, DEFAULT, 'Graduations of all types!', 'Graduation'),
     (FALSE, DEFAULT, 'Only for luxurious event', 'Luxury'),
@@ -52,23 +53,23 @@ INSERT INTO events(
     max_number_participants, privacy, date, event_type_id, id, location_id, organizer_id, description, name
 )
 VALUES
-    (50, 'PUBLIC', '2024-12-25 15:00:00', 1, DEFAULT, 1, 1, 'This is a birthday party for our friend John, I hope he does not know we are organizing this!', 'Birthday Party for John'),
-    (100, 'PUBLIC', '2037-12-26 15:00:00', 2, DEFAULT, 2, 1, 'High school students of prestigious high school "Jonny Smith" are graduating this month!', 'High School Graduation'),
-    (150, 'PUBLIC', '2024-12-27 15:00:00', 1, DEFAULT, 3, 2, 'Lunch in our best office ever! See you there! Big thanks to Eventy for being such a cool platform! #sponsored', 'Office Lunch'),
-    (5, 'PUBLIC', '2025-12-25 15:00:00', 4, DEFAULT, 4, 1, 'D1 aa', 'Event 1'),
-    (10, 'PUBLIC', '2025-12-26 15:00:00', 4, DEFAULT, 5, 1, 'D2 aaa', 'Event 2'),
-    (15, 'PUBLIC', '2025-12-27 15:00:00', 2, DEFAULT, 6, 2, 'D3 bbb', 'Event 3'),
-    (20, 'PUBLIC', '2025-12-26 15:00:00', 4, DEFAULT, 7, 1, 'D4 bbbb', 'Event 4'),
-    (25, 'PUBLIC', '2025-12-26 15:00:00', 5, DEFAULT, 8, 1, 'D5 ccc', 'Event 5'),
-    (30, 'PUBLIC', '2025-12-26 15:00:00', 6, DEFAULT, 9, 1, 'D6 cccc', 'Event 6'),
-    (35, 'PUBLIC', '2025-12-26 15:00:00', 7, DEFAULT, 10, 1, 'D7 ccccc', 'Event 7'),
-    (40, 'PUBLIC', '2025-12-26 15:00:00', 8, DEFAULT, 11, 1, 'D8 cccccc', 'Event 8');
+    (50, 'PUBLIC', '2024-12-25 15:00:00', 2, DEFAULT, 1, 1, 'This is a birthday party for our friend John, I hope he does not know we are organizing this!', 'Birthday Party for John'),
+    (100, 'PUBLIC', '2037-12-26 15:00:00', 3, DEFAULT, 2, 1, 'High school students of prestigious high school "Jonny Smith" are graduating this month!', 'High School Graduation'),
+    (150, 'PUBLIC', '2024-12-27 15:00:00', 2, DEFAULT, 3, 2, 'Lunch in our best office ever! See you there! Big thanks to Eventy for being such a cool platform! #sponsored', 'Office Lunch'),
+    (5, 'PUBLIC', '2025-12-25 15:00:00', 5, DEFAULT, 4, 1, 'D1 aa', 'Event 1'),
+    (10, 'PUBLIC', '2025-12-26 15:00:00', 5, DEFAULT, 5, 1, 'D2 aaa', 'Event 2'),
+    (15, 'PUBLIC', '2025-12-27 15:00:00', 3, DEFAULT, 6, 2, 'D3 bbb', 'Event 3'),
+    (20, 'PUBLIC', '2025-12-26 15:00:00', 5, DEFAULT, 7, 1, 'D4 bbbb', 'Event 4'),
+    (25, 'PUBLIC', '2025-12-26 15:00:00', 6, DEFAULT, 8, 1, 'D5 ccc', 'Event 5'),
+    (30, 'PUBLIC', '2025-12-26 15:00:00', 7, DEFAULT, 9, 1, 'D6 cccc', 'Event 6'),
+    (35, 'PUBLIC', '2025-12-26 15:00:00', 8, DEFAULT, 10, 1, 'D7 ccccc', 'Event 7'),
+    (40, 'PUBLIC', '2025-12-26 15:00:00', 9, DEFAULT, 11, 1, 'D8 cccccc', 'Event 8');
 
 -- Accepted Events
 INSERT INTO users_attending_events (event_id, user_id) VALUES
-(1, 2),
-(2, 2),
-(1, 7);
+                                                           (1, 2),
+                                                           (2, 2),
+                                                           (1, 7);
 
 -- Categories
 INSERT INTO categories (id, name, description, status, is_deleted)
@@ -154,24 +155,24 @@ VALUES (1, 4), -- Dumbbell suggested for Workout
 -- Notifications
 INSERT INTO notifications (id, type, redirection_id, title, message, grader_id, grade, timestamp)
 VALUES
-       -- 1
-       (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2023-11-01 00:00:00'),
-       (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2023-11-01 00:00:00'),
-       (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2022-11-01 00:00:00'),
-       (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2022-11-01 00:00:00'),
-       (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2022-11-01 00:00:00'),
-       (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2022-11-01 00:00:00'),
-       (DEFAULT, 'RATING_EVENT', 201, 'New Event Rating', 'Your event "Charity Run" received a new rating.', 3, 5, '2022-11-03 00:00:00');
+    -- 1
+    (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2023-11-01 00:00:00'),
+    (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2023-11-01 00:00:00'),
+    (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2022-11-01 00:00:00'),
+    (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2022-11-01 00:00:00'),
+    (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2022-11-01 00:00:00'),
+    (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2022-11-01 00:00:00'),
+    (DEFAULT, 'RATING_EVENT', 201, 'New Event Rating', 'Your event "Charity Run" received a new rating.', 3, 5, '2022-11-03 00:00:00');
 
 -- Assign Notifications to Users
 INSERT INTO user_notifications (user_id, notification_id) VALUES
-    (1, 1),
-    (1, 2),
-    (1, 3),
-    (1, 4),
-    (1, 5),
-    (1, 6),
-    (1, 7);
+                                                              (1, 1),
+                                                              (1, 2),
+                                                              (1, 3),
+                                                              (1, 4),
+                                                              (1, 5),
+                                                              (1, 6),
+                                                              (1, 7);
 
 -- Reviews
 INSERT INTO reviews (user_id, event_id, solution_id, comment, grade, status, is_deleted)

@@ -10,7 +10,7 @@ INSERT INTO users (
     id, user_type, email, password, address, phone_number, is_active, is_deactivated, enabled, has_silenced_notifications, suspension_deadline, role_id, last_password_reset_date, last_read_notifications, description, first_name, last_name, name
 )
 VALUES
-    (DEFAULT, 'Organizer', 'tac@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 3, '2000-01-01 00:00:00', '2023-10-30 00:00:00', NULL, 'Tac Tac', 'Jezickovic', NULL),
+    (DEFAULT, 'Organizer', 'tac@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 3,'2000-01-01 00:00:00', '2023-10-30 00:00:00', NULL, 'Tac Tac', 'Jezickovic', NULL),
     (DEFAULT, 'Organizer', 'ves@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3815361', TRUE, FALSE, TRUE, FALSE, NULL, 3, '2000-01-01 00:00:00', '2024-10-30 00:00:00', NULL, 'Ves Ves', 'Jezickovic', NULL),
     (DEFAULT, 'Provider', 'provider@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, '2000-01-01 00:00:00', '2000-01-01 00:00:00', 'Description', NULL, NULL, 'VIT DOO'),
     (DEFAULT, 'Provider', 'provider2@gmail.com', '$2a$10$reTt1CDO6L.cknTdczA.c.N/Xjqbt21RiqbYgqobmGSdE1t7cmPVe', '123 Main St, City, Country', '+3816543', TRUE, FALSE, TRUE, FALSE, NULL, 4, '2000-01-01 00:00:00', '2000-01-01 00:00:00', 'Description', NULL, NULL, 'Lidl'),
@@ -25,10 +25,14 @@ VALUES
     (34.0522, -118.2437, DEFAULT, '456 Sunset Blvd, Los Angeles, CA 90001', 'Los Angeles Office'),
     (51.5074, -0.1278, DEFAULT, '789 Oxford St, London, W1D 2ES', 'London Office'),
     (34.0522, -118.2437, DEFAULT, 'Belgrade 32b', 'Belgrade'),
+    (34.0522, -118.2437, DEFAULT, 'Belgrade bb', 'Belgrade'),
+    (34.0522, -118.2437, DEFAULT, 'Belgrade 3b', 'Belgrade'),
     (34.0522, -118.2437, DEFAULT, 'Novi Sad 38b', 'Novi Sad'),
     (34.0522, -118.2437, DEFAULT, 'Nis 21b', 'Nis'),
     (34.0522, -118.2437, DEFAULT, 'Banja Luka 53b', 'Banja Luka'),
-    (34.0522, -118.2437, DEFAULT, 'Gradiska 12a', 'Gradiska');
+    (34.0522, -118.2437, DEFAULT, 'Gradiska 12a', 'Gradiska'),
+    (34.0522, -118.2437, DEFAULT, 'Gradiska 22a', 'Gradiska'),
+    (34.0522, -118.2437, DEFAULT, 'Gradiska 32a', 'Gradiska');
 
 -- Event Types
 INSERT INTO event_types(is_active, id, description, name)
@@ -38,27 +42,34 @@ VALUES
     (TRUE, DEFAULT, 'Graduations of all types!', 'Graduation'),
     (FALSE, DEFAULT, 'Only for luxurious event', 'Luxury'),
     (TRUE, DEFAULT, 'P U M P A J', 'Workout'),
-    (TRUE, DEFAULT, 'All tech events, let`s rock TOGETHER!!', 'Tech');
+    (TRUE, DEFAULT, 'All tech events, let`s rock TOGETHER!!', 'Tech'),
+    (TRUE, DEFAULT, 'Donate donate!', 'Donation'),
+    (TRUE, DEFAULT, 'EventType7!', 'EventType7'),
+    (TRUE, DEFAULT, 'EventType8!', 'EventType8'),
+    (TRUE, DEFAULT, 'EventType9!', 'EventType9');
 
 -- Events
 INSERT INTO events(
     max_number_participants, privacy, date, event_type_id, id, location_id, organizer_id, description, name
 )
 VALUES
-    (50, 'PUBLIC', '2024-12-25 15:00:00', 1, DEFAULT, 1, 1, 'This is a birthday party for our friend John, I hope he does not know we are organizing this!', 'Birthday Party for John'),
-    (100, 'PUBLIC', '2024-12-26 15:00:00', 2, DEFAULT, 2, 1, 'High school students of prestigious high school "Jonny Smith" are graduating this month!', 'High School Graduation'),
-    (150, 'PUBLIC', '2024-12-27 15:00:00', 1, DEFAULT, 3, 2, 'Lunch in our best office ever! See you there! Big thanks to Eventy for being such a cool platform! #sponsored', 'Office Lunch'),
-    (5, 'PUBLIC', '2025-12-25 15:00:00', 4, DEFAULT, 4, 1, 'D1', 'Event 1'),
-    (10, 'PUBLIC', '2025-12-26 15:00:00', 4, DEFAULT, 5, 1, 'D2', 'Event 2'),
-    (15, 'PUBLIC', '2025-12-27 15:00:00', 2, DEFAULT, 6, 2, 'D3', 'Event 3'),
-    (20, 'PUBLIC', '2025-12-26 15:00:00', 4, DEFAULT, 7, 1, 'D4', 'Event 4'),
-    (25, 'PUBLIC', '2025-12-26 15:00:00', 5, DEFAULT, 8, 1, 'D5', 'Event 5');
+    (50, 'PUBLIC', '2024-12-25 15:00:00', 2, DEFAULT, 1, 1, 'This is a birthday party for our friend John, I hope he does not know we are organizing this!', 'Birthday Party for John'),
+    (100, 'PUBLIC', '2037-12-26 15:00:00', 3, DEFAULT, 2, 1, 'High school students of prestigious high school "Jonny Smith" are graduating this month!', 'High School Graduation'),
+    (150, 'PUBLIC', '2024-12-27 15:00:00', 2, DEFAULT, 3, 2, 'Lunch in our best office ever! See you there! Big thanks to Eventy for being such a cool platform! #sponsored', 'Office Lunch'),
+    (5, 'PUBLIC', '2025-12-25 15:00:00', 5, DEFAULT, 4, 1, 'D1 aa', 'Event 1'),
+    (10, 'PUBLIC', '2025-12-26 15:00:00', 5, DEFAULT, 5, 1, 'D2 aaa', 'Event 2'),
+    (15, 'PUBLIC', '2025-12-27 15:00:00', 3, DEFAULT, 6, 2, 'D3 bbb', 'Event 3'),
+    (20, 'PUBLIC', '2025-12-26 15:00:00', 5, DEFAULT, 7, 1, 'D4 bbbb', 'Event 4'),
+    (25, 'PUBLIC', '2025-12-26 15:00:00', 6, DEFAULT, 8, 1, 'D5 ccc', 'Event 5'),
+    (30, 'PUBLIC', '2025-12-26 15:00:00', 7, DEFAULT, 9, 1, 'D6 cccc', 'Event 6'),
+    (35, 'PUBLIC', '2025-12-26 15:00:00', 8, DEFAULT, 10, 1, 'D7 ccccc', 'Event 7'),
+    (40, 'PUBLIC', '2025-12-26 15:00:00', 9, DEFAULT, 11, 1, 'D8 cccccc', 'Event 8');
 
 -- Accepted Events
 INSERT INTO users_attending_events (event_id, user_id) VALUES
-(1, 2),
-(2, 2),
-(1, 7);
+                                                           (1, 2),
+                                                           (2, 2),
+                                                           (1, 7);
 
 -- Categories
 INSERT INTO categories (id, name, description, status, is_deleted)
@@ -144,24 +155,24 @@ VALUES (1, 4), -- Dumbbell suggested for Workout
 -- Notifications
 INSERT INTO notifications (id, type, redirection_id, title, message, grader_id, grade, timestamp)
 VALUES
-       -- 1
-       (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2023-11-01 00:00:00'),
-       (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2023-11-01 00:00:00'),
-       (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2022-11-01 00:00:00'),
-       (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2022-11-01 00:00:00'),
-       (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2022-11-01 00:00:00'),
-       (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2022-11-01 00:00:00'),
-       (DEFAULT, 'RATING_EVENT', 201, 'New Event Rating', 'Your event "Charity Run" received a new rating.', 3, 5, '2022-11-03 00:00:00');
+    -- 1
+    (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2023-11-01 00:00:00'),
+    (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2023-11-01 00:00:00'),
+    (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2022-11-01 00:00:00'),
+    (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2022-11-01 00:00:00'),
+    (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2022-11-01 00:00:00'),
+    (DEFAULT, 'EVENT_CHANGE', 101, 'Event Updated', 'The event "Music Fest" has been updated.', 1, NULL, '2022-11-01 00:00:00'),
+    (DEFAULT, 'RATING_EVENT', 201, 'New Event Rating', 'Your event "Charity Run" received a new rating.', 3, 5, '2022-11-03 00:00:00');
 
 -- Assign Notifications to Users
 INSERT INTO user_notifications (user_id, notification_id) VALUES
-    (1, 1),
-    (1, 2),
-    (1, 3),
-    (1, 4),
-    (1, 5),
-    (1, 6),
-    (1, 7);
+                                                              (1, 1),
+                                                              (1, 2),
+                                                              (1, 3),
+                                                              (1, 4),
+                                                              (1, 5),
+                                                              (1, 6),
+                                                              (1, 7);
 
 -- Reviews
 INSERT INTO reviews (user_id, event_id, solution_id, comment, grade, status, is_deleted)
@@ -186,7 +197,10 @@ VALUES
     (DEFAULT, 5),
     (DEFAULT, 6),
     (DEFAULT, 7),
-    (DEFAULT, 8);
+    (DEFAULT, 8),
+    (DEFAULT, 9),
+    (DEFAULT, 10),
+    (DEFAULT, 11);
 
 UPDATE budget_items SET budget_item_id = 1 WHERE id IN (1, 2);
 UPDATE budget_items SET budget_item_id = 2 WHERE id = 3;
