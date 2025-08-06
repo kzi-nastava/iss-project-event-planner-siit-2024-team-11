@@ -18,8 +18,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(classes = EventyApplication.class)
 @ActiveProfiles("test") // if you use application-test.properties
@@ -58,8 +60,6 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         slowDown();
 
         ArrayList<String> eventTypeNames = new ArrayList<>();
-        eventTypeNames.add("Workout");
-        eventTypeNames.add("Party");
         eventTypeNames.add("EventType7");
         eventTypeNames.add("EventType8");
         home.selectEventTypes(eventTypeNames);
@@ -68,20 +68,22 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         slowDown();
 
         List<WebElement> eventCards = home.getFilteredEvents();
-        assertEquals(eventCards.size(), 5);
+        assertEquals(eventCards.size(), 2);
 
-        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 5 of 5");
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 2 of 2");
 
         List<String> originalEventCardTitles = new ArrayList<>();
-        originalEventCardTitles.add("Event 1");
-        originalEventCardTitles.add("Event 2");
-        originalEventCardTitles.add("Event 4");
+        originalEventCardTitles.add("Event 6");
         originalEventCardTitles.add("Event 7");
-        originalEventCardTitles.add("Event 8");
 
         List<WebElement> eventCardTitles = home.getFilteredEventTitles();
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+
+        List<WebElement> eventCardEventTypes = home.getEventCardEventTypes();
+        for (int i = 0; i < eventCardEventTypes.size(); i++) {
+            assertTrue(eventCardEventTypes.get(i).getText().equals("EventType7") || (eventCardEventTypes.get(i).getText().equals("EventType8")));
         }
     }
 
@@ -112,6 +114,11 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         List<WebElement> eventCardTitles = home.getFilteredEventTitles();
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+
+        List<WebElement> eventCardMaxParticipants = home.getEventCardMaxParticipants();
+        for (int i = 0; i < eventCardMaxParticipants.size(); i++) {
+            assertTrue(Integer.parseInt(eventCardMaxParticipants.get(i).getText()) <= 30);
         }
     }
 
@@ -156,7 +163,7 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         slowDown();
 
         ArrayList<String> eventTypeNames = new ArrayList<>();
-        eventTypeNames.add("Workout");
+        eventTypeNames.add("Tech");
         home.selectEventTypes(eventTypeNames);
 
         home.enterMaxParticipants("20");
@@ -178,6 +185,16 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
         }
+
+        List<WebElement> eventCardEventTypes = home.getEventCardEventTypes();
+        for (int i = 0; i < eventCardEventTypes.size(); i++) {
+            assertEquals("Tech", eventCardEventTypes.get(i).getText());
+        }
+
+        List<WebElement> eventCardMaxParticipants = home.getEventCardMaxParticipants();
+        for (int i = 0; i < eventCardMaxParticipants.size(); i++) {
+            assertTrue(Integer.parseInt(eventCardMaxParticipants.get(i).getText()) <= 20);
+        }
     }
 
     @Test
@@ -187,7 +204,7 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         slowDown();
 
         ArrayList<String> eventTypeNames = new ArrayList<>();
-        eventTypeNames.add("Workout");
+        eventTypeNames.add("Tech");
         home.selectEventTypes(eventTypeNames);
 
         home.enterMaxParticipants("1");
@@ -226,6 +243,11 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
         }
+
+        List<WebElement> eventLocations = home.getEventCardLocations();
+        for (int i = 0; i < eventLocations.size(); i++) {
+            assertEquals(eventLocations.get(i).getText().toLowerCase(), "belgrade");
+        }
     }
 
     @Test
@@ -253,6 +275,11 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
         }
+
+        List<WebElement> eventLocations = home.getEventCardLocations();
+        for (int i = 0; i < eventLocations.size(); i++) {
+            assertEquals(eventLocations.get(i).getText().toLowerCase(), "belgrade");
+        }
     }
 
     @Test
@@ -279,7 +306,7 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         slowDown();
 
         ArrayList<String> eventTypeNames = new ArrayList<>();
-        eventTypeNames.add("Workout");
+        eventTypeNames.add("Tech");
         home.selectEventTypes(eventTypeNames);
 
         home.enterLocation("belgrade");
@@ -299,6 +326,16 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         List<WebElement> eventCardTitles = home.getFilteredEventTitles();
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+
+        List<WebElement> eventLocations = home.getEventCardLocations();
+        for (int i = 0; i < eventLocations.size(); i++) {
+            assertEquals(eventLocations.get(i).getText().toLowerCase(), "belgrade");
+        }
+
+        List<WebElement> eventCardEventTypes = home.getEventCardEventTypes();
+        for (int i = 0; i < eventCardEventTypes.size(); i++) {
+            assertEquals("Tech", eventCardEventTypes.get(i).getText());
         }
     }
 
@@ -326,6 +363,16 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         List<WebElement> eventCardTitles = home.getFilteredEventTitles();
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+
+        List<WebElement> eventLocations = home.getEventCardLocations();
+        for (int i = 0; i < eventLocations.size(); i++) {
+            assertEquals(eventLocations.get(i).getText().toLowerCase(), "gradiska");
+        }
+
+        List<WebElement> eventCardMaxParticipants = home.getEventCardMaxParticipants();
+        for (int i = 0; i < eventCardMaxParticipants.size(); i++) {
+            assertTrue(Integer.parseInt(eventCardMaxParticipants.get(i).getText()) <= 35);
         }
     }
 
@@ -356,6 +403,11 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
         }
+
+        List<WebElement> eventLocations = home.getEventCardLocations();
+        for (int i = 0; i < eventLocations.size(); i++) {
+            assertEquals(eventLocations.get(i).getText().toLowerCase(), "belgrade");
+        }
     }
 
     @Test
@@ -366,7 +418,7 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
 
         ArrayList<String> eventTypeNames = new ArrayList<>();
         eventTypeNames.add("Graduation");
-        eventTypeNames.add("Workout");
+        eventTypeNames.add("Tech");
         home.selectEventTypes(eventTypeNames);
 
         home.enterMaxParticipants("15");
@@ -377,18 +429,32 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         slowDown();
 
         List<WebElement> eventCards = home.getFilteredEvents();
-        assertEquals(eventCards.size(), 3);
+        assertEquals(eventCards.size(), 2);
 
-        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 3 of 3");
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 2 of 2");
 
         List<String> originalEventCardTitles = new ArrayList<>();
         originalEventCardTitles.add("Event 1");
         originalEventCardTitles.add("Event 2");
-        originalEventCardTitles.add("Event 3");
 
         List<WebElement> eventCardTitles = home.getFilteredEventTitles();
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+
+        List<WebElement> eventLocations = home.getEventCardLocations();
+        for (int i = 0; i < eventLocations.size(); i++) {
+            assertEquals(eventLocations.get(i).getText().toLowerCase(), "belgrade");
+        }
+
+        List<WebElement> eventCardEventTypes = home.getEventCardEventTypes();
+        for (int i = 0; i < eventCardEventTypes.size(); i++) {
+            assertTrue(eventCardEventTypes.get(i).getText().equals("Tech") || (eventCardTitles.get(i).getText().equals("Graduation")));
+        }
+
+        List<WebElement> eventCardMaxParticipants = home.getEventCardMaxParticipants();
+        for (int i = 0; i < eventCardMaxParticipants.size(); i++) {
+            assertTrue(Integer.parseInt(eventCardMaxParticipants.get(i).getText()) <= 15);
         }
     }
 
@@ -413,6 +479,13 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         assertEquals(eventCards.size(), 5);
 
         assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 5 of 8");
+
+        List<WebElement> eventDates = home.getEventCardDates();
+        for (int i = 0; i < eventDates.size(); i++) {
+            DateTimeFormatter formatterDate = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
+            LocalDateTime eventDate = LocalDateTime.parse(eventDates.get(i).getText(), formatterDate.withLocale(Locale.ENGLISH)).withHour(0).withMinute(0);
+            assertTrue((dateTimeStart.isBefore(eventDate) && dateTimeEnd.isAfter(eventDate)) || (dateTimeStart.isEqual(eventDate) || (dateTimeEnd.isEqual(eventDate))));
+        }
     }
 
     @Test
@@ -448,6 +521,13 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
         }
+
+        List<WebElement> eventDates = home.getEventCardDates();
+        for (int i = 0; i < eventDates.size(); i++) {
+            DateTimeFormatter formatterDate = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
+            LocalDateTime eventDate = LocalDateTime.parse(eventDates.get(i).getText(), formatterDate.withLocale(Locale.ENGLISH)).withHour(0).withMinute(0);
+            assertTrue((dateTimeStart.isBefore(eventDate)) || (dateTimeStart.isEqual(eventDate)));
+        }
     }
 
     @Test
@@ -468,11 +548,6 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
 
         home.clickFilterButton();
         slowDown();
-        slowDown();
-        slowDown();
-        slowDown();
-        slowDown();
-        slowDown();
 
         List<WebElement> eventCards = home.getFilteredEvents();
         assertEquals(eventCards.size(), 2);
@@ -486,6 +561,13 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         List<WebElement> eventCardTitles = home.getFilteredEventTitles();
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+
+        List<WebElement> eventDates = home.getEventCardDates();
+        for (int i = 0; i < eventDates.size(); i++) {
+            DateTimeFormatter formatterDate = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
+            LocalDateTime eventDate = LocalDateTime.parse(eventDates.get(i).getText(), formatterDate.withLocale(Locale.ENGLISH)).withHour(0).withMinute(0);
+            assertTrue((dateTimeEnd.isAfter(eventDate)) || (dateTimeEnd.isEqual(eventDate)));
         }
     }
 
@@ -512,17 +594,30 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         slowDown();
 
         List<WebElement> eventCards = home.getFilteredEvents();
-        assertEquals(eventCards.size(), 2);
+        assertEquals(eventCards.size(), 3);
 
-        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 2 of 2");
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 3 of 3");
 
         List<String> originalEventCardTitles = new ArrayList<>();
-        originalEventCardTitles.add("Event 3");
-        originalEventCardTitles.add("Event 5");
+        originalEventCardTitles.add("Event 1");
+        originalEventCardTitles.add("Event 2");
+        originalEventCardTitles.add("Event 4");
 
         List<WebElement> eventCardTitles = home.getFilteredEventTitles();
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+
+        List<WebElement> eventDates = home.getEventCardDates();
+        for (int i = 0; i < eventDates.size(); i++) {
+            DateTimeFormatter formatterDate = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
+            LocalDateTime eventDate = LocalDateTime.parse(eventDates.get(i).getText(), formatterDate.withLocale(Locale.ENGLISH)).withHour(0).withMinute(0);
+            assertTrue((dateTimeStart.isBefore(eventDate) && dateTimeEnd.isAfter(eventDate)) || (dateTimeStart.isEqual(eventDate) || (dateTimeEnd.isEqual(eventDate))));
+        }
+
+        List<WebElement> eventCardEventTypes = home.getEventCardEventTypes();
+        for (int i = 0; i < eventCardEventTypes.size(); i++) {
+            assertTrue(eventCardEventTypes.get(i).getText().equals("Tech") || (eventCardEventTypes.get(i).getText().equals("Graduation")));
         }
     }
 
@@ -585,6 +680,18 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
         }
+
+        List<WebElement> eventDates = home.getEventCardDates();
+        for (int i = 0; i < eventDates.size(); i++) {
+            DateTimeFormatter formatterDate = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
+            LocalDateTime eventDate = LocalDateTime.parse(eventDates.get(i).getText(), formatterDate.withLocale(Locale.ENGLISH)).withHour(0).withMinute(0);
+            assertTrue((dateTimeStart.isBefore(eventDate) && dateTimeEnd.isAfter(eventDate)) || (dateTimeStart.isEqual(eventDate) || (dateTimeEnd.isEqual(eventDate))));
+        }
+
+        List<WebElement> eventCardMaxParticipants = home.getEventCardMaxParticipants();
+        for (int i = 0; i < eventCardMaxParticipants.size(); i++) {
+            assertTrue(Integer.parseInt(eventCardMaxParticipants.get(i).getText()) <= 5);
+        }
     }
 
     @Test
@@ -644,6 +751,18 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
         }
+
+        List<WebElement> eventDates = home.getEventCardDates();
+        for (int i = 0; i < eventDates.size(); i++) {
+            DateTimeFormatter formatterDate = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
+            LocalDateTime eventDate = LocalDateTime.parse(eventDates.get(i).getText(), formatterDate.withLocale(Locale.ENGLISH)).withHour(0).withMinute(0);
+            assertTrue((dateTimeStart.isBefore(eventDate) && dateTimeEnd.isAfter(eventDate)) || (dateTimeStart.isEqual(eventDate) || (dateTimeEnd.isEqual(eventDate))));
+        }
+
+        List<WebElement> eventLocations = home.getEventCardLocations();
+        for (int i = 0; i < eventLocations.size(); i++) {
+            assertEquals(eventLocations.get(i).getText().toLowerCase(), "gradiska");
+        }
     }
 
     @Test
@@ -696,16 +815,35 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         slowDown();
 
         List<WebElement> eventCards = home.getFilteredEvents();
-        assertEquals(eventCards.size(), 1);
+        assertEquals(eventCards.size(), 3);
 
-        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 1 of 1");
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 3 of 3");
 
         List<String> originalEventCardTitles = new ArrayList<>();
-        originalEventCardTitles.add("Event 3");
+        originalEventCardTitles.add("Event 1");
+        originalEventCardTitles.add("Event 2");
+        originalEventCardTitles.add("Event 4");
 
         List<WebElement> eventCardTitles = home.getFilteredEventTitles();
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+
+        List<WebElement> eventDates = home.getEventCardDates();
+        for (int i = 0; i < eventDates.size(); i++) {
+            DateTimeFormatter formatterDate = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
+            LocalDateTime eventDate = LocalDateTime.parse(eventDates.get(i).getText(), formatterDate.withLocale(Locale.ENGLISH)).withHour(0).withMinute(0);
+            assertTrue((dateTimeStart.isBefore(eventDate) && dateTimeEnd.isAfter(eventDate)) || (dateTimeStart.isEqual(eventDate) || (dateTimeEnd.isEqual(eventDate))));
+        }
+
+        List<WebElement> eventCardEventTypes = home.getEventCardEventTypes();
+        for (int i = 0; i < eventCardEventTypes.size(); i++) {
+            assertTrue(eventCardEventTypes.get(i).getText().equals("Tech") || (eventCardEventTypes.get(i).getText().equals("Graduation")));
+        }
+
+        List<WebElement> eventCardMaxParticipants = home.getEventCardMaxParticipants();
+        for (int i = 0; i < eventCardMaxParticipants.size(); i++) {
+            assertTrue(Integer.parseInt(eventCardMaxParticipants.get(i).getText()) <= 20);
         }
     }
 
@@ -747,7 +885,7 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
 
         ArrayList<String> eventTypeNames = new ArrayList<>();
         eventTypeNames.add("Tech");
-        eventTypeNames.add("Graduation");
+        eventTypeNames.add("Donation");
         home.selectEventTypes(eventTypeNames);
 
         home.enterLocation("nis");
@@ -775,6 +913,23 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
         }
+
+        List<WebElement> eventDates = home.getEventCardDates();
+        for (int i = 0; i < eventDates.size(); i++) {
+            DateTimeFormatter formatterDate = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
+            LocalDateTime eventDate = LocalDateTime.parse(eventDates.get(i).getText(), formatterDate.withLocale(Locale.ENGLISH)).withHour(0).withMinute(0);
+            assertTrue((dateTimeStart.isBefore(eventDate) && dateTimeEnd.isAfter(eventDate)) || (dateTimeStart.isEqual(eventDate) || (dateTimeEnd.isEqual(eventDate))));
+        }
+
+        List<WebElement> eventCardEventTypes = home.getEventCardEventTypes();
+        for (int i = 0; i < eventCardEventTypes.size(); i++) {
+            assertTrue(eventCardEventTypes.get(i).getText().equals("Tech") || (eventCardEventTypes.get(i).getText().equals("Donation")));
+        }
+
+        List<WebElement> eventLocations = home.getEventCardLocations();
+        for (int i = 0; i < eventLocations.size(); i++) {
+            assertEquals(eventLocations.get(i).getText().toLowerCase(), "nis");
+        }
     }
 
     @Test
@@ -785,7 +940,7 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
 
         ArrayList<String> eventTypeNames = new ArrayList<>();
         eventTypeNames.add("Tech");
-        eventTypeNames.add("Graduation");
+        eventTypeNames.add("Donation");
         home.selectEventTypes(eventTypeNames);
 
         home.enterLocation("nis");
@@ -839,6 +994,23 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         List<WebElement> eventCardTitles = home.getFilteredEventTitles();
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+
+        List<WebElement> eventDates = home.getEventCardDates();
+        for (int i = 0; i < eventDates.size(); i++) {
+            DateTimeFormatter formatterDate = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
+            LocalDateTime eventDate = LocalDateTime.parse(eventDates.get(i).getText(), formatterDate.withLocale(Locale.ENGLISH)).withHour(0).withMinute(0);
+            assertTrue((dateTimeStart.isBefore(eventDate) && dateTimeEnd.isAfter(eventDate)) || (dateTimeStart.isEqual(eventDate) || (dateTimeEnd.isEqual(eventDate))));
+        }
+
+        List<WebElement> eventLocations = home.getEventCardLocations();
+        for (int i = 0; i < eventLocations.size(); i++) {
+            assertEquals(eventLocations.get(i).getText().toLowerCase(), "gradiska");
+        }
+
+        List<WebElement> eventCardMaxParticipants = home.getEventCardMaxParticipants();
+        for (int i = 0; i < eventCardMaxParticipants.size(); i++) {
+            assertTrue(Integer.parseInt(eventCardMaxParticipants.get(i).getText()) <= 35);
         }
     }
 
@@ -895,17 +1067,40 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         slowDown();
 
         List<WebElement> eventCards = home.getFilteredEvents();
-        assertEquals(eventCards.size(), 2);
+        assertEquals(eventCards.size(), 3);
 
-        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 2 of 2");
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 3 of 3");
 
         List<String> originalEventCardTitles = new ArrayList<>();
         originalEventCardTitles.add("Event 1");
         originalEventCardTitles.add("Event 2");
+        originalEventCardTitles.add("Event 3");
 
         List<WebElement> eventCardTitles = home.getFilteredEventTitles();
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+
+        List<WebElement> eventDates = home.getEventCardDates();
+        for (int i = 0; i < eventDates.size(); i++) {
+            DateTimeFormatter formatterDate = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
+            LocalDateTime eventDate = LocalDateTime.parse(eventDates.get(i).getText(), formatterDate.withLocale(Locale.ENGLISH)).withHour(0).withMinute(0);
+            assertTrue((dateTimeStart.isBefore(eventDate) && dateTimeEnd.isAfter(eventDate)) || (dateTimeStart.isEqual(eventDate) || (dateTimeEnd.isEqual(eventDate))));
+        }
+
+        List<WebElement> eventCardEventTypes = home.getEventCardEventTypes();
+        for (int i = 0; i < eventCardEventTypes.size(); i++) {
+            assertTrue(eventCardEventTypes.get(i).getText().equals("Workout"));
+        }
+
+        List<WebElement> eventLocations = home.getEventCardLocations();
+        for (int i = 0; i < eventLocations.size(); i++) {
+            assertEquals(eventLocations.get(i).getText().toLowerCase(), "belgrade");
+        }
+
+        List<WebElement> eventCardMaxParticipants = home.getEventCardMaxParticipants();
+        for (int i = 0; i < eventCardMaxParticipants.size(); i++) {
+            assertTrue(Integer.parseInt(eventCardMaxParticipants.get(i).getText()) <= 15);
         }
     }
 
@@ -1008,6 +1203,11 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         assertEquals(eventCards.size(), 5);
 
         assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 5 of 8");
+
+        List<WebElement> eventCardTitles = home.getFilteredEventTitles();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertTrue(eventCardTitles.get(i).getText().toLowerCase().startsWith("event"));
+        }
     }
 
     @Test
@@ -1050,6 +1250,11 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
         }
+
+        List<WebElement> eventCardDescriptions = home.getEventCardDescriptions();
+        for (int i = 0; i < eventCardDescriptions.size(); i++) {
+            assertTrue(eventCardDescriptions.get(i).getText().toLowerCase().startsWith("d1"));
+        }
     }
 
     @Test
@@ -1074,6 +1279,11 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         List<WebElement> eventCardTitles = home.getFilteredEventTitles();
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+
+        List<WebElement> eventCardDescriptions = home.getEventCardDescriptions();
+        for (int i = 0; i < eventCardDescriptions.size(); i++) {
+            assertTrue(eventCardDescriptions.get(i).getText().toLowerCase().startsWith("d1"));
         }
     }
 
@@ -1100,6 +1310,11 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
         }
+
+        List<WebElement> eventCardDescriptions = home.getEventCardDescriptions();
+        for (int i = 0; i < eventCardDescriptions.size(); i++) {
+            assertTrue(eventCardDescriptions.get(i).getText().toLowerCase().contains("jonny"));
+        }
     }
 
     @Test
@@ -1124,6 +1339,11 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         List<WebElement> eventCardTitles = home.getFilteredEventTitles();
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+
+        List<WebElement> eventCardDescriptions = home.getEventCardDescriptions();
+        for (int i = 0; i < eventCardDescriptions.size(); i++) {
+            assertTrue(eventCardDescriptions.get(i).getText().toLowerCase().contains("duating"));
         }
     }
 
@@ -1193,6 +1413,11 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         assertEquals(eventCards.size(), 5);
 
         assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 5 of 9");
+
+        List<WebElement> eventCardDescriptions = home.getEventCardDescriptions();
+        for (int i = 0; i < eventCardDescriptions.size(); i++) {
+            assertTrue(eventCardDescriptions.get(i).getText().toLowerCase().contains("d"));
+        }
     }
 
     @Test
@@ -1239,6 +1464,15 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
         }
+        List<WebElement> eventCardDescriptions = home.getEventCardDescriptions();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertTrue((eventCardTitles.get(i).getText().toLowerCase().startsWith("ccc")) || eventCardDescriptions.get(i).getText().toLowerCase().contains("ccc"));
+        }
+
+        List<WebElement> eventCardMaxParticipants = home.getEventCardMaxParticipants();
+        for (int i = 0; i < eventCardMaxParticipants.size(); i++) {
+            assertTrue(Integer.parseInt(eventCardMaxParticipants.get(i).getText()) <= 35);
+        }
     }
 
     @Test
@@ -1265,6 +1499,16 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         List<WebElement> eventCardTitles = home.getFilteredEventTitles();
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+
+        List<WebElement> eventCardDescriptions = home.getEventCardDescriptions();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertTrue((eventCardTitles.get(i).getText().toLowerCase().startsWith("ccc")) || eventCardDescriptions.get(i).getText().toLowerCase().contains("ccc"));
+        }
+
+        List<WebElement> eventLocations = home.getEventCardLocations();
+        for (int i = 0; i < eventLocations.size(); i++) {
+            assertEquals(eventLocations.get(i).getText().toLowerCase(), "banja luka");
         }
     }
 
@@ -1302,17 +1546,33 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         slowDown();
 
         List<WebElement> eventCards = home.getFilteredEvents();
-        assertEquals(eventCards.size(), 2);
+        assertEquals(eventCards.size(), 1);
 
-        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 2 of 2");
+        assertEquals(driver.findElement(By.cssSelector(".mat-mdc-paginator-range-label")).getText().strip(), "1 – 1 of 1");
 
         List<String> originalEventCardTitles = new ArrayList<>();
         originalEventCardTitles.add("Event 5");
-        originalEventCardTitles.add("Event 6");
 
         List<WebElement> eventCardTitles = home.getFilteredEventTitles();
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+
+        List<WebElement> eventCardDescriptions = home.getEventCardDescriptions();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertTrue((eventCardTitles.get(i).getText().toLowerCase().startsWith("ccc")) || eventCardDescriptions.get(i).getText().toLowerCase().contains("ccc"));
+        }
+
+        List<WebElement> eventDates = home.getEventCardDates();
+        for (int i = 0; i < eventDates.size(); i++) {
+            DateTimeFormatter formatterDate = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
+            LocalDateTime eventDate = LocalDateTime.parse(eventDates.get(i).getText(), formatterDate.withLocale(Locale.ENGLISH)).withHour(0).withMinute(0);
+            assertTrue((dateTimeStart.isBefore(eventDate) && dateTimeEnd.isAfter(eventDate)) || (dateTimeStart.isEqual(eventDate) || (dateTimeEnd.isEqual(eventDate))));
+        }
+
+        List<WebElement> eventCardEventTypes = home.getEventCardEventTypes();
+        for (int i = 0; i < eventCardEventTypes.size(); i++) {
+            assertTrue((eventCardEventTypes.get(i).getText().equals("Tech")) || (eventCardEventTypes.get(i).getText().equals("Donation")));
         }
     }
 
@@ -1351,6 +1611,23 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         List<WebElement> eventCardTitles = home.getFilteredEventTitles();
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+
+        List<WebElement> eventCardDescriptions = home.getEventCardDescriptions();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertTrue((eventCardTitles.get(i).getText().toLowerCase().startsWith("ccc")) || eventCardDescriptions.get(i).getText().toLowerCase().contains("ccc"));
+        }
+
+        List<WebElement> eventDates = home.getEventCardDates();
+        for (int i = 0; i < eventDates.size(); i++) {
+            DateTimeFormatter formatterDate = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
+            LocalDateTime eventDate = LocalDateTime.parse(eventDates.get(i).getText(), formatterDate.withLocale(Locale.ENGLISH)).withHour(0).withMinute(0);
+            assertTrue((dateTimeStart.isBefore(eventDate) && dateTimeEnd.isAfter(eventDate)) || (dateTimeStart.isEqual(eventDate) || (dateTimeEnd.isEqual(eventDate))));
+        }
+
+        List<WebElement> eventLocations = home.getEventCardLocations();
+        for (int i = 0; i < eventLocations.size(); i++) {
+            assertEquals(eventLocations.get(i).getText().toLowerCase(), "gradiska");
         }
     }
 
@@ -1400,6 +1677,28 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         List<WebElement> eventCardTitles = home.getFilteredEventTitles();
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+
+        List<WebElement> eventCardDescriptions = home.getEventCardDescriptions();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertTrue((eventCardTitles.get(i).getText().toLowerCase().startsWith("ccc")) || eventCardDescriptions.get(i).getText().toLowerCase().contains("ccc"));
+        }
+
+        List<WebElement> eventDates = home.getEventCardDates();
+        for (int i = 0; i < eventDates.size(); i++) {
+            DateTimeFormatter formatterDate = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
+            LocalDateTime eventDate = LocalDateTime.parse(eventDates.get(i).getText(), formatterDate.withLocale(Locale.ENGLISH)).withHour(0).withMinute(0);
+            assertTrue((dateTimeStart.isBefore(eventDate) && dateTimeEnd.isAfter(eventDate)) || (dateTimeStart.isEqual(eventDate) || (dateTimeEnd.isEqual(eventDate))));
+        }
+
+        List<WebElement> eventCardEventTypes = home.getEventCardEventTypes();
+        for (int i = 0; i < eventCardEventTypes.size(); i++) {
+            assertTrue((eventCardEventTypes.get(i).getText().equals("Tech")) || (eventCardEventTypes.get(i).getText().equals("Donation")));
+        }
+
+        List<WebElement> eventLocations = home.getEventCardLocations();
+        for (int i = 0; i < eventLocations.size(); i++) {
+            assertEquals(eventLocations.get(i).getText().toLowerCase(), "nis");
         }
     }
 
@@ -1457,6 +1756,33 @@ public class SearchAndFilterEventsTest extends ChromeTestBase {
         List<WebElement> eventCardTitles = home.getFilteredEventTitles();
         for (int i = 0; i < eventCardTitles.size(); i++) {
             assertEquals(eventCardTitles.get(i).getText(), originalEventCardTitles.get(i));
+        }
+
+        List<WebElement> eventCardDescriptions = home.getEventCardDescriptions();
+        for (int i = 0; i < eventCardTitles.size(); i++) {
+            assertTrue((eventCardTitles.get(i).getText().toLowerCase().startsWith("ccc")) || eventCardDescriptions.get(i).getText().toLowerCase().contains("ccc"));
+        }
+
+        List<WebElement> eventDates = home.getEventCardDates();
+        for (int i = 0; i < eventDates.size(); i++) {
+            DateTimeFormatter formatterDate = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
+            LocalDateTime eventDate = LocalDateTime.parse(eventDates.get(i).getText(), formatterDate.withLocale(Locale.ENGLISH)).withHour(0).withMinute(0);
+            assertTrue((dateTimeStart.isBefore(eventDate) && dateTimeEnd.isAfter(eventDate)) || (dateTimeStart.isEqual(eventDate) || (dateTimeEnd.isEqual(eventDate))));
+        }
+
+        List<WebElement> eventCardEventTypes = home.getEventCardEventTypes();
+        for (int i = 0; i < eventCardEventTypes.size(); i++) {
+            assertTrue((eventCardEventTypes.get(i).getText().equals("Tech")) || (eventCardEventTypes.get(i).getText().equals("Donation")) || (eventCardEventTypes.get(i).getText().equals("EventType7")) || (eventCardEventTypes.get(i).getText().equals("EventType8")));
+        }
+
+        List<WebElement> eventLocations = home.getEventCardLocations();
+        for (int i = 0; i < eventLocations.size(); i++) {
+            assertEquals(eventLocations.get(i).getText().toLowerCase(), "gradiska");
+        }
+
+        List<WebElement> eventCardMaxParticipants = home.getEventCardMaxParticipants();
+        for (int i = 0; i < eventCardMaxParticipants.size(); i++) {
+            assertTrue(Integer.parseInt(eventCardMaxParticipants.get(i).getText()) <= 35);
         }
     }
 

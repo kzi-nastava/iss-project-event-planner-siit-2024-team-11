@@ -130,6 +130,26 @@ public class HomePage {
         return driver.findElements(By.cssSelector(".card_container > .title"));
     }
 
+    public List<WebElement> getEventCardDescriptions() {
+        return driver.findElements(By.cssSelector(".card_container > .description"));
+    }
+
+    public List<WebElement> getEventCardEventTypes() {
+        return driver.findElements(By.cssSelector(".card_container > #type"));
+    }
+
+    public List<WebElement> getEventCardMaxParticipants() {
+        return driver.findElements(By.cssSelector(".card_container > #max_participants"));
+    }
+
+    public List<WebElement> getEventCardLocations() {
+        return driver.findElements(By.cssSelector(".card_container > #location"));
+    }
+
+    public List<WebElement> getEventCardDates() {
+        return driver.findElements(By.cssSelector(".card_container > #date"));
+    }
+
     public void scrollToEvents() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(1));
         JavascriptExecutor js = (JavascriptExecutor) driver;
