@@ -29,7 +29,9 @@ public class ReservationValidator implements ConstraintValidator<ValidReservatio
     @Override
     public boolean isValid(ReservationDTO reservationDTO, ConstraintValidatorContext context) {
         // 1. Check if the selected event exists
-        if (eventService.getEvent(reservationDTO.getSelectedEventId()) == null) {
+        Event selectedEvent = eventService.getEvent(reservationDTO.getSelectedEventId());
+
+        if (selectedEvent == null) {
             context.buildConstraintViolationWithTemplate("Selected event does not exist.")
                     .addPropertyNode("selectedEventId")
                     .addConstraintViolation();
@@ -80,19 +82,7 @@ public class ReservationValidator implements ConstraintValidator<ValidReservatio
             return false;
         }
 
-        /* need to check the agenda for this
-        // 7. Check if the reservation falls within the Event's date range
-        Event selectedEvent = eventService.getEvent(reservationDTO.getSelectedEventId());
-        if (reservationDTO.getReservationStartDateTime().toLocalDate().isEqual(selectedEvent.getDate().toLocalDate()) ||
-            reservationDTO.getReservationEndDateTime().toLocalDate().isEqual(selectedEvent.getDate().toLocalDate())) {
-            context.buildConstraintViolationWithTemplate("Reservation time must be within the event's date range.")
-                    .addPropertyNode("reservationStartDateTime")
-                    .addConstraintViolation();
-            return false;
-        }
-        */
-
-        // 8. Check if the reservation overlaps with any existing reservations
+        // 7. Check if the reservation overlaps with any existing reservations
         List<Reservation> overlappingReservations = reservationService.findOverlappingReservations(reservationDTO);
         if (!overlappingReservations.isEmpty()) {
             context.buildConstraintViolationWithTemplate("The selected time overlaps with an existing reservation.")
@@ -101,7 +91,7 @@ public class ReservationValidator implements ConstraintValidator<ValidReservatio
             return false;
         }
 
-        // 9. Check for consistency between "From" and "To" fields if the service duration is fixed
+        // 8. Check for consistency between "From" and "To" fields if the service duration is fixed
         if (selectedService.getMinReservationTime().intValue() == selectedService.getMaxReservationTime().intValue()) {
             LocalDateTime calculatedEndTime = reservationDTO.getReservationStartDateTime().plusMinutes(selectedService.getMaxReservationTime());
             if (!reservationDTO.getReservationEndDateTime().equals(calculatedEndTime)) {
@@ -112,7 +102,13 @@ public class ReservationValidator implements ConstraintValidator<ValidReservatio
             }
         }
 
-        Event selectedEvent = eventService.getEvent(reservationDTO.getSelectedEventId());
+        // 9. Check if the event date is in the past
+        if (selectedEvent.getDate().isBefore(LocalDateTime.now())) {
+            context.buildConstraintViolationWithTemplate("Selected event is in the past.")
+                    .addPropertyNode("selectedEventId")
+                    .addConstraintViolation();
+            return false;
+        }
 
         // 10. Check if the reservation time is on the event date
         if (reservationDTO.getReservationStartDateTime().getYear() != selectedEvent.getDate().getYear() ||
@@ -121,13 +117,12 @@ public class ReservationValidator implements ConstraintValidator<ValidReservatio
             reservationDTO.getReservationEndDateTime().getYear() != selectedEvent.getDate().getYear() ||
             reservationDTO.getReservationEndDateTime().getMonth() != selectedEvent.getDate().getMonth() ||
             reservationDTO.getReservationEndDateTime().getDayOfMonth() != selectedEvent.getDate().getDayOfMonth()) {
-            //reservationDTO.getReservationStartDateTime().getHour() < selectedEvent.getDate().getHour() ||
-            //reservationDTO.getReservationEndDateTime().getHour() < selectedEvent.getDate().getHour()) {
             context.buildConstraintViolationWithTemplate("Reservation must be the same day as the event start date.")
                 .addPropertyNode("reservationStartDateTime")
                 .addConstraintViolation();
             return false;
         }
+
         return true;
     }
 }
