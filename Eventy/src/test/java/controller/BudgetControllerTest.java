@@ -198,4 +198,13 @@ public class BudgetControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
         ).andExpect(status().isNotFound());
     }
+
+    @Test
+    @Transactional
+    void removeBudgetItemSolution_CancellationDeadlineNotFarEnough_ReturnsNotFound() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/budget/item/3/solution/8")
+                .header("Authorization", "Bearer " + jwtToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+        ).andExpect(status().isNotFound());
+    }
 }

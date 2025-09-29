@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -171,7 +172,7 @@ public class BudgetItemServiceTest {
         when(budgetItemRepository.findById(1L)).thenReturn(Optional.of(budgetItem));
         when(budgetItemRepository.save(Mockito.any(BudgetItem.class))).thenReturn(budgetItem2);
 
-        boolean success = budgetItemService.deleteBudgetItemSolution(1L, solutionHistory.getId());
+        boolean success = budgetItemService.deleteBudgetItemSolution(1L, solutionHistory.getId(), LocalDateTime.now().plusDays(10));
 
         assertTrue(success);
 
@@ -183,7 +184,7 @@ public class BudgetItemServiceTest {
     void removeBudgetItemSolution_BudgetItemNotFound_ReturnsFalse() {
         when(budgetItemRepository.findById(1L)).thenReturn(Optional.empty());
 
-        boolean success = budgetItemService.deleteBudgetItemSolution(1L, 1L);
+        boolean success = budgetItemService.deleteBudgetItemSolution(1L, 1L, LocalDateTime.now().plusDays(10));
 
         assertFalse(success);
 
@@ -219,7 +220,43 @@ public class BudgetItemServiceTest {
         when(budgetItemRepository.findById(1L)).thenReturn(Optional.of(budgetItem));
         when(budgetItemRepository.save(Mockito.any(BudgetItem.class))).thenReturn(budgetItem2);
 
-        boolean success = budgetItemService.deleteBudgetItemSolution(1L, 2L);
+        boolean success = budgetItemService.deleteBudgetItemSolution(1L, 2L, LocalDateTime.now().plusDays(10));
+
+        assertFalse(success);
+
+        verify(budgetItemRepository, times(1)).findById(1L);
+        verify(budgetItemRepository, times(1)).save(Mockito.any(BudgetItem.class));
+    }
+
+    @Test
+    void removeBudgetItemSolution_CancellationDeadlineTooClose_ReturnsFalse() {
+        SolutionHistory solutionHistory = new SolutionHistory();
+        solutionHistory.setId(1L);
+        solutionHistory.setName("test");
+        solutionHistory.setDescription("test");
+        solutionHistory.setDiscount(0);
+        solutionHistory.setPrice(100.0);
+        solutionHistory.setCancellationDeadline(100);
+        solutionHistory.setProviderId(1L);
+
+        List<SolutionHistory> list = new ArrayList<>();
+        list.add(solutionHistory);
+        BudgetItem budgetItem = new BudgetItem();
+        budgetItem.setId(1L);
+        budgetItem.setCategory(null);
+        budgetItem.setPlannedFunds(100.0);
+        budgetItem.setReservedItems(list);
+
+        BudgetItem budgetItem2 = new BudgetItem();
+        budgetItem2.setId(1L);
+        budgetItem2.setCategory(null);
+        budgetItem2.setPlannedFunds(100.0);
+        budgetItem2.setReservedItems(new ArrayList<>());
+
+        when(budgetItemRepository.findById(1L)).thenReturn(Optional.of(budgetItem));
+        when(budgetItemRepository.save(Mockito.any(BudgetItem.class))).thenReturn(budgetItem2);
+
+        boolean success = budgetItemService.deleteBudgetItemSolution(1L, solutionHistory.getId(), LocalDateTime.now().plusDays(5));
 
         assertFalse(success);
 

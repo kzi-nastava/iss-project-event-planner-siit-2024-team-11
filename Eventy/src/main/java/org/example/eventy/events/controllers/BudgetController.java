@@ -174,7 +174,7 @@ public class BudgetController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        boolean isDeleted = budgetItemService.deleteBudgetItemSolution(budgetItemId, solutionHistoryId);
+        boolean isDeleted = budgetItemService.deleteBudgetItemSolution(budgetItemId, solutionHistoryId, budget.getEvent().getDate());
         if (isDeleted) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
