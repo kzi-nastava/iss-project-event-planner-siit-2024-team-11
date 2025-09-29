@@ -33,6 +33,7 @@ public class BudgetService {
     public Budget createBudget(Long eventId) {
         Budget budget = new Budget();
         Event relatedEvent = eventService.getEvent(eventId);
+        if (relatedEvent == null) { return null; }
 
         List<BudgetItem> items = new ArrayList<>();
         for (Category category : relatedEvent.getType().getRecommendedSolutionCategories())
@@ -56,8 +57,13 @@ public class BudgetService {
 
     public boolean deleteBudgetItemFromBudget(Budget budget, Long budgetItemId) {
         List<BudgetItem> items = budget.getBudgetedItems();
-        items.removeIf(v -> v.getId().equals(budgetItemId));
+        boolean success = items.removeIf(v -> v.getId().equals(budgetItemId));
+        if (!success) { return false; }
         budgetRepository.save(budget);
         return true;
+    }
+
+    public Budget getBudgetByBudgetItemId(Long budgetItemId) {
+        return budgetRepository.findWhichContainsBudgetItemId(budgetItemId).orElse(null);
     }
 }
