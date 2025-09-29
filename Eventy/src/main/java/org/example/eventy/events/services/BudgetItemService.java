@@ -21,12 +21,17 @@ public class BudgetItemService {
         budgetItem.setCategory(category);
         budgetItem.setPlannedFunds(allocatedFunds);
         budgetItem.setReservedItems(new ArrayList<>());
-        return budgetItemRepository.save(budgetItem);
+        try {
+            return budgetItemRepository.save(budgetItem);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public BudgetItem updateAllocatedFunds(Long id, Double allocatedFunds) {
         BudgetItem budgetItem = budgetItemRepository.findById(id).orElse(null);
         if (budgetItem == null) { return null; }
+        if (allocatedFunds < 0) { return null; }
         budgetItem.setPlannedFunds(allocatedFunds);
         return budgetItemRepository.save(budgetItem);
     }
@@ -47,7 +52,11 @@ public class BudgetItemService {
     }
 
     @Transactional
-    public void deleteBudgetItem(Long id) {
+    public boolean deleteBudgetItem(Long id) {
+        BudgetItem budgetItem = budgetItemRepository.findById(id).orElse(null);
+        if (budgetItem == null) { return false; }
+        if (!budgetItem.getReservedItems().isEmpty()) { return false; }
         budgetItemRepository.deleteById(id);
+        return true;
     }
 }
