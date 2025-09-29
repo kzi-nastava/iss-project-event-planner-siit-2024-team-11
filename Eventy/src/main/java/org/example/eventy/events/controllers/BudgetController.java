@@ -67,7 +67,7 @@ public class BudgetController {
     }
 
     @PostMapping(value = "/{eventId}/item/{categoryId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<BudgetItemDTO> createBudgetItem(@PathVariable Long eventId, @PathVariable Long categoryId, @RequestHeader(value = "Authorization", required = false) String token, @RequestBody Double allocatedFunds) {
+    public ResponseEntity<BudgetItemDTO> createBudgetItem(@PathVariable Long eventId, @PathVariable Long categoryId, @RequestHeader(value = "Authorization") String token, @RequestBody Double allocatedFunds) {
         User user = null;
         if(token != null) {
             token = token.substring(7);
@@ -79,8 +79,16 @@ public class BudgetController {
             }
         }
 
+        Event event = eventService.getEvent(eventId);
+        if (!event.getOrganiser().getId().equals(user.getId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
         Budget budget = budgetService.getBudget(eventId);
         Category category = solutionCategoryService.getCategory(categoryId);
+        if (category == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         BudgetItem budgetItem = budgetItemService.createBudgetItem(category, allocatedFunds);
         budgetService.addBudgetItem(budget, budgetItem);
 
@@ -88,16 +96,7 @@ public class BudgetController {
     }
 
     @DeleteMapping(value = "/{eventId}/item/{budgetItemId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> removeBudgetItem(@PathVariable Long eventId, @PathVariable Long budgetItemId, @RequestHeader(value = "Authorization", required = false) String token) {
-        Budget budget = budgetService.getBudget(eventId);
-        budgetService.deleteBudgetItemFromBudget(budget, budgetItemId);
-        budgetItemService.deleteBudgetItem(budgetItemId);
-
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    @PutMapping(value = "/item/{budgetItemId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<BudgetItemDTO> updateBudgetItemFunds(@PathVariable Long budgetItemId, @RequestBody Double allocatedFunds, @RequestHeader(value = "Authorization", required = false) String token) {
+    public ResponseEntity<Boolean> removeBudgetItem(@PathVariable Long eventId, @PathVariable Long budgetItemId, @RequestHeader(value = "Authorization") String token)    {
         User user = null;
         if(token != null) {
             token = token.substring(7);
@@ -107,6 +106,44 @@ public class BudgetController {
             }
             catch (Exception ignored) {
             }
+        }
+
+        Event event = eventService.getEvent(eventId);
+        if (event == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (!event.getOrganiser().getId().equals(user.getId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        Budget budget = budgetService.getBudget(eventId);
+
+        budgetService.deleteBudgetItemFromBudget(budget, budgetItemId);
+        if (budgetItemService.deleteBudgetItem(budgetItemId)) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @PutMapping(value = "/item/{budgetItemId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<BudgetItemDTO> updateBudgetItemFunds(@PathVariable Long budgetItemId, @RequestBody Double allocatedFunds, @RequestHeader(value = "Authorization") String token) {
+        User user = null;
+        if(token != null) {
+            token = token.substring(7);
+
+            try {
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
+        }
+
+        Budget budget = budgetService.getBudgetByBudgetItemId(budgetItemId);
+        if (budget == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (!budget.getEvent().getOrganiser().getId().equals(user.getId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         BudgetItem budgetItem = budgetItemService.updateAllocatedFunds(budgetItemId, allocatedFunds);
@@ -117,7 +154,26 @@ public class BudgetController {
     }
 
     @DeleteMapping(value = "/item/{budgetItemId}/solution/{solutionHistoryId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> removeBudgetItemSolution(@PathVariable Long budgetItemId, @PathVariable Long solutionHistoryId) {
+    public ResponseEntity<Boolean> removeBudgetItemSolution(@PathVariable Long budgetItemId, @PathVariable Long solutionHistoryId, @RequestHeader(value = "Authorization") String token) {
+        User user = null;
+        if(token != null) {
+            token = token.substring(7);
+
+            try {
+                user = userService.findByEmail(tokenUtils.getUsernameFromToken(token));
+            }
+            catch (Exception ignored) {
+            }
+        }
+
+        Budget budget = budgetService.getBudgetByBudgetItemId(budgetItemId);
+        if (budget == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (!budget.getEvent().getOrganiser().getId().equals(user.getId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
         boolean isDeleted = budgetItemService.deleteBudgetItemSolution(budgetItemId, solutionHistoryId);
         if (isDeleted) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
