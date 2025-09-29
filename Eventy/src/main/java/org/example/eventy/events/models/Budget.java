@@ -17,7 +17,7 @@ public class Budget {
     private List<BudgetItem> budgetedItems;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "event_id", referencedColumnName = "id")
+    @JoinColumn(name = "event_id", referencedColumnName = "id", nullable = false)
     private Event event;
 
     public Budget() {
