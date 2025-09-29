@@ -1,6 +1,7 @@
 package org.example.eventy.events.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import org.example.eventy.solutions.models.Category;
 import org.example.eventy.solutions.models.Solution;
 import org.example.eventy.solutions.models.SolutionHistory;
@@ -17,7 +18,7 @@ public class BudgetItem {
     private Long id;
 
     @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
-    @JoinColumn(name="category_id", referencedColumnName = "id")
+    @JoinColumn(name="category_id", referencedColumnName = "id", nullable = false)
     private Category category;
 
     @ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
@@ -25,6 +26,7 @@ public class BudgetItem {
     private List<SolutionHistory> reservedItems;
 
     @Column(nullable = false)
+    @Min(0)
     private double plannedFunds;
 
     public BudgetItem()
