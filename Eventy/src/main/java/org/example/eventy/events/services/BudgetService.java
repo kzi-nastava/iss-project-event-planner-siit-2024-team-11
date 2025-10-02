@@ -57,7 +57,7 @@ public class BudgetService {
 
     public boolean deleteBudgetItemFromBudget(Budget budget, Long budgetItemId) {
         List<BudgetItem> items = budget.getBudgetedItems();
-        boolean success = items.removeIf(v -> v.getId().equals(budgetItemId));
+        boolean success = items.removeIf(v -> v.getId().equals(budgetItemId) && v.getReservedItems().isEmpty());
         if (!success) { return false; }
         budgetRepository.save(budget);
         return true;
