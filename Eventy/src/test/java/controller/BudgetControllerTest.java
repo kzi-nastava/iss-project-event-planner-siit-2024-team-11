@@ -175,7 +175,7 @@ public class BudgetControllerTest {
     @Test
     @Transactional
     void removeBudgetItemSolution_AllValid_ReturnsNoContent() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/budget/item/3/solution/6")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/budget/item/3/solution/1")
                 .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
         ).andExpect(status().isNoContent());
@@ -193,7 +193,7 @@ public class BudgetControllerTest {
     @Test
     @Transactional
     void removeBudgetItemSolution_BudgetItemSolutionNotFound_ReturnsNotFound() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/budget/item/3/solution/1")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/budget/item/3/solution/2")
                 .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
         ).andExpect(status().isNotFound());

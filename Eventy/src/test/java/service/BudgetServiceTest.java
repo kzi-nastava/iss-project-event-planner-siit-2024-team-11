@@ -120,6 +120,7 @@ public class BudgetServiceTest {
     void removeBudgetItem_AllValid_ReturnsTrue() {
         BudgetItem budgetItem = new BudgetItem();
         budgetItem.setId(1L);
+        budgetItem.setReservedItems(new ArrayList<>());
 
         List<BudgetItem> list = new ArrayList<>();
         list.add(budgetItem);

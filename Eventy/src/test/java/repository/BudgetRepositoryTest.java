@@ -50,11 +50,11 @@ public class BudgetRepositoryTest {
 
         Budget budget = new Budget();
         budget.setBudgetedItems(budgetItems);
-        budget.setEvent(eventRepository.getReferenceById(1L));
+        budget.setEvent(eventRepository.getReferenceById(11L));
 
         budgetRepository.save(budget);
 
-        Budget repoBudget = budgetRepository.findByEventId(1L).orElse(null);
+        Budget repoBudget = budgetRepository.findByEventId(11L).orElse(null);
 
         assertThat(budget).usingRecursiveComparison().isEqualTo(repoBudget);
     }
@@ -79,7 +79,7 @@ public class BudgetRepositoryTest {
 
         Budget budget = new Budget();
         budget.setBudgetedItems(budgetItems);
-        budget.setEvent(eventRepository.getReferenceById(1L));
+        budget.setEvent(eventRepository.getReferenceById(11L));
 
         budgetRepository.save(budget);
 
