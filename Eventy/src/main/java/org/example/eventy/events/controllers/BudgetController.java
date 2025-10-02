@@ -118,8 +118,7 @@ public class BudgetController {
 
         Budget budget = budgetService.getBudget(eventId);
 
-        budgetService.deleteBudgetItemFromBudget(budget, budgetItemId);
-        if (budgetItemService.deleteBudgetItem(budgetItemId)) {
+        if (budgetService.deleteBudgetItemFromBudget(budget, budgetItemId)) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

@@ -46,7 +46,7 @@ public class BudgetItemService {
         BudgetItem budgetItem = budgetItemRepository.findById(id).orElse(null);
         if (budgetItem == null) { return false; }
         int lengthBefore = budgetItem.getReservedItems().size();
-        budgetItem.getReservedItems().removeIf(v -> (v.getId() == solutionHistoryId && (v.getCancellationDeadline() == null || eventDate.plusDays(v.getCancellationDeadline()).isBefore(LocalDateTime.now()))));
+        budgetItem.getReservedItems().removeIf(v -> (v.getId() == solutionHistoryId && (v.getCancellationDeadline() == null || LocalDateTime.now().plusDays(v.getCancellationDeadline()).isBefore(eventDate))));
         budgetItemRepository.save(budgetItem);
         int lengthAfter = budgetItem.getReservedItems().size();
         return lengthBefore != lengthAfter;
