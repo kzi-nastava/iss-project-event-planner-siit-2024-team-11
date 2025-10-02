@@ -185,6 +185,7 @@ INSERT INTO budget_items (id, category_id, planned_funds)
 VALUES
     (DEFAULT, 1, 300.00),
     (DEFAULT, 2, 200.00),
+    (DEFAULT, 3, 500.00),
     (DEFAULT, 3, 500.00);
 
 -- Budgets
@@ -199,8 +200,13 @@ VALUES
     (DEFAULT, 7),
     (DEFAULT, 8),
     (DEFAULT, 9),
-    (DEFAULT, 10),
-    (DEFAULT, 11);
+    (DEFAULT, 10);
 
 UPDATE budget_items SET budget_item_id = 1 WHERE id IN (1, 2);
-UPDATE budget_items SET budget_item_id = 2 WHERE id = 3;
+UPDATE budget_items SET budget_item_id = 3 WHERE id IN (3, 4);
+
+INSERT INTO reserved_items (budget_item_id, solution_history_id)
+VALUES
+    (3, 1),
+    (3, 7),
+    (3, 8);

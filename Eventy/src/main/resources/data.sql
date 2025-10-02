@@ -80,7 +80,8 @@ VALUES
     (DEFAULT, 4, 'Photography', 'Wedding photography package', 99.99, 15, 15),
     (DEFAULT, 4, 'Training', 'Personal training session', 149.99, 20, 12),
     (DEFAULT, 4, 'Event Planning', 'Event planning service', 199.99, 10, 7),
-    (DEFAULT, 3, 'Cleaning', 'House cleaning service', 79.99, 25, 17);
+    (DEFAULT, 3, 'Cleaning', 'House cleaning service', 79.99, 25, 17),
+    (DEFAULT, 3, 'TestBadService', 'TestService', 109.99, 0, 170000);
 
 -- Solutions
 INSERT INTO solutions (
@@ -97,7 +98,7 @@ VALUES
     (15, 15, FALSE, FALSE, TRUE, 240, 60, 99.99, 7, 0, 2, DEFAULT, 5, 4, 'Service', 'Wedding photography package', 'Photography', 'Includes editing and delivery in 2 weeks'),
     (12, 20, TRUE, FALSE, TRUE, 180, 30, 149.99, 0, 1, 3, DEFAULT, 6, 4, 'Service', 'Personal training session', 'Training', 'One-on-one session with certified trainer'),
     (7, 10, TRUE, FALSE, TRUE, 300, 90, 199.99, 14, 1, 2, DEFAULT, 7, 4, 'Service', 'Event planning service', 'Event Planning', 'Full-service planning and coordination'),
-    (17, 25, TRUE, FALSE, TRUE, 60, 60, 79.99, 14, 0, 3, DEFAULT, 8, 3, 'Service', 'House cleaning service', 'Cleaning', 'Deep cleaning for apartments and houses');
+    (17, 25, TRUE, FALSE, TRUE, 60, 60, 79.99, 14, 0, 1, DEFAULT, 8, 3, 'Service', 'House cleaning service', 'Cleaning', 'Deep cleaning for apartments and houses');
 
 -- Pictures
 INSERT INTO pictures
@@ -182,7 +183,9 @@ INSERT INTO budget_items (id, category_id, planned_funds)
 VALUES
     (DEFAULT, 1, 300.00),
     (DEFAULT, 2, 200.00),
-    (DEFAULT, 3, 500.00);
+    (DEFAULT, 3, 500.00),
+    (DEFAULT, 1, 500.00),
+    (DEFAULT, 2, 1000.00);
 
 -- Reserved Items for BudgetItems
 INSERT INTO reserved_items (budget_item_id, solution_history_id)
@@ -191,19 +194,23 @@ VALUES
     (2, 5), -- Wedding Photography
     (3, 6), -- Personal Training
     (3, 7), -- Event Planning
-    (3, 8); -- House Cleaning
+    (3, 8), -- House Cleaning
+    (4, 4),
+    (5, 9);
 
 -- Budgets
 INSERT INTO budgets (id, event_id)
 VALUES
     (DEFAULT, 1),
-    (DEFAULT, 2);
+    (DEFAULT, 2),
+    (DEFAULT, 3);
 
 -- Link budget items to budgets (this is implicit via OneToMany + JoinColumn on budgetitems.budget_item_id)
 -- So we add this by updating the foreign key in BudgetItem (assuming the column is budget_id; if not, adjust accordingly)
 
 UPDATE budget_items SET budget_item_id = 1 WHERE id IN (1, 2);
 UPDATE budget_items SET budget_item_id = 2 WHERE id = 3;
+UPDATE budget_items SET budget_item_id = 3 WHERE id IN (4, 5);
 
 -- Insert sample reservations into the Reservations table
 INSERT INTO reservations (selected_event_id, selected_service_id, reservation_start_date_time, reservation_end_date_time, notification_sent) VALUES
